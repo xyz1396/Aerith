@@ -1,0 +1,5 @@
+^LICENSE\.md$
+^\.vscode$
+^.*\.Rproj$
+^\.Rproj\.user$
+^rmd$

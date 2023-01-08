@@ -12,6 +12,7 @@ You can download the source package in release to install or install from github
 ```r
 library(devtools)
 install_github("xyz1396/Aerith")
+library(Aerith)
 ```
 
 ### Read and write Mass spectrum scan

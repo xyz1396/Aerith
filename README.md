@@ -3,7 +3,7 @@
 
 ![Aerith](./png/logo.png)
 
-Aerith, as the last surviving Cetra, or "Ancient", can talk to the planet in Final Fantasy VII. In SIP (stable isotope probe) or other stable isotope analysis, we are talking earth or even the universe by element's isotope. This R package, Aerith provides interfaces to read and write Mass spectrum scan, calculate theorotic isotopic peak envelope of peptide precursor and its B Y ions, score and visualize the PSM (peptide and spectra match), and visualize the TIC (total ion current) by Rcpp.
+Aerith, as the last surviving Cetra, or "Ancient", can talk to the planet in Final Fantasy VII. In SIP (stable isotope probe) or other stable isotope analysis, we are talking to the earth or even the universe by element's isotope. This R package, Aerith provides interfaces to read and write Mass spectrum scan, calculate theorotic isotopic peak envelope of peptide precursor and its B Y ions, score and visualize the PSM (peptide and spectra match), and visualize the TIC (total ion current) by Rcpp.
 
 ### Install 
 

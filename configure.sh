@@ -6,6 +6,9 @@ case $1 in
 "cleanProject")
 	rm -r .Rproj.user/*
 	;;
+"copy2Git")
+	rsync -a --exclude 'rmd' ./* '/mnt/d/work/202301/Aerith for github'
+	;;
 *)
 	mkdir ~/.R
 	touch ~/.R/Makevars

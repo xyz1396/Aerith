@@ -3,6 +3,49 @@
 
 using namespace Rcpp;
 
+// [[Rcpp::export]]
+NumericVector rankyfify(NumericVector a)
+{
+    ftFileWriter writer;
+    vector<double> b = as<vector<double>>(a);
+    return wrap(writer.rankify(b));
+}
+
+//' denoise one MS2 scan has charge
+//' @param scanList a list of one MS2 scan has charge
+//' @param window a float of mz window size for denoise
+//' @param step a float of mz step for denoise
+//' @param threshold a float of top N threshold for denoise
+//' @return a denoised MS2 scan has charge
+//' @examples
+//' ft2 <- readAllScanMS2("demo.ft2")
+//' ms2 <- denoiseOneMS2ScanHasCharge(ft2[1], 100, 10, 25)
+//' @export
+// [[Rcpp::export]]
+List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float threshold)
+{
+    ftFileWriter writer;
+    Scan scan;
+    DataFrame peaks;
+    List newScanList = clone(scanList);
+    peaks = scanList["peaks"];
+    scan.mz = as<vector<double>>(peaks["mz"]);
+    scan.intensity = as<vector<double>>(peaks["intensity"]);
+    scan.resolution = as<vector<int>>(peaks["resolution"]);
+    scan.baseLine = as<vector<float>>(peaks["baseLine"]);
+    scan.signalToNoise = as<vector<float>>(peaks["signalToNoise"]);
+    scan.charge = as<vector<int>>(peaks["charge"]);
+    writer.denoiseMS2ScanHasCharge(scan, window, step, threshold);
+    DataFrame newPeaks = DataFrame::create(Named("mz") = scan.mz,
+                                         _["intensity"] = scan.intensity,
+                                         _["resolution"] = scan.resolution,
+                                         _["baseLine"] = scan.baseLine,
+                                         _["signalToNoise"] = scan.signalToNoise,
+                                         _["charge"] = scan.charge);
+    newScanList["peaks"] = newPeaks;
+    return newScanList;
+}
+
 //' write all MS2 scans has charge
 //' @param header a list of FT file header
 //' @param scans a list of scans for output

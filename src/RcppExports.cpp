@@ -359,6 +359,31 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rankyfify
+NumericVector rankyfify(NumericVector a);
+RcppExport SEXP _Aerith_rankyfify(SEXP aSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type a(aSEXP);
+    rcpp_result_gen = Rcpp::wrap(rankyfify(a));
+    return rcpp_result_gen;
+END_RCPP
+}
+// denoiseOneMS2ScanHasCharge
+List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float threshold);
+RcppExport SEXP _Aerith_denoiseOneMS2ScanHasCharge(SEXP scanListSEXP, SEXP windowSEXP, SEXP stepSEXP, SEXP thresholdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type scanList(scanListSEXP);
+    Rcpp::traits::input_parameter< float >::type window(windowSEXP);
+    Rcpp::traits::input_parameter< float >::type step(stepSEXP);
+    Rcpp::traits::input_parameter< float >::type threshold(thresholdSEXP);
+    rcpp_result_gen = Rcpp::wrap(denoiseOneMS2ScanHasCharge(scanList, window, step, threshold));
+    return rcpp_result_gen;
+END_RCPP
+}
 // writeAllScanMS2
 bool writeAllScanMS2(List header, List scansList, CharacterVector ftFile);
 RcppExport SEXP _Aerith_writeAllScanMS2(SEXP headerSEXP, SEXP scansListSEXP, SEXP ftFileSEXP) {
@@ -402,6 +427,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_scorePSMold", (DL_FUNC) &_Aerith_scorePSMold, 6},
     {"_Aerith_calc_sum", (DL_FUNC) &_Aerith_calc_sum, 1},
     {"_Aerith_test_ftFileReader", (DL_FUNC) &_Aerith_test_ftFileReader, 1},
+    {"_Aerith_rankyfify", (DL_FUNC) &_Aerith_rankyfify, 1},
+    {"_Aerith_denoiseOneMS2ScanHasCharge", (DL_FUNC) &_Aerith_denoiseOneMS2ScanHasCharge, 4},
     {"_Aerith_writeAllScanMS2", (DL_FUNC) &_Aerith_writeAllScanMS2, 3},
     {NULL, NULL, 0}
 };

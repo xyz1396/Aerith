@@ -261,6 +261,24 @@ test_ftFileReader <- function(ftFile) {
     invisible(.Call(`_Aerith_test_ftFileReader`, ftFile))
 }
 
+rankyfify <- function(a) {
+    .Call(`_Aerith_rankyfify`, a)
+}
+
+#' denoise one MS2 scan has charge
+#' @param scanList a list of one MS2 scan has charge
+#' @param window a float of mz window size for denoise
+#' @param step a float of mz step for denoise
+#' @param threshold a float of top N threshold for denoise
+#' @return a denoised MS2 scan has charge
+#' @examples
+#' ft2 <- readAllScanMS2("demo.ft2")
+#' ms2 <- denoiseOneMS2ScanHasCharge(ft2[1], 100, 10, 25)
+#' @export
+denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
+    .Call(`_Aerith_denoiseOneMS2ScanHasCharge`, scanList, window, step, threshold)
+}
+
 #' write all MS2 scans has charge
 #' @param header a list of FT file header
 #' @param scans a list of scans for output

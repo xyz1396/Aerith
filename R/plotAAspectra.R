@@ -136,6 +136,34 @@ getSipBYionSpectra <-
     return(AAsOBJ)
   }
 
+#' Convert one scan in list format to AAspectra class
+#'
+#' @param scan one scan in list format
+#'
+#' @return AAspectra object
+#' @export
+#'
+#' @examples
+#' a <- readAllScanMS2("demo.FT2")
+#' b <- getRealScanFromList(a[[1]])
+#' plot(b)
+getRealScanFromList <- function(scan)
+{
+  maxProb <- max(scan$peaks$intensity)
+  BYreal <- data.frame(
+    Mass = scan$peaks$mz,
+    Prob = scan$peaks$intensity / maxProb * 100,
+    Kind = "Real",
+    MZ = scan$peaks$mz,
+    Charge = 1
+  )
+  AAsOBJ <- new("AAspectra",
+                spectra = BYreal,
+                charges = 1,
+                AAstr = "Unknown")
+  return(AAsOBJ)
+}
+
 #' Convert one scan with charges=1 normalized by highest peak in scans list of ft file to AAspectra class
 #'
 #' @param scanNumber ScanNumber of one scan
@@ -151,19 +179,7 @@ getSipBYionSpectra <-
 getRealScan <- function(scanNumber, ft)
 {
   scan <- ft[[paste0("", scanNumber)]]
-  maxProb <- max(scan$peaks$intensity)
-  BYreal <- data.frame(
-    Mass = scan$peaks$mz,
-    Prob = scan$peaks$intensity / maxProb * 100,
-    Kind = "Real",
-    MZ = scan$peaks$mz,
-    Charge = 1
-  )
-  AAsOBJ <- new("AAspectra",
-                spectra = BYreal,
-                charges = 1,
-                AAstr = "Unknown")
-  return(AAsOBJ)
+  return(getRealScanFromList(scan))
 }
 
 #' Convert one scan in scans with real charges list of ft file to AAspectra class
@@ -241,7 +257,7 @@ plot.AAspectra <- function(x) {
           fill = NA,
           color = "grey10",
           linetype = 1,
-          size = 0.5
+          linewidth = 0.5
         ),
         text = ggplot2::element_text(size = 15)
       ) +
@@ -249,7 +265,7 @@ plot.AAspectra <- function(x) {
       ggplot2::ylab("Intensity") +
       ggplot2::guides(color = ggplot2::guide_legend(override.aes =
                                                       list(
-                                                        size = 5, fill =
+                                                        linewidth = 5, fill =
                                                           NA
                                                       )))
   )
@@ -328,7 +344,7 @@ plotRealScan <- function(spect)
       drawDf,
       inherit.aes = F,
       color = "red",
-      size = 0.1
+      linewidth = 0.1
     )
   )
 }

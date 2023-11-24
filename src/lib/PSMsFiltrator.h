@@ -1,22 +1,24 @@
 #pragma once
-#include "sipFileReader.h"
+#include "sipPSM.h"
 #include <tuple>
+#include <unordered_map>
 
-struct alignas(64) sipPSMinfo : sipPSM
+class alignas(64) sipPSMinfo : public sipPSM
 {
-    vector<float> retentionTimes;
-    vector<bool> isDecoys;
+public:
+    std::vector<float> retentionTimes;
+    std::vector<bool> isDecoys;
     // sip abundance
-    vector<int> pcts;
-    vector<int> pepLengths;
-    vector<int> proCounts;
-    vector<string> psmIDs;
-    vector<string> trimedProteinNames;
-    vector<string> realPepSeqs;
-    vector<string> formatedPepSeqs;
+    std::vector<int> pcts;
+    std::vector<int> pepLengths;
+    std::vector<int> proCounts;
+    std::vector<std::string> psmIDs;
+    std::vector<std::string> trimedProteinNames;
+    std::vector<std::string> realPepSeqs;
+    std::vector<std::string> formatedPepSeqs;
     // for accurate isotopic abundance calculation and quantify
-    vector<vector<double>> precursorIsotopicMasses;
-    vector<vector<double>> precursorIsotopicIntensities;
+    std::vector<std::vector<double>> precursorIsotopicMasses;
+    std::vector<std::vector<double>> precursorIsotopicIntensities;
 };
 
 class PSMsFiltrator
@@ -24,21 +26,21 @@ class PSMsFiltrator
 private:
 public:
     float FDRthreshold;
-    string sipPath, ftPath;
-    vector<string> tokens;
-    PSMsFiltrator(const string &msipPath, const string &mftPath);
-    PSMsFiltrator(const string &workPath);
+    std::string sipPath, ftPath;
+    std::vector<std::string> tokens;
+    PSMsFiltrator(const std::string &msipPath, const std::string &mftPath);
+    PSMsFiltrator(const std::string &workPath);
     ~PSMsFiltrator();
-    void splitString(const string &mString);
+    void splitString(const std::string &mString);
     // <proCount,isDecoy,protein name without fake decoy>
-    tuple<int, bool, string> detectProDecoy(const string &proteinName);
+    std::tuple<int, bool, std::string> detectProDecoy(const std::string &proteinName);
     float getRentionTime();
-    int getPct(const string &searchName);
+    int getPct(const std::string &searchName);
     // <pepLength, pepSeq in "[]", formated peptide seq for percolator>
-    tuple<int, string, string> getRealPep(const string &pepSeq);
+    std::tuple<int, std::string, std::string> getRealPep(const std::string &pepSeq);
     // <precursorIsotopicMass, precursorIsotopicIntensity>
-    pair<vector<double>, vector<double>> getPrecursorIsotopicPeak();
+    std::pair<std::vector<double>, std::vector<double>> getPrecursorIsotopicPeak();
     void writePercolatorTSV();
     void readPercolatorTSV();
-    sipPSMinfo convertFilesScansTopPSMs(const unordered_map<string, unordered_map<int, vector<topPSM>>> &filesScansTopPSMs);
+    sipPSMinfo convertFilesScansTopPSMs(const std::unordered_map<std::string, std::unordered_map<int, std::vector<scanTopPSM>>> &filesScansTopPSMs);
 };

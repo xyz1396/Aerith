@@ -89,6 +89,40 @@ precursor_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
     .Call(`_Aerith_precursor_peak_calculator_DIY`, AAstr, Atom, Prob)
 }
 
+#' Simple calculator of CHONPS atom count of peptide
+#' @param AAstr a CharacterVector of peptides
+#' @return a dataframe of CHONPS atom count each row is for one peptide
+#' @export
+#' @examples
+#' df <- calPepAtomCount(c("HKFL","ADCH"))
+calPepAtomCount <- function(AAstrs) {
+    .Call(`_Aerith_calPepAtomCount`, AAstrs)
+}
+
+#' Simple calculator of peptide precursor mass by binomial NP
+#' @param AAstr a CharacterVector of peptides
+#' @param Atom a Character of "C13", "H2", "O18", or "N15"
+#' @param Probs a NumericVector with the same length of AAstr for SIP abundances
+#' @return a vector of peptide precursor masses
+#' @export
+#' @examples
+#' masses <- calPepPrecursorMass(c("HKFL", "ADCH"), "C13", c(0.2, 0.3))
+calPepPrecursorMass <- function(AAstrs, Atom, Probs) {
+    .Call(`_Aerith_calPepPrecursorMass`, AAstrs, Atom, Probs)
+}
+
+#' Simple calculator neutron mass by average delta mass of each isotope
+#' @param AAstr a CharacterVector of peptides
+#' @param Atom a Character of "C13", "H2", "O18", or "N15"
+#' @param Probs a NumericVector with the same length of AAstr for SIP abundances
+#' @return a vector of peptide neutron masses
+#' @export
+#' @examples
+#' masses <- calPepNeutronMass(c("HKFL", "ADCH"), "C13", c(0.2, 0.3))
+calPepNeutronMass <- function(AAstrs, Atom, Probs) {
+    .Call(`_Aerith_calPepNeutronMass`, AAstrs, Atom, Probs)
+}
+
 #' Simple peak calculator of user defined isotopic distribution of one peptide by averagine
 #' @param AAstr a CharacterVector of peptides
 #' @param Atom a CharacterVector C13 or N15
@@ -193,14 +227,59 @@ readFilesScansTopPSMs <- function(workingPath, topN) {
 
 #' readFilesScansTopPSMsFromOneFT2 read each scan's top PSMs from multiple .sip files of one .FT2 file
 #' @param workingPath a full path with .sip files in it
-#' @param pattern a regex pattern of the .Ft2 file
+#' @param pattern a regex pattern of the .FT2 file
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @return a dataframe of top N PSMs
 #' @examples
-#' top3 <-  readFilesScansTopPSMsFromOneFT2(".", "demo1", 3)
+#' top3 <-  readFilesScansTopPSMsFromOneFT2(".", ".*demo1.*", 3)
 #' @export
 readFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN) {
     .Call(`_Aerith_readFilesScansTopPSMsFromOneFT2`, workingPath, pattern, topN)
+}
+
+#' readSpe2Pep
+#' @param Spe2PepFile a .Spe2PepFile file's full path
+#' @return the PSMs in a dataframe in a list
+#' @examples
+#' psm <- readSpe2Pep("test.Spe2Pep.txt")
+#' psm <- psm$PSM
+#' @export
+readSpe2Pep <- function(Spe2PepFile) {
+    .Call(`_Aerith_readSpe2Pep`, Spe2PepFile)
+}
+
+#' readSpe2Peps
+#' @param workingPath a full path with .Spe2Pep.txt files in it
+#' @return the PSMs dataframes in lists
+#' @examples
+#' psm <- readSpe2Peps("testDir")
+#' psm <- psm[[1]]$PSM
+#' @export
+readSpe2Peps <- function(workingPath) {
+    .Call(`_Aerith_readSpe2Peps`, workingPath)
+}
+
+#' readSpe2PepFilesScansTopPSMs read each scan's top PSMs from multiple .Spe2Pep.txt files
+#' @param workingPath a full path with .Spe2Pep.txt files in it
+#' @param topN store top N PSMs of each scan of one .FT2 file
+#' @return the PSMs in a dataframe in a list
+#' @examples
+#' psm <- readSpe2PepFilesScansTopPSMs("testDir")
+#' @export
+readSpe2PepFilesScansTopPSMs <- function(workingPath, topN = 5L) {
+    .Call(`_Aerith_readSpe2PepFilesScansTopPSMs`, workingPath, topN)
+}
+
+#' readSpe2PepFilesScansTopPSMsFromOneFT2 read each scan's top PSMs from multiple .Spe2PepFile.txt files of one .FT2 file
+#' @param workingPath a full path with .Spe2PepFile.txt files in it
+#' @param pattern a regex pattern of the .FT2 file
+#' @param topN store top N PSMs of each scan of one .FT2 file
+#' @return a dataframe of top N PSMs
+#' @examples
+#' top3 <-  readSpe2PepFilesScansTopPSMsFromOneFT2("testDir", ".*demo1.*", 3)
+#' @export
+readSpe2PepFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN = 5L) {
+    .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2`, workingPath, pattern, topN)
 }
 
 #' scoreIntensity

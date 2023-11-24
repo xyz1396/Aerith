@@ -5,7 +5,7 @@ peptideInfo::peptideInfo(bool mIsDecoy, float mBestScore)
 {
 }
 
-peptidesFiltrator::peptidesFiltrator(const vector<sipPSM> &sipPSMs, float mFDRthreshold)
+peptidesFiltrator::peptidesFiltrator(const std::vector<sipPSM> &sipPSMs, float mFDRthreshold)
 	: FDRthreshold(mFDRthreshold)
 {
 	for (sipPSM psm : sipPSMs)
@@ -35,9 +35,9 @@ peptidesFiltrator::~peptidesFiltrator()
 {
 }
 
-void peptidesFiltrator::splitString(const string mString)
+void peptidesFiltrator::splitString(const std::string mString)
 {
-	string sep = ",";
+	std::string sep = ",";
 	size_t start = 0;
 	size_t end = mString.find(sep);
 	tokens.clear();
@@ -50,10 +50,10 @@ void peptidesFiltrator::splitString(const string mString)
 	tokens.push_back(mString.substr(start));
 }
 
-void peptidesFiltrator::initFillPeptideMap(const string &pepSeq,
+void peptidesFiltrator::initFillPeptideMap(const std::string &pepSeq,
 									   const float score,
-									   const string &proName,
-									   unordered_map<string, peptideInfo> &mMap)
+									   const std::string &proName,
+									   std::unordered_map<std::string, peptideInfo> &mMap)
 {
 	auto pepIX = mMap.find(pepSeq);
 	if (pepIX != mMap.end())
@@ -77,12 +77,12 @@ void peptidesFiltrator::initFillPeptideMap(const string &pepSeq,
 	}
 }
 
-bool peptidesFiltrator::detectDecoy(const string &proteinName)
+bool peptidesFiltrator::detectDecoy(const std::string &proteinName)
 {
 	// remove {} out of protein names then split it
 	splitString(proteinName.substr(1, proteinName.size() - 2));
 	// if one protein is not decoy the peptide is not decoy
-	for (string token : tokens)
+	for (std::string token : tokens)
 	{
 		if (token.substr(0, 4) != "Rev_")
 			return false;
@@ -91,9 +91,9 @@ bool peptidesFiltrator::detectDecoy(const string &proteinName)
 }
 
 void peptidesFiltrator::
-	sortPeptideBestScore(const unordered_map<string, peptideInfo> &mPepMap, vector<pair<float, bool>> &bestScoreDecoyPairs)
+	sortPeptideBestScore(const std::unordered_map<std::string, peptideInfo> &mPepMap, std::vector<std::pair<float, bool>> &bestScoreDecoyPairs)
 {
-	// convert unordered_map to vector of pairs
+	// convert std::unordered_map to vector of pairs
 	bestScoreDecoyPairs.clear();
 	bestScoreDecoyPairs.resize(mPepMap.size());
 	size_t i = 0;
@@ -104,15 +104,15 @@ void peptidesFiltrator::
 	}
 	// descending sort
 	sort(bestScoreDecoyPairs.begin(), bestScoreDecoyPairs.end(),
-		 [](const pair<float, bool> &a, const pair<float, bool> &b) -> bool
+		 [](const std::pair<float, bool> &a, const std::pair<float, bool> &b) -> bool
 		 {
 			 return a.first > b.first;
 		 });
 }
 
-void peptidesFiltrator::sortPeptideAllScore(const unordered_map<string, peptideInfo> &mPepMap, vector<pair<float, pair<string, bool>>> &scoreDecoyPairs)
+void peptidesFiltrator::sortPeptideAllScore(const std::unordered_map<std::string, peptideInfo> &mPepMap, std::vector<std::pair<float, std::pair<std::string, bool>>> &scoreDecoyPairs)
 {
-	// convert unordered_map to vector of pairs
+	// convert std::unordered_map to std::vector of std::pairs
 	scoreDecoyPairs.clear();
 	for (auto &pepIX : mPepMap)
 	{
@@ -123,17 +123,17 @@ void peptidesFiltrator::sortPeptideAllScore(const unordered_map<string, peptideI
 	}
 	// descending sort
 	sort(scoreDecoyPairs.begin(), scoreDecoyPairs.end(),
-		 [](const pair<float, pair<string, bool>> &a, const pair<float, pair<string, bool>> &b) -> bool
+		 [](const std::pair<float, std::pair<std::string, bool>> &a, const std::pair<float, std::pair<std::string, bool>> &b) -> bool
 		 {
 			 return a.first > b.first;
 		 });
 }
 
-tuple<size_t, size_t, float> peptidesFiltrator::getDecoyCountScoreThreshold(vector<pair<float, bool>> &bestScoreDecoyPairs)
+std::tuple<size_t, size_t, float> peptidesFiltrator::getDecoyCountScoreThreshold(std::vector<std::pair<float, bool>> &bestScoreDecoyPairs)
 {
 	size_t decoyCount = 0;
-	vector<float> FDRs(bestScoreDecoyPairs.size());
-	vector<int> decoyCounts(bestScoreDecoyPairs.size());
+	std::vector<float> FDRs(bestScoreDecoyPairs.size());
+	std::vector<int> decoyCounts(bestScoreDecoyPairs.size());
 	for (size_t i = 0; i < bestScoreDecoyPairs.size(); i++)
 	{
 		if (bestScoreDecoyPairs[i].second)
@@ -151,17 +151,17 @@ tuple<size_t, size_t, float> peptidesFiltrator::getDecoyCountScoreThreshold(vect
 			return {decoyCounts[i], i, bestScoreDecoyPairs[i].first};
 	}
 	// if Cannot find FDRthreshold
-	cout << "Cannot find FDRthreshold" << endl;
+	std::cout << "Cannot find FDRthreshold" << std::endl;
 	return {0, 0, 0};
 }
 
-tuple<size_t, size_t, float> peptidesFiltrator::getDecoyCountScoreThreshold(vector<pair<float, pair<string, bool>>> &scoreDecoyPairs)
+std::tuple<size_t, size_t, float> peptidesFiltrator::getDecoyCountScoreThreshold(std::vector<std::pair<float, std::pair<std::string, bool>>> &scoreDecoyPairs)
 {
-	vector<int> pepCounts(scoreDecoyPairs.size());
-	vector<int> decoyCounts(scoreDecoyPairs.size());
-	unordered_set<string> pepSeqs;
-	unordered_set<string> decoySeqs;
-	vector<float> FDRs(scoreDecoyPairs.size());
+	std::vector<int> pepCounts(scoreDecoyPairs.size());
+	std::vector<int> decoyCounts(scoreDecoyPairs.size());
+	std::unordered_set<std::string> pepSeqs;
+	std::unordered_set<std::string> decoySeqs;
+	std::vector<float> FDRs(scoreDecoyPairs.size());
 	size_t i = 0;
 	for (auto ix : scoreDecoyPairs)
 	{
@@ -182,28 +182,28 @@ tuple<size_t, size_t, float> peptidesFiltrator::getDecoyCountScoreThreshold(vect
 			return {decoyCounts[i], pepCounts[i], scoreDecoyPairs[i].first};
 	}
 	// if Cannot find FDRthreshold
-	cout << "Cannot find FDRthreshold" << endl;
+	std::cout << "Cannot find FDRthreshold" << std::endl;
 	return {0, 0, 0};
 }
 
 void peptidesFiltrator::filterPeptideMap()
 {
 	// temp bestScoreDecoyPairs for sort
-	// vector<pair<float, bool>> bestScoreDecoyPairs;
+	// std::vector<std::pair<float, bool>> bestScoreDecoyPairs;
 	// sortPeptideBestScore(peptideMapCharge2, bestScoreDecoyPairs);
-	// tie(decoyCountCharge2, pepCountCharge2, scoreThresholdCharge2) = getDecoyCountScoreThreshold(bestScoreDecoyPairs);
+	// std::tie(decoyCountCharge2, pepCountCharge2, scoreThresholdCharge2) = getDecoyCountScoreThreshold(bestScoreDecoyPairs);
 	// sortPeptideBestScore(peptideMapCharge3, bestScoreDecoyPairs);
-	// tie(decoyCountCharge3, pepCountCharge3, scoreThresholdCharge3) = getDecoyCountScoreThreshold(bestScoreDecoyPairs);
+	// std::tie(decoyCountCharge3, pepCountCharge3, scoreThresholdCharge3) = getDecoyCountScoreThreshold(bestScoreDecoyPairs);
 	// sortPeptideBestScore(peptideMapChargeLargerThan3, bestScoreDecoyPairs);
-	// tie(decoyCountChargeLargerThan3, pepCountChargeLargerThan3, scoreThresholdChargeLargerThan3) = getDecoyCountScoreThreshold(bestScoreDecoyPairs);
+	// std::tie(decoyCountChargeLargerThan3, pepCountChargeLargerThan3, scoreThresholdChargeLargerThan3) = getDecoyCountScoreThreshold(bestScoreDecoyPairs);
 
-	vector<pair<float, pair<string, bool>>> scoreDecoyPairs;
+	std::vector<std::pair<float, std::pair<std::string, bool>>> scoreDecoyPairs;
 	sortPeptideAllScore(peptideMapCharge2, scoreDecoyPairs);
-	tie(decoyCountCharge2, pepCountCharge2, scoreThresholdCharge2) = getDecoyCountScoreThreshold(scoreDecoyPairs);
+	std::tie(decoyCountCharge2, pepCountCharge2, scoreThresholdCharge2) = getDecoyCountScoreThreshold(scoreDecoyPairs);
 	sortPeptideAllScore(peptideMapCharge3, scoreDecoyPairs);
-	tie(decoyCountCharge3, pepCountCharge3, scoreThresholdCharge3) = getDecoyCountScoreThreshold(scoreDecoyPairs);
+	std::tie(decoyCountCharge3, pepCountCharge3, scoreThresholdCharge3) = getDecoyCountScoreThreshold(scoreDecoyPairs);
 	sortPeptideAllScore(peptideMapChargeLargerThan3, scoreDecoyPairs);
-	tie(decoyCountChargeLargerThan3, pepCountChargeLargerThan3, scoreThresholdChargeLargerThan3) = getDecoyCountScoreThreshold(scoreDecoyPairs);
+	std::tie(decoyCountChargeLargerThan3, pepCountChargeLargerThan3, scoreThresholdChargeLargerThan3) = getDecoyCountScoreThreshold(scoreDecoyPairs);
 }
 
 void peptidesFiltrator::fillPeptideMapExtraInfo()

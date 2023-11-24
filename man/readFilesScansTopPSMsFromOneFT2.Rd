@@ -9,7 +9,7 @@ readFilesScansTopPSMsFromOneFT2(workingPath, pattern, topN)
 \arguments{
 \item{workingPath}{a full path with .sip files in it}
 
-\item{pattern}{a regex pattern of the .Ft2 file}
+\item{pattern}{a regex pattern of the .FT2 file}
 
 \item{topN}{store top N PSMs of each scan of one .FT2 file}
 }
@@ -20,5 +20,5 @@ a dataframe of top N PSMs
 readFilesScansTopPSMsFromOneFT2 read each scan's top PSMs from multiple .sip files of one .FT2 file
 }
 \examples{
-top3 <-  readFilesScansTopPSMsFromOneFT2(".", "demo1", 3)
+top3 <-  readFilesScansTopPSMsFromOneFT2(".", ".*demo1.*", 3)
 }

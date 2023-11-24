@@ -1,33 +1,37 @@
-#include "sipFileReader.h"
+#include "Spe2PepFileReader.h"
 
-sipFileReader::sipFileReader()
+Spe2PepFileReader::Spe2PepFileReader()
 {
 }
 
 // get all .sip files' full path in workingPath
-sipFileReader::sipFileReader(std::string mWorkingPath) : workingPath(mWorkingPath)
+Spe2PepFileReader::Spe2PepFileReader(std::string mWorkingPath) : workingPath(mWorkingPath)
 {
-    std::string ext(".sip");
     // recursive_directory_iterator can get .sip file in all child path
     for (auto &p : fs::directory_iterator(workingPath))
     {
-        if (p.path().extension() == ext)
+        std::string stem = p.path().stem().string();
+        std::string ext = p.path().extension().string();
+        // for ".Spe2Pep.txt"
+        std::string a = stem.substr(stem.size() - 8);
+        if (ext == ".txt" && stem.size() >= 8 && stem.substr(stem.size() - 8) == ".Spe2Pep")
             sipFileNames.push_back(p.path().string());
     }
     if (sipFileNames.size() == 0)
-        std::cout << "no .sip file was found in " << workingPath << " !" << std::endl;
+        std::cout << "no .Spe2Pep.txt file was found in " << workingPath << " !" << std::endl;
 }
 
-sipFileReader::~sipFileReader()
+Spe2PepFileReader::~Spe2PepFileReader()
 {
 }
 
-void sipFileReader::splitString(const std::string &mString)
+void Spe2PepFileReader::splitString(const std::string &mString)
 {
     std::string sep = "\t";
     size_t start = 0;
     size_t end = mString.find(sep);
     tokens.clear();
+    tokens.reserve(10);
     while (end != std::string::npos)
     {
         tokens.push_back(mString.substr(start, end - start));
@@ -37,20 +41,50 @@ void sipFileReader::splitString(const std::string &mString)
     tokens.push_back(mString.substr(start));
 }
 
-void sipFileReader::fillVectors()
+void Spe2PepFileReader::fillVectors()
 {
-    currentSipPSM.scanNumbers.push_back(stoi(tokens[1]));
-    currentSipPSM.parentCharges.push_back(stoi(tokens[2]));
-    currentSipPSM.measuredParentMasses.push_back(stod(tokens[3]));
-    currentSipPSM.calculatedParentMasses.push_back(stod(tokens[4]));
-    currentSipPSM.ranks.push_back(stoi(tokens[8]));
-    currentSipPSM.scores.push_back(stof(tokens[9]));
-    currentSipPSM.identifiedPeptides.push_back(tokens[10]);
-    currentSipPSM.originalPeptides.push_back(tokens[11]);
-    currentSipPSM.proteinNames.push_back(tokens[12]);
+    size_t i = 0;
+    splitString(Sep2PepFileChunkLines[i]);
+    int scanNumber = stoi(tokens[2]);
+    int parentCharge = stoi(tokens[3]);
+    double measuredParentMass = stod(tokens[4]);
+    float retentionTime = (stof(tokens[7]));
+    i++;
+    while (i < Sep2PepFileChunkLines.size())
+    {
+        splitString(Sep2PepFileChunkLines[i]);
+        currentSipPSM.scanNumbers.push_back(scanNumber);
+        currentSipPSM.parentCharges.push_back(parentCharge);
+        currentSipPSM.measuredParentMasses.push_back(measuredParentMass);
+        currentSipPSM.retentionTimes.push_back(retentionTime);
+        currentSipPSM.calculatedParentMasses.push_back(stod(tokens[3]));
+        currentSipPSM.ranks.push_back(i);
+        currentSipPSM.MVHscores.push_back(stof(tokens[4]));
+        currentSipPSM.XcorrScores.push_back(stof(tokens[5]));
+        currentSipPSM.WDPscores.push_back(stof(tokens[6]));
+        currentSipPSM.identifiedPeptides.push_back(tokens[1]);
+        currentSipPSM.originalPeptides.push_back(tokens[2]);
+        currentSipPSM.proteinNames.push_back(tokens[7]);
+        i++;
+    }
 }
 
-void sipFileReader::readOneFile(std::string sipFileName)
+void Spe2PepFileReader::readFileChunk()
+{
+    Sep2PepFileChunkLines.clear();
+    Sep2PepFileChunkLines.reserve(topN + 1);
+    // line begin with "+"
+    Sep2PepFileChunkLines.push_back(currentLine);
+    while (!sipFileStream.eof())
+    {
+        getline(sipFileStream, currentLine);
+        if (currentLine[0] != '*')
+            break;
+        Sep2PepFileChunkLines.push_back(currentLine);
+    }
+}
+
+void Spe2PepFileReader::readOneFile(std::string sipFileName)
 {
     setlocale(LC_ALL, "C");
     std::ios_base::sync_with_stdio(false);
@@ -61,31 +95,30 @@ void sipFileReader::readOneFile(std::string sipFileName)
         {
             std::cout << "Cannot open " << sipFileName << std::endl;
         }
-        std::string currentLine;
-        // ignore annotation in sip result file
+        // ignore annotation in .Spe2Pep.txt file
         while (!sipFileStream.eof())
         {
             getline(sipFileStream, currentLine);
             if (currentLine[0] != '#')
                 break;
         }
-        // read first line
+        // ignore column names
+        readFileChunk();
+        // read first chunck
         if (!sipFileStream.eof())
         {
-            getline(sipFileStream, currentLine);
-            splitString(currentLine);
-            currentSipPSM.fileName = tokens[0];
+            readFileChunk();
+            splitString(Sep2PepFileChunkLines[0]);
+            currentSipPSM.fileName = tokens[1];
             currentSipPSM.scanType = tokens[5];
             currentSipPSM.searchName = tokens[6];
-            currentSipPSM.scoringFunction = tokens[7];
             fillVectors();
         }
-        // read more lines
+        // read more chunks
         // ignore the last /n
         while (sipFileStream.peek() != EOF)
         {
-            getline(sipFileStream, currentLine);
-            splitString(currentLine);
+            readFileChunk();
             fillVectors();
         }
         if (sipFileStream.is_open())
@@ -97,7 +130,7 @@ void sipFileReader::readOneFile(std::string sipFileName)
     }
 }
 
-void sipFileReader::readAllFiles()
+void Spe2PepFileReader::readAllFiles()
 {
     for (std::string sipFileName : sipFileNames)
     {
@@ -107,7 +140,7 @@ void sipFileReader::readAllFiles()
     }
 }
 
-void sipFileReader::readAllFilesTopPSMs()
+void Spe2PepFileReader::readAllFilesTopPSMs()
 {
 
     for (std::string sipFileName : sipFileNames)
@@ -135,7 +168,7 @@ void sipFileReader::readAllFilesTopPSMs()
     }
 }
 
-void sipFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, const int psmIX)
+void Spe2PepFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, const int psmIX)
 {
     // for insert position
     size_t i = 0;
@@ -194,29 +227,33 @@ void sipFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, const 
         scanTopPSMs.pop_back();
 }
 
-sipPSM sipFileReader::convertFilesScansTopPSMs()
+sipPSM Spe2PepFileReader::convertFilesScansTopPSMs()
 {
     // converted from filesScansTopPSMs
-    sipPSM scanTopPSMs;
+    sipPSM topPSMs;
     for (auto &fileIX : filesScansTopPSMs)
     {
         for (auto &scanIX : fileIX.second)
         {
             for (size_t i = 0; i < scanIX.second.size(); i++)
             {
-                scanTopPSMs.fileNames.push_back(fileIX.first);
-                scanTopPSMs.scanNumbers.push_back(scanIX.first);
-                scanTopPSMs.parentCharges.push_back(scanIX.second[i].parentCharge);
-                scanTopPSMs.measuredParentMasses.push_back(scanIX.second[i].measuredParentMass);
-                scanTopPSMs.calculatedParentMasses.push_back(scanIX.second[i].calculatedParentMass);
-                scanTopPSMs.searchNames.push_back(scanIX.second[i].searchName);
-                scanTopPSMs.ranks.push_back(i + 1);
-                scanTopPSMs.scores.push_back(scanIX.second[i].score);
-                scanTopPSMs.identifiedPeptides.push_back(scanIX.second[i].identifiedPeptide);
-                scanTopPSMs.originalPeptides.push_back(scanIX.second[i].originalPeptide);
-                scanTopPSMs.proteinNames.push_back(scanIX.second[i].proteinName);
+                topPSMs.fileNames.push_back(fileIX.first);
+                topPSMs.scanNumbers.push_back(scanIX.first);
+                topPSMs.parentCharges.push_back(scanIX.second[i].parentCharge);
+                topPSMs.measuredParentMasses.push_back(scanIX.second[i].measuredParentMass);
+                topPSMs.calculatedParentMasses.push_back(scanIX.second[i].calculatedParentMass);
+                topPSMs.searchNames.push_back(scanIX.second[i].searchName);
+                topPSMs.ranks.push_back(i + 1);
+                topPSMs.scores.push_back(scanIX.second[i].score);
+                topPSMs.identifiedPeptides.push_back(scanIX.second[i].identifiedPeptide);
+                topPSMs.originalPeptides.push_back(scanIX.second[i].originalPeptide);
+                topPSMs.proteinNames.push_back(scanIX.second[i].proteinName);
+                topPSMs.retentionTimes.push_back(scanIX.second[i].retentionTime);
+                topPSMs.MVHscores.push_back(scanIX.second[i].MVHscore);
+                topPSMs.XcorrScores.push_back(scanIX.second[i].XcorrScore);
+                topPSMs.WDPscores.push_back(scanIX.second[i].WDPscore);
             }
         }
     }
-    return scanTopPSMs;
+    return topPSMs;
 }

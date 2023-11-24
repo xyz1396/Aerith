@@ -125,6 +125,43 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calPepAtomCount
+DataFrame calPepAtomCount(StringVector AAstrs);
+RcppExport SEXP _Aerith_calPepAtomCount(SEXP AAstrsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< StringVector >::type AAstrs(AAstrsSEXP);
+    rcpp_result_gen = Rcpp::wrap(calPepAtomCount(AAstrs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calPepPrecursorMass
+NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVector Probs);
+RcppExport SEXP _Aerith_calPepPrecursorMass(SEXP AAstrsSEXP, SEXP AtomSEXP, SEXP ProbsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< StringVector >::type AAstrs(AAstrsSEXP);
+    Rcpp::traits::input_parameter< String >::type Atom(AtomSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Probs(ProbsSEXP);
+    rcpp_result_gen = Rcpp::wrap(calPepPrecursorMass(AAstrs, Atom, Probs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calPepNeutronMass
+NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector Probs);
+RcppExport SEXP _Aerith_calPepNeutronMass(SEXP AAstrsSEXP, SEXP AtomSEXP, SEXP ProbsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< StringVector >::type AAstrs(AAstrsSEXP);
+    Rcpp::traits::input_parameter< String >::type Atom(AtomSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Probs(ProbsSEXP);
+    rcpp_result_gen = Rcpp::wrap(calPepNeutronMass(AAstrs, Atom, Probs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // precursor_peak_calculator_DIY_averagine
 List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom, double Prob);
 RcppExport SEXP _Aerith_precursor_peak_calculator_DIY_averagine(SEXP AAstrsSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
@@ -279,6 +316,53 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// readSpe2Pep
+List readSpe2Pep(String Spe2PepFile);
+RcppExport SEXP _Aerith_readSpe2Pep(SEXP Spe2PepFileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type Spe2PepFile(Spe2PepFileSEXP);
+    rcpp_result_gen = Rcpp::wrap(readSpe2Pep(Spe2PepFile));
+    return rcpp_result_gen;
+END_RCPP
+}
+// readSpe2Peps
+List readSpe2Peps(String workingPath);
+RcppExport SEXP _Aerith_readSpe2Peps(SEXP workingPathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type workingPath(workingPathSEXP);
+    rcpp_result_gen = Rcpp::wrap(readSpe2Peps(workingPath));
+    return rcpp_result_gen;
+END_RCPP
+}
+// readSpe2PepFilesScansTopPSMs
+DataFrame readSpe2PepFilesScansTopPSMs(String workingPath, size_t topN);
+RcppExport SEXP _Aerith_readSpe2PepFilesScansTopPSMs(SEXP workingPathSEXP, SEXP topNSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type workingPath(workingPathSEXP);
+    Rcpp::traits::input_parameter< size_t >::type topN(topNSEXP);
+    rcpp_result_gen = Rcpp::wrap(readSpe2PepFilesScansTopPSMs(workingPath, topN));
+    return rcpp_result_gen;
+END_RCPP
+}
+// readSpe2PepFilesScansTopPSMsFromOneFT2
+DataFrame readSpe2PepFilesScansTopPSMsFromOneFT2(String workingPath, String pattern, size_t topN);
+RcppExport SEXP _Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2(SEXP workingPathSEXP, SEXP patternSEXP, SEXP topNSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type workingPath(workingPathSEXP);
+    Rcpp::traits::input_parameter< String >::type pattern(patternSEXP);
+    Rcpp::traits::input_parameter< size_t >::type topN(topNSEXP);
+    rcpp_result_gen = Rcpp::wrap(readSpe2PepFilesScansTopPSMsFromOneFT2(workingPath, pattern, topN));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scoreIntensity
 double scoreIntensity(const bool observed, const double realIntensity, const double expectedIntensity, const String& Atom, double Prob);
 RcppExport SEXP _Aerith_scoreIntensity(SEXP observedSEXP, SEXP realIntensitySEXP, SEXP expectedIntensitySEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
@@ -408,6 +492,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_precursor_peak_calculator", (DL_FUNC) &_Aerith_precursor_peak_calculator, 1},
     {"_Aerith_residue_peak_calculator_DIY", (DL_FUNC) &_Aerith_residue_peak_calculator_DIY, 3},
     {"_Aerith_precursor_peak_calculator_DIY", (DL_FUNC) &_Aerith_precursor_peak_calculator_DIY, 3},
+    {"_Aerith_calPepAtomCount", (DL_FUNC) &_Aerith_calPepAtomCount, 1},
+    {"_Aerith_calPepPrecursorMass", (DL_FUNC) &_Aerith_calPepPrecursorMass, 3},
+    {"_Aerith_calPepNeutronMass", (DL_FUNC) &_Aerith_calPepNeutronMass, 3},
     {"_Aerith_precursor_peak_calculator_DIY_averagine", (DL_FUNC) &_Aerith_precursor_peak_calculator_DIY_averagine, 3},
     {"_Aerith_BYion_peak_calculator_DIY", (DL_FUNC) &_Aerith_BYion_peak_calculator_DIY, 3},
     {"_Aerith_readOneScanMS2", (DL_FUNC) &_Aerith_readOneScanMS2, 2},
@@ -421,6 +508,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_readSips", (DL_FUNC) &_Aerith_readSips, 1},
     {"_Aerith_readFilesScansTopPSMs", (DL_FUNC) &_Aerith_readFilesScansTopPSMs, 2},
     {"_Aerith_readFilesScansTopPSMsFromOneFT2", (DL_FUNC) &_Aerith_readFilesScansTopPSMsFromOneFT2, 3},
+    {"_Aerith_readSpe2Pep", (DL_FUNC) &_Aerith_readSpe2Pep, 1},
+    {"_Aerith_readSpe2Peps", (DL_FUNC) &_Aerith_readSpe2Peps, 1},
+    {"_Aerith_readSpe2PepFilesScansTopPSMs", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMs, 2},
+    {"_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2, 3},
     {"_Aerith_scoreIntensity", (DL_FUNC) &_Aerith_scoreIntensity, 5},
     {"_Aerith_scoreIntensityByCE", (DL_FUNC) &_Aerith_scoreIntensityByCE, 2},
     {"_Aerith_scorePSM", (DL_FUNC) &_Aerith_scorePSM, 6},

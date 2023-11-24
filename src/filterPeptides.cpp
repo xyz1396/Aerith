@@ -9,16 +9,16 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 DataFrame getUnfilteredPeptides(CharacterVector workingPath)
 {
-    sipFileReader reader(as<string>(workingPath));
+    sipFileReader reader(as<std::string>(workingPath));
     reader.readAllFiles();
     peptidesFiltrator filtrator(reader.sipPSMs, 0.01);
     filtrator.peptideMap.merge(filtrator.peptideMapCharge2);
     filtrator.peptideMap.merge(filtrator.peptideMapCharge3);
     filtrator.peptideMap.merge(filtrator.peptideMapChargeLargerThan3);
     size_t pepCount = filtrator.peptideMap.size();
-    vector<string> identifiedPeptides(pepCount);
-    vector<float> bestScores(pepCount);
-    vector<bool> isDecoy(pepCount);
+    std::vector<std::string> identifiedPeptides(pepCount);
+    std::vector<float> bestScores(pepCount);
+    std::vector<bool> isDecoy(pepCount);
     size_t i = 0;
     for (auto pepIX : filtrator.peptideMap)
     {
@@ -40,15 +40,15 @@ DataFrame getUnfilteredPeptides(CharacterVector workingPath)
 // [[Rcpp::export]]
 DataFrame getFilterThreshold(CharacterVector workingPath, NumericVector OverallThreshold)
 {
-    sipFileReader reader(as<string>(workingPath));
+    sipFileReader reader(as<std::string>(workingPath));
     reader.readAllFiles();
     peptidesFiltrator filtrator(reader.sipPSMs, as<float>(OverallThreshold));
     filtrator.filterPeptideMap();
-    vector<int> decoyCount{filtrator.decoyCountCharge2, filtrator.decoyCountCharge3,
+    std::vector<int> decoyCount{filtrator.decoyCountCharge2, filtrator.decoyCountCharge3,
                            filtrator.decoyCountChargeLargerThan3};
-    vector<int> pepCount{filtrator.pepCountCharge2, filtrator.pepCountCharge3,
+    std::vector<int> pepCount{filtrator.pepCountCharge2, filtrator.pepCountCharge3,
                          filtrator.pepCountChargeLargerThan3};
-    vector<float> scoreThreshold{filtrator.scoreThresholdCharge2, filtrator.scoreThresholdCharge3,
+    std::vector<float> scoreThreshold{filtrator.scoreThresholdCharge2, filtrator.scoreThresholdCharge3,
                                  filtrator.scoreThresholdChargeLargerThan3};
     return DataFrame::create(
         Named("decoyCount") = decoyCount,
@@ -65,11 +65,11 @@ DataFrame getFilterThreshold(CharacterVector workingPath, NumericVector OverallT
 // [[Rcpp::export]]
 List getFilterThresholdTopPSMs(CharacterVector workingPath, NumericVector OverallThreshold, size_t topN)
 {
-    sipFileReader reader(as<string>(workingPath));
+    sipFileReader reader(as<std::string>(workingPath));
     reader.topN = topN;
     reader.readAllFilesTopPSMs();
     sipPSM topPSMs = reader.convertFilesScansTopPSMs();
-    vector<sipPSM> topPSMss{topPSMs};
+    std::vector<sipPSM> topPSMss{topPSMs};
     DataFrame psmDf = DataFrame::create(Named("fileNames") = move(topPSMs.fileNames),
                                         _["scanNumbers"] = move(topPSMs.scanNumbers),
                                         _["parentCharges"] = move(topPSMs.parentCharges),
@@ -82,15 +82,15 @@ List getFilterThresholdTopPSMs(CharacterVector workingPath, NumericVector Overal
                                         _["proteinNames"] = move(topPSMs.proteinNames));
     peptidesFiltrator filtrator(topPSMss, as<float>(OverallThreshold));
     filtrator.filterPeptideMap();
-    vector<int> decoyCount{filtrator.decoyCountCharge2, filtrator.decoyCountCharge3,
+    std::vector<int> decoyCount{filtrator.decoyCountCharge2, filtrator.decoyCountCharge3,
                            filtrator.decoyCountChargeLargerThan3};
-    vector<int> pepCount{filtrator.pepCountCharge2, filtrator.pepCountCharge3,
+    std::vector<int> pepCount{filtrator.pepCountCharge2, filtrator.pepCountCharge3,
                          filtrator.pepCountChargeLargerThan3};
-    vector<float> scoreThreshold{filtrator.scoreThresholdCharge2, filtrator.scoreThresholdCharge3,
+    std::vector<float> scoreThreshold{filtrator.scoreThresholdCharge2, filtrator.scoreThresholdCharge3,
                                  filtrator.scoreThresholdChargeLargerThan3};
     return List::create(Named("threshold") = DataFrame::create(
                             Named("decoyCount") = decoyCount,
                             _["pepCount"] = pepCount,
                             _["scoreThreshold"] = scoreThreshold),
-                        _["topPSMs"] = move(psmDf));
+                        _["topPSMs"] = std::move(psmDf));
 }

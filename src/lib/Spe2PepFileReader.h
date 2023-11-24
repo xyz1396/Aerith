@@ -8,7 +8,7 @@
 #include "sipPSM.h"
 namespace fs = std::filesystem;
 
-class sipFileReader
+class Spe2PepFileReader
 {
 private:
 public:
@@ -17,25 +17,28 @@ public:
     std::vector<sipPSM> sipPSMs;
     // store top N PSMs of each scan of one .FT file
     size_t topN = 5;
-    // unordered_map<.FT file name, unordered_map<scanNumber, std::vector<top N PSM>>>
+    // std::unordered_map<.FT file name, std::unordered_map<scanNumber, std::vector<top N PSM>>>
     // store topN PSMs of each scan of each .FT file
     std::unordered_map<std::string, std::unordered_map<int, std::vector<scanTopPSM>>> filesScansTopPSMs;
     std::vector<std::string> tokens;
+    std::vector<std::string> Sep2PepFileChunkLines;
     sipPSM currentSipPSM;
     std::string currentFilePath;
+    std::string currentLine;
     std::fstream sipFileStream;
     // for single file
-    sipFileReader();
+    Spe2PepFileReader();
     // for multi files;
-    sipFileReader(std::string mWorkingPath);
-    ~sipFileReader();
+    Spe2PepFileReader(std::string mWorkingPath);
+    ~Spe2PepFileReader();
     void splitString(const std::string &mString);
-    // fill vectors in currentSipPSM
+    // fill std::vectors in currentSipPSM
     void fillVectors();
     void readOneFile(std::string sipFileName);
+    void readFileChunk();
     void readAllFiles();
     void readAllFilesTopPSMs();
-    void fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, const int psmIX);
+    void fillScanTopPSMs(std::vector<scanTopPSM> &topPSMs, const int psmIX);
     // converted from filesScansTopPSMs
     // make it good for output
     sipPSM convertFilesScansTopPSMs();

@@ -1,4 +1,5 @@
 #include "lib/PSMsFiltrator.h"
+#include "lib/sipFileReader.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 

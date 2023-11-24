@@ -83,6 +83,150 @@ DataFrame precursor_peak_calculator_DIY(CharacterVector AAstr, CharacterVector A
 	return df;
 }
 
+//' Simple calculator of CHONPS atom count of peptide
+//' @param AAstr a CharacterVector of peptides
+//' @return a dataframe of CHONPS atom count each row is for one peptide
+//' @export
+//' @examples
+//' df <- calPepAtomCount(c("HKFL","ADCH"))
+// [[Rcpp::export]]
+DataFrame calPepAtomCount(StringVector AAstrs)
+{
+	string config = get_extdata();
+	ProNovoConfig::setFilename(config);
+	averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
+						 ProNovoConfig::getMaxPeptideLength());
+	vector<int> C(AAstrs.size(), 0);
+	vector<int> H, O, N, P, S;
+	H = O = N = P = S = C;
+	for (int i = 0; i < AAstrs.size(); i++)
+	{
+		mAveragine.calPepAtomCounts(as<std::string>((AAstrs[i])));
+		C[i] = mAveragine.pepAtomCounts[0];
+		H[i] = mAveragine.pepAtomCounts[1];
+		O[i] = mAveragine.pepAtomCounts[2];
+		N[i] = mAveragine.pepAtomCounts[3];
+		P[i] = mAveragine.pepAtomCounts[4];
+		S[i] = mAveragine.pepAtomCounts[5];
+	}
+	DataFrame df = DataFrame::create(Named("C") = C, _("H") = H,
+									 _("O") = O, _("N") = N,
+									 _("P") = P, _("S") = S);
+	return df;
+}
+
+//' Simple calculator of peptide precursor mass by binomial NP
+//' @param AAstr a CharacterVector of peptides
+//' @param Atom a Character of "C13", "H2", "O18", or "N15"
+//' @param Probs a NumericVector with the same length of AAstr for SIP abundances
+//' @return a vector of peptide precursor masses
+//' @export
+//' @examples
+//' masses <- calPepPrecursorMass(c("HKFL", "ADCH"), "C13", c(0.2, 0.3))
+// [[Rcpp::export]]
+NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVector Probs)
+{
+	bool goodInput = true;
+	if (Probs.size() != AAstrs.size())
+	{
+		Rcout << "lengths of AAstr and Probs are not equal!" << endl;
+		goodInput = false;
+	}
+	for (R_xlen_t i = 0; i < Probs.size(); i++)
+	{
+		if (Probs[i] < 0 || Probs[i] > 1)
+		{
+			Rcout << "Wrong isotopic percentage!" << endl;
+			goodInput = false;
+		}
+	}
+	char cAtom = 'C';
+	if (Atom == "C13")
+		cAtom = 'C';
+	else if (Atom == "H2")
+		cAtom = 'H';
+	else if (Atom == "O18")
+		cAtom = 'O';
+	else if (Atom == "N15")
+		cAtom = 'N';
+	else
+	{
+		goodInput = false;
+		cout << Atom.get_cstring() << " element not supported!" << endl;
+	}
+	NumericVector v(AAstrs.size(), 0);
+	if (goodInput)
+	{
+		// read default config
+		string config = get_extdata();
+		ProNovoConfig::setFilename(config);
+		averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
+							 ProNovoConfig::getMaxPeptideLength());
+		for (int i = 0; i < AAstrs.size(); i++)
+		{
+			mAveragine.changeAtomSIPabundance(cAtom, Probs[i]);
+			v[i] = mAveragine.calPrecusorMass(as<std::string>((AAstrs[i])));
+		}
+	}
+	return v;
+}
+
+//' Simple calculator neutron mass by average delta mass of each isotope
+//' @param AAstr a CharacterVector of peptides
+//' @param Atom a Character of "C13", "H2", "O18", or "N15"
+//' @param Probs a NumericVector with the same length of AAstr for SIP abundances
+//' @return a vector of peptide neutron masses
+//' @export
+//' @examples
+//' masses <- calPepNeutronMass(c("HKFL", "ADCH"), "C13", c(0.2, 0.3))
+// [[Rcpp::export]]
+NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector Probs)
+{
+	bool goodInput = true;
+	if (Probs.size() != AAstrs.size())
+	{
+		Rcout << "lengths of AAstr and Probs are not equal!" << endl;
+		goodInput = false;
+	}
+	for (R_xlen_t i = 0; i < Probs.size(); i++)
+	{
+		if (Probs[i] < 0 || Probs[i] > 1)
+		{
+			Rcout << "Wrong isotopic percentage!" << endl;
+			goodInput = false;
+		}
+	}
+	char cAtom = 'C';
+	if (Atom == "C13")
+		cAtom = 'C';
+	else if (Atom == "H2")
+		cAtom = 'H';
+	else if (Atom == "O18")
+		cAtom = 'O';
+	else if (Atom == "N15")
+		cAtom = 'N';
+	else
+	{
+		goodInput = false;
+		cout << Atom.get_cstring() << " element not supported!" << endl;
+	}
+	NumericVector v(AAstrs.size(), 0);
+	if (goodInput)
+	{
+		// read default config
+		string config = get_extdata();
+		ProNovoConfig::setFilename(config);
+		averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
+							 ProNovoConfig::getMaxPeptideLength());
+		for (int i = 0; i < AAstrs.size(); i++)
+		{
+			mAveragine.changeAtomSIPabundance(cAtom, Probs[i]);
+			v[i] = mAveragine.calNetronMass(as<std::string>((AAstrs[i])));
+		}
+	}
+	return v;
+}
+
 //' Simple peak calculator of user defined isotopic distribution of one peptide by averagine
 //' @param AAstr a CharacterVector of peptides
 //' @param Atom a CharacterVector C13 or N15
@@ -99,7 +243,7 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 		Rcout << "Wrong isotopic percentage!" << endl;
 		goodInput = false;
 	}
-	char cAtom;
+	char cAtom = 'C';
 	if (Atom == "C13")
 		cAtom = 'C';
 	else if (Atom == "N15")
@@ -120,7 +264,7 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 		mAveragine.changeAtomSIPabundance(cAtom, Prob);
 		mAveragine.calAveraginePepAtomCounts();
 		mAveragine.calAveraginePepSIPdistributions();
-		
+
 		IsotopeDistribution mSIP;
 		DataFrame df;
 		for (int i = 0; i < AAstrs.size(); i++)

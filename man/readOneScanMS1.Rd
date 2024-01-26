@@ -4,13 +4,19 @@
 \alias{readOneScanMS1}
 \title{readOneScanMS1}
 \usage{
-readOneScanMS1(ftFile, scanCount)
+readOneScanMS1(ftFile, scanNumber)
 }
 \arguments{
 \item{ftFile}{a ft1 file's full path}
 
-\item{scanCount}{the scanCount'th scan}
+\item{scanNumber}{the scan at scanNumber}
+}
+\value{
+a list of MS1 scan
 }
 \description{
 readOneScanMS1
+}
+\examples{
+ft1 <- readOneScanMS1("demo.ft1", 2)
 }

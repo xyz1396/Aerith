@@ -4,10 +4,14 @@
 \alias{readScansMS1}
 \title{read MS1 scans with scanNumber as index}
 \usage{
-readScansMS1(ftFile, scanCount)
+readScansMS1(ftFile, startScanNumber, endScanNumber)
 }
 \arguments{
 \item{ftFile}{a ft1 file's full path}
+
+\item{startScanNumber}{read scans starting from this scanNumber}
+
+\item{endScanNumber}{read scans ending at this scanNumber}
 }
 \value{
 a list of MS1 scans with names of scan number

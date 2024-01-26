@@ -21,23 +21,29 @@ Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecusorScan
 													  precursorMz(mPrecusorMz),
 													  precursorCharge(mPrecusorCharge) {}
 
-ftFileReader::ftFileReader(string file) : ftFileName(file)
+ftFileReader::ftFileReader(std::string file) : ftFileName(file)
 {
 	setlocale(LC_ALL, "C");
-	ios_base::sync_with_stdio(false);
+	std::ios_base::sync_with_stdio(false);
 	if (fs::exists(ftFileName))
 	{
-		ftFileStream.open(ftFileName.c_str(), ios::in);
+		ftFileStream.open(ftFileName.c_str(), std::ios::in);
 		if (!ftFileStream.is_open())
 		{
 			isEmpty = true;
-			cout << "Cannot open " << ftFileName << endl;
+			std::cout << "Cannot open " << ftFileName << std::endl;
+		}
+		else
+		{ // Set the buffer size to 2mb
+			const int bufsize = 1024 * 1024 * 2;
+			char buf[bufsize];
+			ftFileStream.rdbuf()->pubsetbuf(buf, bufsize);
 		}
 	}
 	else
 	{
 		isEmpty = true;
-		cout << ftFileName << " does not exists" << endl;
+		std::cout << ftFileName << " does not exists" << std::endl;
 	}
 }
 
@@ -47,9 +53,9 @@ ftFileReader::~ftFileReader()
 		ftFileStream.close();
 }
 
-void ftFileReader::splitString(const string &mString)
+void ftFileReader::splitString(const std::string &mString)
 {
-	string sep = "\t";
+	std::string sep = "\t";
 	size_t start = 0;
 	size_t end = mString.find(sep);
 	tokens.clear();
@@ -203,6 +209,24 @@ void ftFileReader::readPeakCharge()
 	}
 }
 
+void ftFileReader::skipScans(const size_t scanNumber)
+{
+	size_t currentScanNumber = 0;
+	while (hasNextScan())
+	{
+		if (currentLine[0] == 'S')
+		{
+			splitString(currentLine);
+			currentScanNumber = stoi(tokens[1]);
+			if (currentScanNumber >= scanNumber)
+			{
+				break;
+			}
+		}
+		getline(ftFileStream, currentLine);
+	}
+}
+
 void ftFileReader::readNextScan()
 {
 	if (hasPrecursor)
@@ -214,48 +238,91 @@ void ftFileReader::readNextScan()
 	readPeakCharge();
 }
 
-Scan ftFileReader::readOneScan(const int scanCount)
+Scan ftFileReader::readOneScan(const size_t scanNumber)
 {
-	if (detectPrecursorAndCharge())
+	Scan emptyScan(0, 0, 0, 0, 0, 0);
+	if (!detectPrecursorAndCharge())
 	{
-		for (int i = 0; i < scanCount; i++)
+		std::cout << "Cannot read the first scan" << std::endl;
+		return (emptyScan);
+	}
+	skipScans(scanNumber);
+	if (hasNextScan())
+	{
+		readNextScan();
+		if (currentScan.scanNumber == scanNumber)
+			return currentScan;
+		else
 		{
-			if (hasNextScan())
-				readNextScan();
-			else
-			{
-				cout << ftFileName << " has " << i << " scans < " << scanCount << endl;
-				Scan emptyScan(0, 0, 0, 0, 0, 0);
-				return emptyScan;
-			}
+			std::cout << scanNumber << " not exist" << std::endl;
+			return emptyScan;
 		}
 	}
 	else
-		cout << "Cannot read the first scan" << endl;
-	return currentScan;
+	{
+		std::cout << scanNumber << " is larger than the last scan number" << std::endl;
+		return emptyScan;
+	}
 }
 
-void ftFileReader::readScans(const int scanCount)
+void ftFileReader::readScans(const size_t startScanNumber, const size_t endScanNumber)
 {
 	if (detectPrecursorAndCharge())
 	{
 		Scans.clear();
-		for (int i = 0; i < scanCount; i++)
+		skipScans(startScanNumber);
+		while (hasNextScan())
 		{
-			if (hasNextScan())
+			readNextScan();
+			Scans.push_back(currentScan);
+			if (currentScan.scanNumber == endScanNumber)
 			{
-				readNextScan();
-				Scans.push_back(currentScan);
+				break;
 			}
-			else
+			else if (currentScan.scanNumber > endScanNumber)
 			{
-				cout << ftFileName << " has " << i << " scans < " << scanCount << endl;
+				Scans.pop_back();
 				break;
 			}
 		}
 	}
 	else
-		cout << "Cannot read the first scan" << endl;
+		std::cout << "Cannot read the first scan" << std::endl;
+}
+
+void ftFileReader::readScans(std::vector<size_t> &scanNumbers)
+{
+	// sort ascending
+	std::sort(scanNumbers.begin(), scanNumbers.end());
+	// remove duplicates
+	auto new_end = std::unique(scanNumbers.begin(), scanNumbers.end());
+	scanNumbers.erase(new_end, scanNumbers.end());
+	// convert to set
+	std::set<size_t> scanNumbersSet(scanNumbers.begin(), scanNumbers.end());
+	if (detectPrecursorAndCharge())
+	{
+		size_t i = 0;
+		Scans.clear();
+		while (hasNextScan() && i < scanNumbers.size())
+		{
+			skipScans(scanNumbers[i]);
+			readNextScan();
+			if (scanNumbersSet.find(currentScan.scanNumber) != scanNumbersSet.end())
+				Scans.push_back(currentScan);
+			// skip scan not exist
+			while (currentScan.scanNumber > scanNumbers[i] && i < scanNumbers.size())
+			{
+				std::cout << "Scan " << scanNumbers[i] << " not exist!" << std::endl;
+				i++;
+			}
+			if (currentScan.scanNumber == scanNumbers[i] && i < scanNumbers.size())
+				i++;
+			if (currentScan.scanNumber >= scanNumbers.back())
+				break;
+		}
+	}
+	else
+		std::cout << "Cannot read the first scan" << std::endl;
 }
 
 void ftFileReader::readAllScan()
@@ -270,16 +337,16 @@ void ftFileReader::readAllScan()
 		}
 	}
 	else
-		cout << "Cannot read the first scan" << endl;
+		std::cout << "Cannot read the first scan" << std::endl;
 }
 
 void ftFileReader::printFileInfo()
 {
-	cout << "ftFileName: " << ftFileName << endl;
-	cout << "has precursor: " << hasPrecursor << endl;
-	cout << "has charge: " << hasCharge << endl;
-	cout << "scanType: " << scanType << endl;
-	cout << "instrument: " << instrument << endl;
+	std::cout << "ftFileName: " << ftFileName << std::endl;
+	std::cout << "has precursor: " << hasPrecursor << std::endl;
+	std::cout << "has charge: " << hasCharge << std::endl;
+	std::cout << "scanType: " << scanType << std::endl;
+	std::cout << "instrument: " << instrument << std::endl;
 }
 
 void ftFileReader::printScan(const Scan &mScan)

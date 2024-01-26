@@ -2,13 +2,19 @@
 % Please edit documentation in R/RcppExports.R
 \name{readAllScanMS1}
 \alias{readAllScanMS1}
-\title{readAllScanMS1}
+\title{read MS1 scans with scanNumber as index}
 \usage{
 readAllScanMS1(ftFile)
 }
 \arguments{
 \item{ftFile}{a ft1 file's full path}
 }
+\value{
+a list of MS1 scans with names of scan number
+}
 \description{
-readAllScanMS1
+read MS1 scans with scanNumber as index
+}
+\examples{
+ft1 <- readAllScanMS1("demo.ft1")
 }

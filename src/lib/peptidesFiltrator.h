@@ -29,6 +29,7 @@ private:
 public:
     float FDRthreshold;
     std::vector<std::string> tokens;
+    std::string DecoyStr;
     // identified peptides with different charge states
     // we always don't select singly charged precursor in expriment
     // charge 2: 3 : >3 is nearly 100:10:1
@@ -42,7 +43,7 @@ public:
     float scoreThresholdCharge2, scoreThresholdCharge3, scoreThresholdChargeLargerThan3;
     // for output filtered peptides
     std::unordered_map<std::string, peptideInfo> peptideMap;
-    peptidesFiltrator(const std::vector<sipPSM> &sipPSMs, float mFDRthreshold);
+    peptidesFiltrator(const std::vector<sipPSM> &sipPSMs, float mFDRthreshold, std::string DecoyStr);
     ~peptidesFiltrator();
     void splitString(const std::string mString);
     bool detectDecoy(const std::string &proteinName);

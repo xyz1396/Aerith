@@ -3,18 +3,19 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 #include <filesystem>
+#include <algorithm>
 namespace fs = std::filesystem;
-using namespace std;
 
 struct alignas(64) Scan
 {
-	int scanNumber;
+	size_t scanNumber;
 	float retentionTime;
 	double TIC;
-	vector<double> mz;
-	vector<double> mass;
-	vector<double> intensity;
+	std::vector<double> mz;
+	std::vector<double> mass;
+	std::vector<double> intensity;
 
 	// only MS2 scan has follows
 	int precursorScanNumber;
@@ -22,10 +23,10 @@ struct alignas(64) Scan
 	int precursorCharge;
 
 	// only orbitrap scan has follows
-	vector<int> resolution;
-	vector<float> baseLine;
-	vector<float> signalToNoise;
-	vector<int> charge;
+	std::vector<int> resolution;
+	std::vector<float> baseLine;
+	std::vector<float> signalToNoise;
+	std::vector<int> charge;
 
 	Scan();
 	// for MS1 scans
@@ -39,31 +40,36 @@ class ftFileReader
 {
 private:
 public:
-	string ftFileName;
-	ifstream ftFileStream;
-	string currentLine;
+	std::string ftFileName;
+	std::ifstream ftFileStream;
+	std::string currentLine;
 	bool continueRead;
 	bool hasPrecursor;
 	bool hasCharge;
 	// avoid empty file
 	bool isEmpty = false;
-	string instrument;
-	string scanType;
-	string scanFilter;
+	std::string instrument;
+	std::string scanType;
+	std::string scanFilter;
 	Scan currentScan;
-	vector<Scan> Scans;
-	vector<string> tokens;
-	ftFileReader(string file);
+	std::vector<Scan> Scans;
+	std::vector<std::string> tokens;
+	ftFileReader(std::string file);
 	~ftFileReader();
-	void splitString(const string &mString);
+	void splitString(const std::string &mString);
 	bool detectPrecursorAndCharge();
 	bool hasNextScan();
 	Scan readScanNumberRentionTime();
 	Scan readScanNumberRentionTimePrecursor();
 	void readPeakCharge();
+	// ignore scans before scanNumber
+	void skipScans(const size_t scanNumber);
 	void readNextScan();
-	Scan readOneScan(const int scanNumber);
-	void readScans(const int scanCount);
+	Scan readOneScan(const size_t scanNumber);
+	// read scans in a range
+	void readScans(const size_t startScanNumber, const size_t endScanNumber);
+	// read scans of scanNumbers
+	void readScans(std::vector<size_t> &scanNumbers);
 	void readAllScan();
 
 	// for test

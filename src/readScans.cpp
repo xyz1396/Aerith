@@ -10,9 +10,9 @@ using namespace Rcpp;
 //' header <- readFTheader("demo.ft1")
 //' @export
 // [[Rcpp::export]]
-List readFTheader(CharacterVector ftFile)
+List readFTheader(String ftFile)
 {
-    ftFileReader reader(as<string>(ftFile));
+    ftFileReader reader(ftFile);
     reader.detectPrecursorAndCharge();
     List header = List::create(Named("instrument") = reader.instrument,
                                _["scanType"] = reader.scanType,
@@ -22,6 +22,87 @@ List readFTheader(CharacterVector ftFile)
     return header;
 }
 
+//' read MS1 scans with scanNumber as index in a range
+//' @param ftFile a ft1 file's full path
+//' @param startScanNumber read scans starting from this scanNumber
+//' @param endScanNumber read scans ending at this scanNumber
+//' @return a list of MS1 scans with names of scan number
+//' @examples
+//' ft1 <- readScansMS1("demo.ft1", 1, 10)
+//' @export
+// [[Rcpp::export]]
+List readScansMS1(const String ftFile, const size_t startScanNumber, const size_t endScanNumber)
+{
+    ftFileReader reader(ftFile);
+    // avoid empty scanList crash
+    if (reader.isEmpty)
+        return 0;
+    reader.readScans(startScanNumber, endScanNumber);
+    List scanList(reader.Scans.size());
+    Scan *mScan;
+    CharacterVector scanNumbers(reader.Scans.size());
+    for (size_t i = 0; i < reader.Scans.size(); i++)
+    {
+        mScan = &reader.Scans[i];
+        DataFrame peakDf = DataFrame::create(Named("mz") = std::move(mScan->mz),
+                                             _["intensity"] = std::move(mScan->intensity),
+                                             _["resolution"] = std::move(mScan->resolution),
+                                             _["baseLine"] = std::move(mScan->baseLine),
+                                             _["signalToNoise"] = std::move(mScan->signalToNoise),
+                                             _["charge"] = std::move(mScan->charge));
+        List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
+                                      _["retentionTime"] = mScan->retentionTime,
+                                      _["TIC"] = mScan->TIC,
+                                      _["peaks"] = std::move(peakDf));
+        scanList[i] = std::move(mScanList);
+        scanNumbers[i] = std::to_string(mScan->scanNumber);
+    }
+    // change list's names to scanNumber
+    scanList.names() = scanNumbers;
+    return scanList;
+}
+
+//' read MS1 scans with scanNumber as index in a vector
+//' @param ftFile a ft1 file's full path
+//' @param startScanNumber read scans starting from this scanNumber
+//' @param endScanNumber read scans ending at this scanNumber
+//' @return a list of MS1 scans with names of scan number
+//' @examples
+//' ft1 <- readAllScanMS1("demo.ft1")
+//' @export
+// [[Rcpp::export]]
+List readScansMS1Vector(const String ftFile, const NumericVector scanNumbersVector)
+{
+    ftFileReader reader(ftFile);
+    // avoid empty scanList crash
+    if (reader.isEmpty)
+        return 0;
+    std::vector<std::size_t> scanNumbers = as<std::vector<std::size_t>>(scanNumbersVector);
+    reader.readScans(scanNumbers);
+    List scanList(reader.Scans.size());
+    Scan *mScan;
+    CharacterVector scanNumbersStr(reader.Scans.size());
+    for (size_t i = 0; i < reader.Scans.size(); i++)
+    {
+        mScan = &reader.Scans[i];
+        DataFrame peakDf = DataFrame::create(Named("mz") = std::move(mScan->mz),
+                                             _["intensity"] = std::move(mScan->intensity),
+                                             _["resolution"] = std::move(mScan->resolution),
+                                             _["baseLine"] = std::move(mScan->baseLine),
+                                             _["signalToNoise"] = std::move(mScan->signalToNoise),
+                                             _["charge"] = std::move(mScan->charge));
+        List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
+                                      _["retentionTime"] = mScan->retentionTime,
+                                      _["TIC"] = mScan->TIC,
+                                      _["peaks"] = std::move(peakDf));
+        scanList[i] = std::move(mScanList);
+        scanNumbersStr[i] = std::to_string(mScan->scanNumber);
+    }
+    // change list's names to scanNumber
+    scanList.names() = scanNumbersStr;
+    return scanList;
+}
+
 //' read MS1 scans with scanNumber as index
 //' @param ftFile a ft1 file's full path
 //' @return a list of MS1 scans with names of scan number
@@ -29,44 +110,9 @@ List readFTheader(CharacterVector ftFile)
 //' ft1 <- readAllScanMS1("demo.ft1")
 //' @export
 // [[Rcpp::export]]
-List readScansMS1(CharacterVector ftFile, NumericVector scanCount)
+List readAllScanMS1(const String ftFile)
 {
-    ftFileReader reader(as<string>(ftFile));
-    // avoid empty scanList crash
-    if (reader.isEmpty)
-        return 0;
-    size_t scanCountInt = as<int>(scanCount);
-    reader.readScans(scanCountInt);
-    // in case there is not enough scan in ft file
-    scanCountInt = scanCountInt < reader.Scans.size() ? scanCountInt : reader.Scans.size();
-    List scanList(scanCountInt);
-    Scan *mScan;
-    for (size_t i = 0; i < scanCountInt; i++)
-    {
-        mScan = &reader.Scans[i];
-        DataFrame peakDf = DataFrame::create(Named("mz") = move(mScan->mz),
-                                             _["intensity"] = move(mScan->intensity),
-                                             _["resolution"] = move(mScan->resolution),
-                                             _["baseLine"] = move(mScan->baseLine),
-                                             _["signalToNoise"] = move(mScan->signalToNoise),
-                                             _["charge"] = move(mScan->charge));
-        List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
-                                      _["retentionTime"] = mScan->retentionTime,
-                                      _["TIC"] = mScan->TIC,
-                                      _["peaks"] = move(peakDf));
-        scanList[i] = move(mScanList);
-    }
-    return scanList;
-}
-
-//' readAllScanMS1
-//' @param ftFile a ft1 file's full path
-//' @export
-// [[Rcpp::export]]
-List readAllScanMS1(CharacterVector ftFile)
-{
-    ftFileReader reader(as<string>(ftFile));
-    // avoid empty scanList crash
+    ftFileReader reader(ftFile);
     if (reader.isEmpty)
         return 0;
     reader.readAllScan();
@@ -87,50 +133,98 @@ List readAllScanMS1(CharacterVector ftFile)
         List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
                                       _["retentionTime"] = mScan->retentionTime,
                                       _["TIC"] = mScan->TIC,
-                                      _["peaks"] = move(peakDf));
-        scanList[i] = move(mScanList);
-        scanNumbers[i] = to_string(mScan->scanNumber);
+                                      _["peaks"] = std::move(peakDf));
+        scanList[i] = std::move(mScanList);
+        scanNumbers[i] = std::to_string(mScan->scanNumber);
     }
     // change list's names to scanNumber
     scanList.names() = scanNumbers;
     return scanList;
 }
 
-//' readScansMS2
+//' read MS2 scans with scanNumber as index in a range
 //' @param ftFile a ft2 file's full path
-//' @param scanNumber the scanNumber th scan
+//' @param startScanNumber read scans starting from this scanNumber
+//' @param endScanNumber read scans ending at this scanNumber
+//' @return a list of MS2 scans with names of scan number
+//' @examples
+//' ft2 <- readScansMS2("demo.ft2", 1, 10)
 //' @export
 // [[Rcpp::export]]
-List readScansMS2(CharacterVector ftFile, NumericVector scanCount)
+List readScansMS2(const String ftFile, const size_t startScanNumber, const size_t endScanNumber)
 {
-    ftFileReader reader(as<string>(ftFile));
+    ftFileReader reader(ftFile);
     // avoid empty scanList crash
     if (reader.isEmpty)
         return 0;
-    size_t scanCountInt = as<int>(scanCount);
-    reader.readScans(scanCountInt);
-    // in case there is not enough scan in ft file
-    scanCountInt = scanCountInt < reader.Scans.size() ? scanCountInt : reader.Scans.size();
-    List scanList(scanCountInt);
+    reader.readScans(startScanNumber, endScanNumber);
+    List scanList(reader.Scans.size());
     Scan *mScan;
-    for (size_t i = 0; i < scanCountInt; i++)
+    CharacterVector scanNumbers(reader.Scans.size());
+    for (size_t i = 0; i < reader.Scans.size(); i++)
     {
         mScan = &reader.Scans[i];
-        DataFrame peakDf = DataFrame::create(Named("mz") = move(mScan->mz),
-                                             _["intensity"] = move(mScan->intensity),
-                                             _["resolution"] = move(mScan->resolution),
-                                             _["baseLine"] = move(mScan->baseLine),
-                                             _["signalToNoise"] = move(mScan->signalToNoise),
-                                             _["charge"] = move(mScan->charge));
+        DataFrame peakDf = DataFrame::create(Named("mz") = std::move(mScan->mz),
+                                             _["intensity"] = std::move(mScan->intensity),
+                                             _["resolution"] = std::move(mScan->resolution),
+                                             _["baseLine"] = std::move(mScan->baseLine),
+                                             _["signalToNoise"] = std::move(mScan->signalToNoise),
+                                             _["charge"] = std::move(mScan->charge));
         List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
                                       _["retentionTime"] = mScan->retentionTime,
                                       _["precursorScanNumber"] = mScan->precursorScanNumber,
                                       _["precursorMz"] = mScan->precursorMz,
                                       _["TIC"] = mScan->TIC,
                                       _["precursorCharge"] = mScan->precursorCharge,
-                                      _["peaks"] = move(peakDf));
-        scanList[i] = move(mScanList);
+                                      _["peaks"] = std::move(peakDf));
+        scanList[i] = std::move(mScanList);
+        scanNumbers[i] = std::to_string(mScan->scanNumber);
     }
+    // change list's names to scanNumber
+    scanList.names() = scanNumbers;
+    return scanList;
+}
+
+//' read MS2 scans with scanNumber as index in a vector
+//' @param ftFile a ft2 file's full path
+//' @param scanNumbersVector read scans starting of these scanNumbers
+//' @return a list of MS2 scans with names of scan number
+//' @examples
+//' ft2 <- readScansMS2("demo.ft2", c(9, 8, 7))
+//' @export
+// [[Rcpp::export]]
+List readScansMS2Vector(const String ftFile, const NumericVector scanNumbersVector)
+{
+    ftFileReader reader(ftFile);
+    // avoid empty scanList crash
+    if (reader.isEmpty)
+        return 0;
+    std::vector<std::size_t> scanNumbers = as<std::vector<std::size_t>>(scanNumbersVector);
+    reader.readScans(scanNumbers);
+    List scanList(reader.Scans.size());
+    Scan *mScan;
+    CharacterVector scanNumbersStr(reader.Scans.size());
+    for (size_t i = 0; i < reader.Scans.size(); i++)
+    {
+        mScan = &reader.Scans[i];
+        DataFrame peakDf = DataFrame::create(Named("mz") = std::move(mScan->mz),
+                                             _["intensity"] = std::move(mScan->intensity),
+                                             _["resolution"] = std::move(mScan->resolution),
+                                             _["baseLine"] = std::move(mScan->baseLine),
+                                             _["signalToNoise"] = std::move(mScan->signalToNoise),
+                                             _["charge"] = std::move(mScan->charge));
+        List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
+                                      _["retentionTime"] = mScan->retentionTime,
+                                      _["precursorScanNumber"] = mScan->precursorScanNumber,
+                                      _["precursorMz"] = mScan->precursorMz,
+                                      _["TIC"] = mScan->TIC,
+                                      _["precursorCharge"] = mScan->precursorCharge,
+                                      _["peaks"] = std::move(peakDf));
+        scanList[i] = std::move(mScanList);
+        scanNumbersStr[i] = std::to_string(mScan->scanNumber);
+    }
+    // change list's names to scanNumber
+    scanList.names() = scanNumbersStr;
     return scanList;
 }
 
@@ -141,9 +235,9 @@ List readScansMS2(CharacterVector ftFile, NumericVector scanCount)
 //' ft2 <- readAllScanMS2("demo.ft2")
 //' @export
 // [[Rcpp::export]]
-List readAllScanMS2(CharacterVector ftFile)
+List readAllScanMS2(const String ftFile)
 {
-    ftFileReader reader(as<string>(ftFile));
+    ftFileReader reader(ftFile);
     // avoid empty scanList crash
     if (reader.isEmpty)
         return 0;
@@ -167,9 +261,9 @@ List readAllScanMS2(CharacterVector ftFile)
                                       _["precursorMz"] = mScan->precursorMz,
                                       _["TIC"] = mScan->TIC,
                                       _["precursorCharge"] = mScan->precursorCharge,
-                                      _["peaks"] = move(peakDf));
-        scanList[i] = move(mScanList);
-        scanNumbers[i] = to_string(mScan->scanNumber);
+                                      _["peaks"] = std::move(peakDf));
+        scanList[i] = std::move(mScanList);
+        scanNumbers[i] = std::to_string(mScan->scanNumber);
     }
     // change list's names to scanNumber
     scanList.names() = scanNumbers;

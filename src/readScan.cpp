@@ -4,13 +4,16 @@ using namespace Rcpp;
 
 //' readOneScanMS2
 //' @param ftFile a ft2 file's full path
-//' @param scanCount the scanCount'th scan
+//' @param scanNumber the scan at scanNumber
+//' @return a list of MS2 scan
+//' @examples
+//' ft2 <- readOneScanMS2("demo.ft2", 2)
 //' @export
 // [[Rcpp::export]]
-List readOneScanMS2(CharacterVector ftFile, NumericVector scanCount)
+List readOneScanMS2(const String &ftFile, const size_t scanNumber)
 {
-    ftFileReader reader(as<std::string>(ftFile));
-    Scan mScan = reader.readOneScan(as<int>(scanCount));
+    ftFileReader reader(ftFile);
+    Scan mScan = reader.readOneScan(scanNumber);
     DataFrame peakDf = DataFrame::create(Named("mz") = mScan.mz,
                                          _["intensity"] = mScan.intensity,
                                          _["resolution"] = mScan.resolution,
@@ -28,13 +31,16 @@ List readOneScanMS2(CharacterVector ftFile, NumericVector scanCount)
 
 //' readOneScanMS1
 //' @param ftFile a ft1 file's full path
-//' @param scanCount the scanCount'th scan
+//' @param scanNumber the scan at scanNumber
+//' @return a list of MS1 scan
+//' @examples
+//' ft1 <- readOneScanMS1("demo.ft1", 2)
 //' @export
 // [[Rcpp::export]]
-List readOneScanMS1(CharacterVector ftFile, NumericVector scanCount)
+List readOneScanMS1(const String &ftFile, const size_t scanNumber)
 {
-    ftFileReader reader(as<std::string>(ftFile));
-    Scan mScan = reader.readOneScan(as<int>(scanCount));
+    ftFileReader reader(ftFile);
+    Scan mScan = reader.readOneScan(scanNumber);
     DataFrame peakDf = DataFrame::create(Named("mz") = mScan.mz,
                                          _["intensity"] = mScan.intensity,
                                          _["resolution"] = mScan.resolution,

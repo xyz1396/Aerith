@@ -4,18 +4,20 @@ Spe2PepFileReader::Spe2PepFileReader()
 {
 }
 
-// get all .sip files' full path in workingPath
+// get all .Spe2Pep files' full path in workingPath
 Spe2PepFileReader::Spe2PepFileReader(std::string mWorkingPath) : workingPath(mWorkingPath)
 {
-    // recursive_directory_iterator can get .sip file in all child path
+    // recursive_directory_iterator can get .Spe2Pep file in all child path
     for (auto &p : fs::directory_iterator(workingPath))
     {
         std::string stem = p.path().stem().string();
         std::string ext = p.path().extension().string();
         // for ".Spe2Pep.txt"
-        std::string a = stem.substr(stem.size() - 8);
-        if (ext == ".txt" && stem.size() >= 8 && stem.substr(stem.size() - 8) == ".Spe2Pep")
-            sipFileNames.push_back(p.path().string());
+        if (stem.size() > 8)
+        {
+            if (ext == ".txt" && stem.substr(stem.size() - 8) == ".Spe2Pep")
+                sipFileNames.push_back(p.path().string());
+        }
     }
     if (sipFileNames.size() == 0)
         std::cout << "no .Spe2Pep.txt file was found in " << workingPath << " !" << std::endl;
@@ -256,4 +258,101 @@ sipPSM Spe2PepFileReader::convertFilesScansTopPSMs()
         }
     }
     return topPSMs;
+}
+
+void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const std::string &workingPath, size_t topN = 5)
+{
+    Spe2PepFileReader reader(workingPath);
+    std::unordered_map<std::string, std::vector<std::string>> FT2map;
+    // group the .Spe2PepFile.txt files by FT2 name
+    for (const auto &str : reader.sipFileNames)
+    {
+        // Extract the filename
+        std::filesystem::path full_path(str);
+        std::string filename = full_path.filename().string();
+        // get FT2 file name by substring before the first "." character
+        size_t pos = filename.find(".");
+        FT2map[filename.substr(0, pos)].push_back(str);
+    }
+    FT2s.clear();
+    for (auto const &pair : FT2map)
+    {
+        FT2s.push_back(pair.first);
+    }
+    sipPSMs = std::vector<sipPSM>(FT2s.size());
+    int num_cores = omp_get_num_procs();
+    // Set the number of threads to the lesser of num_cores and 10
+    int num_threads = std::min(num_cores, 10);
+    omp_set_num_threads(num_threads);
+#pragma omp parallel for
+    for (size_t i = 0; i < FT2s.size(); i++)
+    {
+        Spe2PepFileReader reader;
+        reader.sipFileNames = FT2map[FT2s[i]];
+        reader.topN = topN;
+        reader.readAllFilesTopPSMs();
+        sipPSMs[i] = reader.convertFilesScansTopPSMs();
+    }
+}
+
+void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
+{
+    setlocale(LC_ALL, "C");
+    std::ios_base::sync_with_stdio(false);
+    std::ofstream file(fileName);
+    if (!file)
+    {
+        std::cerr << "Unable to open file for writing.\n";
+    }
+    file << std::fixed << std::setprecision(6);
+
+    const size_t chunkSize = 10000;
+    std::stringstream ss;
+    ss << "fileNames"
+       << "\t"
+       << "scanNumbers"
+       << "\t"
+       << "parentCharges"
+       << "\t"
+       << "measuredParentMasses"
+       << "\t"
+       << "calculatedParentMasses"
+       << "\t"
+       << "searchNames"
+       << "\t"
+       << "retentionTimes"
+       << "\t"
+       << "MVHscores"
+       << "\t"
+       << "XcorrScores"
+       << "\t"
+       << "WDPscores"
+       << "\t"
+       << "ranks"
+       << "\t"
+       << "identifiedPeptides"
+       << "\t"
+       << "originalPeptides"
+       << "\t"
+       << "proteinNames"
+       << "\n";
+    for (size_t i = 0; i < sipPSMs.size(); i++)
+    {
+        for (size_t j = 0; j < sipPSMs[i].fileNames.size(); j += chunkSize)
+        {
+            for (size_t k = j; k < std::min(k + chunkSize, sipPSMs[i].fileNames.size()); ++k)
+            {
+                ss << sipPSMs[i].fileNames[k] << "\t" << sipPSMs[i].scanNumbers[k] << "\t"
+                   << sipPSMs[i].parentCharges[k] << "\t"
+                   << sipPSMs[i].measuredParentMasses[k] << "\t" << sipPSMs[i].calculatedParentMasses[k] << "\t"
+                   << sipPSMs[i].searchNames[k] << "\t" << sipPSMs[i].retentionTimes[k] << "\t" << sipPSMs[i].MVHscores[k] << "\t"
+                   << sipPSMs[i].XcorrScores[k] << "\t" << sipPSMs[i].WDPscores[k] << "\t"
+                   << sipPSMs[i].ranks[k] << "\t" << sipPSMs[i].identifiedPeptides[k] << "\t"
+                   << sipPSMs[i].originalPeptides[k] << "\t" << sipPSMs[i].proteinNames[k] << "\n";
+            }
+            file << ss.str();
+            ss.str(std::string()); // Clear the stringstream
+        }
+    }
+    file.close();
 }

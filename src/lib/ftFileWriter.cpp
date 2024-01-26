@@ -2,8 +2,8 @@
 
 ftFileWriter::ftFileWriter() {}
 
-ftFileWriter::ftFileWriter(string file, string mInstrument,
-                           string mScanType, string mScanFilter,
+ftFileWriter::ftFileWriter(std::string file, std::string mInstrument,
+                           std::string mScanType, std::string mScanFilter,
                            bool mHasCharge, int mMSlevel) : ftFileName(file),
                                                             instrument(mInstrument),
                                                             scanType(mScanType),
@@ -14,20 +14,20 @@ ftFileWriter::ftFileWriter(string file, string mInstrument,
     // speedup writing
     // setlocale(LC_ALL, "C");
     // ios_base::sync_with_stdio(false);
-    ftFileStream = stringstream("", ios_base::app | ios_base::out);
+    ftFileStream = std::stringstream("", std::ios_base::app | std::ios_base::out);
     // in case overwrite existing file
     if (!fs::exists(ftFileName))
     {
-        ftFileStreamtoFile.open(ftFileName.c_str(), ios::out);
+        ftFileStreamtoFile.open(ftFileName.c_str(), std::ios::out);
         if (ftFileStreamtoFile.is_open())
         {
             isWriteable = true;
         }
         else
-            cout << "Cannot write " << ftFileName << endl;
+            std::cout << "Cannot write " << ftFileName << std::endl;
     }
     else
-        cout << "Old " << ftFileName << " exists" << endl;
+        std::cout << "Old " << ftFileName << " exists" << std::endl;
 }
 
 ftFileWriter::~ftFileWriter()
@@ -36,20 +36,20 @@ ftFileWriter::~ftFileWriter()
         ftFileStreamtoFile.close();
 }
 
-vector<int> ftFileWriter::rankify(const vector<double> &A)
+std::vector<int> ftFileWriter::rankify(const std::vector<double> &A)
 {
     int n = A.size();
-    vector<int> R(n);
+    std::vector<int> R(n);
     // T[][0] is the data and T[][1] is
     // the index of data in A
-    vector<pair<double, int>> T(n);
+    std::vector<std::pair<double, int>> T(n);
     for (int i = 0; i < n; i++)
     {
         T[i].first = A[i];
         T[i].second = i;
     }
     // Sort T according to first element
-    sort(T.begin(), T.end(), [](const pair<double, int> &a, const pair<double, int> &b) -> bool
+    std::sort(T.begin(), T.end(), [](const std::pair<double, int> &a, const std::pair<double, int> &b) -> bool
          { return (a.first > b.first); });
     for (int i = 0; i < n; i++)
     {
@@ -58,13 +58,13 @@ vector<int> ftFileWriter::rankify(const vector<double> &A)
     return (R);
 }
 
-void ftFileWriter::getMeanRanksOfPeaks(vector<float> &ranks,
+void ftFileWriter::getMeanRanksOfPeaks(std::vector<float> &ranks,
                                        Scan const &mScan, const double &window,
                                        const double &step)
 {
     int n = mScan.mz.size();
     // in case devide by 0
-    vector<int> windowsCount(n, 1);
+    std::vector<int> windowsCount(n, 1);
     double start = mScan.mz.front();
     double end = start + window;
     int startIX = 0, IX = 0;
@@ -79,8 +79,8 @@ void ftFileWriter::getMeanRanksOfPeaks(vector<float> &ranks,
                 IX++;
                 // moveWindow = true;
             }
-            vector<int> tempRanks(rankify(
-                vector<double>(mScan.intensity.begin() + startIX, mScan.intensity.begin() + IX)));
+            std::vector<int> tempRanks(rankify(
+                std::vector<double>(mScan.intensity.begin() + startIX, mScan.intensity.begin() + IX)));
             for (size_t i = 0; i < tempRanks.size(); i++)
             {
                 ranks[startIX + i] += (float)tempRanks[i];
@@ -106,15 +106,15 @@ void ftFileWriter::denoiseMS2ScanHasCharge(Scan &mScan, const double &window, co
                                            const float &threshold)
 {
     int n = mScan.mz.size();
-    vector<float> ranks(n);
+    std::vector<float> ranks(n);
     getMeanRanksOfPeaks(ranks, mScan, window, step);
-    vector<double> mz, intensity;
+    std::vector<double> mz, intensity;
     mz.reserve(n);
     intensity.reserve(n);
-    vector<int> charge, resolution;
+    std::vector<int> charge, resolution;
     charge.reserve(n);
     resolution.reserve(n);
-    vector<float> baseLine, signalToNoise;
+    std::vector<float> baseLine, signalToNoise;
     baseLine.reserve(n);
     signalToNoise.reserve(n);
     // filter out the top threshold peaks
@@ -142,34 +142,34 @@ void ftFileWriter::denoiseMS2ScanHasCharge(Scan &mScan, const double &window, co
 
 void ftFileWriter::writeHeaderHasCharge()
 {
-    ftFileStream << "H\tExtractor\tAerith V0.1" << endl;
-    ftFileStream << "H\tm/z\tIntensity\tResolution\tBaseline\tNoise\tCharge" << endl;
-    ftFileStream << "H\tInstrument Model\t" << instrument << endl;
+    ftFileStream << "H\tExtractor\tAerith V0.1" << std::endl;
+    ftFileStream << "H\tm/z\tIntensity\tResolution\tBaseline\tNoise\tCharge" << std::endl;
+    ftFileStream << "H\tInstrument Model\t" << instrument << std::endl;
 }
 
 void ftFileWriter::writeMS2ScanHasCharge(Scan &mScan)
 {
-    ftFileStream << fixed << setprecision(6);
-    ftFileStream << "S\t" << to_string(mScan.scanNumber) << "\t" << mScan.precursorMz
-                 << setprecision(2) << "\t" << mScan.TIC << endl;
-    ftFileStream << "Z\t" << to_string(mScan.precursorCharge)
-                 << setprecision(6) << "\t" << mScan.precursorMz * mScan.precursorCharge << endl;
-    ftFileStream << "I\tRetentionTime\t" << mScan.retentionTime << endl;
-    ftFileStream << "I\tScanType\t" << scanType << endl;
-    ftFileStream << "I\tScanFilter\t" << scanFilter << endl;
-    ftFileStream << "D\tParentScanNumber\t" << to_string(mScan.precursorScanNumber) << endl;
+    ftFileStream << std::fixed << std::setprecision(6);
+    ftFileStream << "S\t" << std::to_string(mScan.scanNumber) << "\t" << mScan.precursorMz
+                 << std::setprecision(2) << "\t" << mScan.TIC << std::endl;
+    ftFileStream << "Z\t" << std::to_string(mScan.precursorCharge)
+                 << std::setprecision(6) << "\t" << mScan.precursorMz * mScan.precursorCharge << std::endl;
+    ftFileStream << "I\tRetentionTime\t" << mScan.retentionTime << std::endl;
+    ftFileStream << "I\tScanType\t" << scanType << std::endl;
+    ftFileStream << "I\tScanFilter\t" << scanFilter << std::endl;
+    ftFileStream << "D\tParentScanNumber\t" << std::to_string(mScan.precursorScanNumber) << std::endl;
     for (size_t i = 0; i < mScan.mz.size(); i++)
     {
-        ftFileStream << setprecision(6) << mScan.mz[i]
-                     << "\t" << setprecision(2) << mScan.intensity[i]
-                     << "\t" << to_string(mScan.resolution[i])
+        ftFileStream << std::setprecision(6) << mScan.mz[i]
+                     << "\t" << std::setprecision(2) << mScan.intensity[i]
+                     << "\t" << std::to_string(mScan.resolution[i])
                      << "\t" << mScan.baseLine[i]
-                     << "\t" << mScan.signalToNoise[i] << "\t" << to_string(mScan.charge[i])
-                     << endl;
+                     << "\t" << mScan.signalToNoise[i] << "\t" << std::to_string(mScan.charge[i])
+                     << std::endl;
     }
 }
 
-void ftFileWriter::writeAllScanMS2(vector<Scan> &mScans)
+void ftFileWriter::writeAllScanMS2(std::vector<Scan> &mScans)
 {
     if (!isWriteable)
         return;
@@ -185,5 +185,5 @@ void ftFileWriter::writeAllScanMS2(vector<Scan> &mScans)
         }
     }
     else
-        cout << "This format is not implemented!" << endl;
+        std::cout << "This format is not implemented!" << std::endl;
 }

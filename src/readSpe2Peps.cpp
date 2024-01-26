@@ -1,6 +1,7 @@
 #include "lib/Spe2PepFileReader.h"
 #include <Rcpp.h>
 #include <regex>
+#include <omp.h>
 using namespace Rcpp;
 
 //' readSpe2Pep
@@ -147,4 +148,57 @@ DataFrame readSpe2PepFilesScansTopPSMsFromOneFT2(String workingPath, String patt
                                         _["originalPeptides"] = std::move(topPSMs.originalPeptides),
                                         _["proteinNames"] = std::move(topPSMs.proteinNames));
     return psmDf;
+}
+
+//' readSpe2PepFilesScansTopPSMsFromEachFT2Parallel read each scan's top PSMs from multiple .Spe2PepFile.txt files of each .FT2 file
+//' @param workingPath a full path with .Spe2PepFile.txt files in it
+//' @param topN store top N PSMs of each scan of one .FT2 file
+//' @return a dataframe of top N PSMs
+//' @examples
+//' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3)
+//' @export
+// [[Rcpp::export]]
+List readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN = 5)
+{
+    Spe2PepFileReader reader;
+    reader.readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(workingPath, topN);
+    List psmList(reader.sipPSMs.size());
+    for (size_t i = 0; i < reader.sipPSMs.size(); i++)
+    {
+        DataFrame psmDf = DataFrame::create(Named("fileNames") = reader.sipPSMs[i].fileNames,
+                                            _["scanNumbers"] = reader.sipPSMs[i].scanNumbers,
+                                            _["parentCharges"] = reader.sipPSMs[i].parentCharges,
+                                            _["measuredParentMasses"] = reader.sipPSMs[i].measuredParentMasses,
+                                            _["calculatedParentMasses"] = reader.sipPSMs[i].calculatedParentMasses,
+                                            _["searchNames"] = reader.sipPSMs[i].searchNames,
+                                            _["retentionTimes"] = reader.sipPSMs[i].retentionTimes,
+                                            _["MVHscores"] = reader.sipPSMs[i].MVHscores,
+                                            _["XcorrScores"] = reader.sipPSMs[i].XcorrScores,
+                                            _["WDPscores"] = reader.sipPSMs[i].WDPscores,
+                                            _["ranks"] = reader.sipPSMs[i].ranks,
+                                            _["identifiedPeptides"] = reader.sipPSMs[i].identifiedPeptides,
+                                            _["originalPeptides"] = reader.sipPSMs[i].originalPeptides,
+                                            _["proteinNames"] = reader.sipPSMs[i].proteinNames);
+
+        psmList[i] = psmDf;
+    }
+    psmList.names() = reader.FT2s;
+    return psmList;
+}
+
+//' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel read each scan's top PSMs from multiple .Spe2PepFile.txt
+//' files of each .FT2 file and write them to one tsv file
+//' @param workingPath a full path with .Spe2PepFile.txt files in it
+//' @param topN store top N PSMs of each scan of one .FT2 file
+//' @param fileName the output path
+//' @return nothing but write a tsv of top N PSMs
+//' @examples
+//' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3, "test.tsv")
+//' @export
+// [[Rcpp::export]]
+void writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN = 5, String fileName = "a.tsv")
+{
+    Spe2PepFileReader reader;
+    reader.readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(workingPath, topN);
+    reader.writeTSV(fileName);
 }

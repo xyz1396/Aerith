@@ -59,6 +59,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getFilterThresholdTopPSMsSpe2Pep
+List getFilterThresholdTopPSMsSpe2Pep(String workingPath, float OverallThreshold, size_t topN);
+RcppExport SEXP _Aerith_getFilterThresholdTopPSMsSpe2Pep(SEXP workingPathSEXP, SEXP OverallThresholdSEXP, SEXP topNSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type workingPath(workingPathSEXP);
+    Rcpp::traits::input_parameter< float >::type OverallThreshold(OverallThresholdSEXP);
+    Rcpp::traits::input_parameter< size_t >::type topN(topNSEXP);
+    rcpp_result_gen = Rcpp::wrap(getFilterThresholdTopPSMsSpe2Pep(workingPath, OverallThreshold, topN));
+    return rcpp_result_gen;
+END_RCPP
+}
 // generateOneCFG
 bool generateOneCFG(String cfgPath, String outPath, String element, int pct, int center, int width);
 RcppExport SEXP _Aerith_generateOneCFG(SEXP cfgPathSEXP, SEXP outPathSEXP, SEXP elementSEXP, SEXP pctSEXP, SEXP centerSEXP, SEXP widthSEXP) {
@@ -189,82 +202,108 @@ BEGIN_RCPP
 END_RCPP
 }
 // readOneScanMS2
-List readOneScanMS2(CharacterVector ftFile, NumericVector scanCount);
-RcppExport SEXP _Aerith_readOneScanMS2(SEXP ftFileSEXP, SEXP scanCountSEXP) {
+List readOneScanMS2(const String& ftFile, const size_t scanNumber);
+RcppExport SEXP _Aerith_readOneScanMS2(SEXP ftFileSEXP, SEXP scanNumberSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type scanCount(scanCountSEXP);
-    rcpp_result_gen = Rcpp::wrap(readOneScanMS2(ftFile, scanCount));
+    Rcpp::traits::input_parameter< const String& >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type scanNumber(scanNumberSEXP);
+    rcpp_result_gen = Rcpp::wrap(readOneScanMS2(ftFile, scanNumber));
     return rcpp_result_gen;
 END_RCPP
 }
 // readOneScanMS1
-List readOneScanMS1(CharacterVector ftFile, NumericVector scanCount);
-RcppExport SEXP _Aerith_readOneScanMS1(SEXP ftFileSEXP, SEXP scanCountSEXP) {
+List readOneScanMS1(const String& ftFile, const size_t scanNumber);
+RcppExport SEXP _Aerith_readOneScanMS1(SEXP ftFileSEXP, SEXP scanNumberSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type scanCount(scanCountSEXP);
-    rcpp_result_gen = Rcpp::wrap(readOneScanMS1(ftFile, scanCount));
+    Rcpp::traits::input_parameter< const String& >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type scanNumber(scanNumberSEXP);
+    rcpp_result_gen = Rcpp::wrap(readOneScanMS1(ftFile, scanNumber));
     return rcpp_result_gen;
 END_RCPP
 }
 // readFTheader
-List readFTheader(CharacterVector ftFile);
+List readFTheader(String ftFile);
 RcppExport SEXP _Aerith_readFTheader(SEXP ftFileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< String >::type ftFile(ftFileSEXP);
     rcpp_result_gen = Rcpp::wrap(readFTheader(ftFile));
     return rcpp_result_gen;
 END_RCPP
 }
 // readScansMS1
-List readScansMS1(CharacterVector ftFile, NumericVector scanCount);
-RcppExport SEXP _Aerith_readScansMS1(SEXP ftFileSEXP, SEXP scanCountSEXP) {
+List readScansMS1(const String ftFile, const size_t startScanNumber, const size_t endScanNumber);
+RcppExport SEXP _Aerith_readScansMS1(SEXP ftFileSEXP, SEXP startScanNumberSEXP, SEXP endScanNumberSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type scanCount(scanCountSEXP);
-    rcpp_result_gen = Rcpp::wrap(readScansMS1(ftFile, scanCount));
+    Rcpp::traits::input_parameter< const String >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type startScanNumber(startScanNumberSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type endScanNumber(endScanNumberSEXP);
+    rcpp_result_gen = Rcpp::wrap(readScansMS1(ftFile, startScanNumber, endScanNumber));
+    return rcpp_result_gen;
+END_RCPP
+}
+// readScansMS1Vector
+List readScansMS1Vector(const String ftFile, const NumericVector scanNumbersVector);
+RcppExport SEXP _Aerith_readScansMS1Vector(SEXP ftFileSEXP, SEXP scanNumbersVectorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const String >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type scanNumbersVector(scanNumbersVectorSEXP);
+    rcpp_result_gen = Rcpp::wrap(readScansMS1Vector(ftFile, scanNumbersVector));
     return rcpp_result_gen;
 END_RCPP
 }
 // readAllScanMS1
-List readAllScanMS1(CharacterVector ftFile);
+List readAllScanMS1(const String ftFile);
 RcppExport SEXP _Aerith_readAllScanMS1(SEXP ftFileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const String >::type ftFile(ftFileSEXP);
     rcpp_result_gen = Rcpp::wrap(readAllScanMS1(ftFile));
     return rcpp_result_gen;
 END_RCPP
 }
 // readScansMS2
-List readScansMS2(CharacterVector ftFile, NumericVector scanCount);
-RcppExport SEXP _Aerith_readScansMS2(SEXP ftFileSEXP, SEXP scanCountSEXP) {
+List readScansMS2(const String ftFile, const size_t startScanNumber, const size_t endScanNumber);
+RcppExport SEXP _Aerith_readScansMS2(SEXP ftFileSEXP, SEXP startScanNumberSEXP, SEXP endScanNumberSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type scanCount(scanCountSEXP);
-    rcpp_result_gen = Rcpp::wrap(readScansMS2(ftFile, scanCount));
+    Rcpp::traits::input_parameter< const String >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type startScanNumber(startScanNumberSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type endScanNumber(endScanNumberSEXP);
+    rcpp_result_gen = Rcpp::wrap(readScansMS2(ftFile, startScanNumber, endScanNumber));
+    return rcpp_result_gen;
+END_RCPP
+}
+// readScansMS2Vector
+List readScansMS2Vector(const String ftFile, const NumericVector scanNumbersVector);
+RcppExport SEXP _Aerith_readScansMS2Vector(SEXP ftFileSEXP, SEXP scanNumbersVectorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const String >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type scanNumbersVector(scanNumbersVectorSEXP);
+    rcpp_result_gen = Rcpp::wrap(readScansMS2Vector(ftFile, scanNumbersVector));
     return rcpp_result_gen;
 END_RCPP
 }
 // readAllScanMS2
-List readAllScanMS2(CharacterVector ftFile);
+List readAllScanMS2(const String ftFile);
 RcppExport SEXP _Aerith_readAllScanMS2(SEXP ftFileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const String >::type ftFile(ftFileSEXP);
     rcpp_result_gen = Rcpp::wrap(readAllScanMS2(ftFile));
     return rcpp_result_gen;
 END_RCPP
@@ -363,6 +402,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// readSpe2PepFilesScansTopPSMsFromEachFT2Parallel
+List readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN);
+RcppExport SEXP _Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(SEXP workingPathSEXP, SEXP topNSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type workingPath(workingPathSEXP);
+    Rcpp::traits::input_parameter< size_t >::type topN(topNSEXP);
+    rcpp_result_gen = Rcpp::wrap(readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(workingPath, topN));
+    return rcpp_result_gen;
+END_RCPP
+}
+// writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel
+void writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN, String fileName);
+RcppExport SEXP _Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(SEXP workingPathSEXP, SEXP topNSEXP, SEXP fileNameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type workingPath(workingPathSEXP);
+    Rcpp::traits::input_parameter< size_t >::type topN(topNSEXP);
+    Rcpp::traits::input_parameter< String >::type fileName(fileNameSEXP);
+    writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(workingPath, topN, fileName);
+    return R_NilValue;
+END_RCPP
+}
 // scoreIntensity
 double scoreIntensity(const bool observed, const double realIntensity, const double expectedIntensity, const String& Atom, double Prob);
 RcppExport SEXP _Aerith_scoreIntensity(SEXP observedSEXP, SEXP realIntensitySEXP, SEXP expectedIntensitySEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
@@ -422,27 +485,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// calc_sum
-double calc_sum(NumericVector x);
-RcppExport SEXP _Aerith_calc_sum(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_sum(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_ftFileReader
-void test_ftFileReader(CharacterVector ftFile);
-RcppExport SEXP _Aerith_test_ftFileReader(SEXP ftFileSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
-    test_ftFileReader(ftFile);
-    return R_NilValue;
-END_RCPP
-}
 // rankyfify
 NumericVector rankyfify(NumericVector a);
 RcppExport SEXP _Aerith_rankyfify(SEXP aSEXP) {
@@ -469,14 +511,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // writeAllScanMS2
-bool writeAllScanMS2(List header, List scansList, CharacterVector ftFile);
+bool writeAllScanMS2(List header, List scansList, const String& ftFile);
 RcppExport SEXP _Aerith_writeAllScanMS2(SEXP headerSEXP, SEXP scansListSEXP, SEXP ftFileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type header(headerSEXP);
     Rcpp::traits::input_parameter< List >::type scansList(scansListSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type ftFile(ftFileSEXP);
+    Rcpp::traits::input_parameter< const String& >::type ftFile(ftFileSEXP);
     rcpp_result_gen = Rcpp::wrap(writeAllScanMS2(header, scansList, ftFile));
     return rcpp_result_gen;
 END_RCPP
@@ -487,6 +529,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_getUnfilteredPeptides", (DL_FUNC) &_Aerith_getUnfilteredPeptides, 1},
     {"_Aerith_getFilterThreshold", (DL_FUNC) &_Aerith_getFilterThreshold, 2},
     {"_Aerith_getFilterThresholdTopPSMs", (DL_FUNC) &_Aerith_getFilterThresholdTopPSMs, 3},
+    {"_Aerith_getFilterThresholdTopPSMsSpe2Pep", (DL_FUNC) &_Aerith_getFilterThresholdTopPSMsSpe2Pep, 3},
     {"_Aerith_generateOneCFG", (DL_FUNC) &_Aerith_generateOneCFG, 6},
     {"_Aerith_generateCFGs", (DL_FUNC) &_Aerith_generateCFGs, 3},
     {"_Aerith_precursor_peak_calculator", (DL_FUNC) &_Aerith_precursor_peak_calculator, 1},
@@ -500,9 +543,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_readOneScanMS2", (DL_FUNC) &_Aerith_readOneScanMS2, 2},
     {"_Aerith_readOneScanMS1", (DL_FUNC) &_Aerith_readOneScanMS1, 2},
     {"_Aerith_readFTheader", (DL_FUNC) &_Aerith_readFTheader, 1},
-    {"_Aerith_readScansMS1", (DL_FUNC) &_Aerith_readScansMS1, 2},
+    {"_Aerith_readScansMS1", (DL_FUNC) &_Aerith_readScansMS1, 3},
+    {"_Aerith_readScansMS1Vector", (DL_FUNC) &_Aerith_readScansMS1Vector, 2},
     {"_Aerith_readAllScanMS1", (DL_FUNC) &_Aerith_readAllScanMS1, 1},
-    {"_Aerith_readScansMS2", (DL_FUNC) &_Aerith_readScansMS2, 2},
+    {"_Aerith_readScansMS2", (DL_FUNC) &_Aerith_readScansMS2, 3},
+    {"_Aerith_readScansMS2Vector", (DL_FUNC) &_Aerith_readScansMS2Vector, 2},
     {"_Aerith_readAllScanMS2", (DL_FUNC) &_Aerith_readAllScanMS2, 1},
     {"_Aerith_readSip", (DL_FUNC) &_Aerith_readSip, 1},
     {"_Aerith_readSips", (DL_FUNC) &_Aerith_readSips, 1},
@@ -512,12 +557,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_readSpe2Peps", (DL_FUNC) &_Aerith_readSpe2Peps, 1},
     {"_Aerith_readSpe2PepFilesScansTopPSMs", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMs, 2},
     {"_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2, 3},
+    {"_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel, 2},
+    {"_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel", (DL_FUNC) &_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel, 3},
     {"_Aerith_scoreIntensity", (DL_FUNC) &_Aerith_scoreIntensity, 5},
     {"_Aerith_scoreIntensityByCE", (DL_FUNC) &_Aerith_scoreIntensityByCE, 2},
     {"_Aerith_scorePSM", (DL_FUNC) &_Aerith_scorePSM, 6},
     {"_Aerith_scorePSMold", (DL_FUNC) &_Aerith_scorePSMold, 6},
-    {"_Aerith_calc_sum", (DL_FUNC) &_Aerith_calc_sum, 1},
-    {"_Aerith_test_ftFileReader", (DL_FUNC) &_Aerith_test_ftFileReader, 1},
     {"_Aerith_rankyfify", (DL_FUNC) &_Aerith_rankyfify, 1},
     {"_Aerith_denoiseOneMS2ScanHasCharge", (DL_FUNC) &_Aerith_denoiseOneMS2ScanHasCharge, 4},
     {"_Aerith_writeAllScanMS2", (DL_FUNC) &_Aerith_writeAllScanMS2, 3},

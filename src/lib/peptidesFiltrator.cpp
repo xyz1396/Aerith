@@ -5,8 +5,8 @@ peptideInfo::peptideInfo(bool mIsDecoy, float mBestScore)
 {
 }
 
-peptidesFiltrator::peptidesFiltrator(const std::vector<sipPSM> &sipPSMs, float mFDRthreshold)
-	: FDRthreshold(mFDRthreshold)
+peptidesFiltrator::peptidesFiltrator(const std::vector<sipPSM> &sipPSMs, float mFDRthreshold, std::string DecoyStr)
+	: FDRthreshold(mFDRthreshold), DecoyStr(DecoyStr)
 {
 	for (sipPSM psm : sipPSMs)
 	{
@@ -84,7 +84,7 @@ bool peptidesFiltrator::detectDecoy(const std::string &proteinName)
 	// if one protein is not decoy the peptide is not decoy
 	for (std::string token : tokens)
 	{
-		if (token.substr(0, 4) != "Rev_")
+		if (token.substr(0, DecoyStr.length()) != DecoyStr)
 			return false;
 	}
 	return true;

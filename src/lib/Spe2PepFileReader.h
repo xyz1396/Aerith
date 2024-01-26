@@ -5,6 +5,7 @@
 #include <vector>
 #include <filesystem>
 #include <unordered_map>
+#include <omp.h>
 #include "sipPSM.h"
 namespace fs = std::filesystem;
 
@@ -14,6 +15,7 @@ private:
 public:
     std::string workingPath;
     std::vector<std::string> sipFileNames;
+    std::vector<std::string> FT2s;
     std::vector<sipPSM> sipPSMs;
     // store top N PSMs of each scan of one .FT file
     size_t topN = 5;
@@ -42,4 +44,6 @@ public:
     // converted from filesScansTopPSMs
     // make it good for output
     sipPSM convertFilesScansTopPSMs();
+    void readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const std::string &workingPath, size_t topN);
+    void writeTSV(const std::string fileName);
 };

@@ -4,13 +4,21 @@
 \alias{readScansMS2}
 \title{readScansMS2}
 \usage{
-readScansMS2(ftFile, scanCount)
+readScansMS2(ftFile, startScanNumber, endScanNumber)
 }
 \arguments{
-\item{ftFile}{a ft2 file's full path}
+\item{ftFile}{a ft1 file's full path}
 
-\item{scanNumber}{the scanNumber th scan}
+\item{startScanNumber}{read scans starting from this scanNumber}
+
+\item{endScanNumber}{read scans ending at this scanNumber}
+}
+\value{
+a list of MS2 scans with names of scan number
 }
 \description{
 readScansMS2
+}
+\examples{
+ft2 <- readScansMS2("demo.ft2")
 }

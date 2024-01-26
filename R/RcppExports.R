@@ -38,6 +38,18 @@ getFilterThresholdTopPSMs <- function(workingPath, OverallThreshold, topN) {
     .Call(`_Aerith_getFilterThresholdTopPSMs`, workingPath, OverallThreshold, topN)
 }
 
+#' getFilterThresholdTopPSMsSpe2Pep get filter threshold of top PSMs of each scan from multiple .sip file
+#' @param workingPath a full path with .Spe2Pep files in it
+#' @param OverallThreshold FDR thredhold of peptides
+#' @param topN store top N PSMs of each scan of one .FT file
+#' @return a dataframe about filter threshold and FDR results
+#' @examples
+#' getFilterThresholdTopPSMsSpe2Pep("testDir", 0.01, 3)
+#' @export
+getFilterThresholdTopPSMsSpe2Pep <- function(workingPath, OverallThreshold, topN) {
+    .Call(`_Aerith_getFilterThresholdTopPSMsSpe2Pep`, workingPath, OverallThreshold, topN)
+}
+
 #' generateOneCFG
 #' @param cfgPath a full path of .cfg file
 #' @param outPath a full path for .cfg file output
@@ -144,18 +156,24 @@ BYion_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
 
 #' readOneScanMS2
 #' @param ftFile a ft2 file's full path
-#' @param scanCount the scanCount'th scan
+#' @param scanNumber the scan at scanNumber
+#' @return a list of MS2 scan
+#' @examples
+#' ft2 <- readOneScanMS2("demo.ft2", 2)
 #' @export
-readOneScanMS2 <- function(ftFile, scanCount) {
-    .Call(`_Aerith_readOneScanMS2`, ftFile, scanCount)
+readOneScanMS2 <- function(ftFile, scanNumber) {
+    .Call(`_Aerith_readOneScanMS2`, ftFile, scanNumber)
 }
 
 #' readOneScanMS1
 #' @param ftFile a ft1 file's full path
-#' @param scanCount the scanCount'th scan
+#' @param scanNumber the scan at scanNumber
+#' @return a list of MS1 scan
+#' @examples
+#' ft1 <- readOneScanMS1("demo.ft1", 2)
 #' @export
-readOneScanMS1 <- function(ftFile, scanCount) {
-    .Call(`_Aerith_readOneScanMS1`, ftFile, scanCount)
+readOneScanMS1 <- function(ftFile, scanNumber) {
+    .Call(`_Aerith_readOneScanMS1`, ftFile, scanNumber)
 }
 
 #' read FT file header
@@ -168,29 +186,61 @@ readFTheader <- function(ftFile) {
     .Call(`_Aerith_readFTheader`, ftFile)
 }
 
+#' read MS1 scans with scanNumber as index in a range
+#' @param ftFile a ft1 file's full path
+#' @param startScanNumber read scans starting from this scanNumber
+#' @param endScanNumber read scans ending at this scanNumber
+#' @return a list of MS1 scans with names of scan number
+#' @examples
+#' ft1 <- readScansMS1("demo.ft1", 1, 10)
+#' @export
+readScansMS1 <- function(ftFile, startScanNumber, endScanNumber) {
+    .Call(`_Aerith_readScansMS1`, ftFile, startScanNumber, endScanNumber)
+}
+
+#' read MS1 scans with scanNumber as index in a vector
+#' @param ftFile a ft1 file's full path
+#' @param startScanNumber read scans starting from this scanNumber
+#' @param endScanNumber read scans ending at this scanNumber
+#' @return a list of MS1 scans with names of scan number
+#' @examples
+#' ft1 <- readAllScanMS1("demo.ft1")
+#' @export
+readScansMS1Vector <- function(ftFile, scanNumbersVector) {
+    .Call(`_Aerith_readScansMS1Vector`, ftFile, scanNumbersVector)
+}
+
 #' read MS1 scans with scanNumber as index
 #' @param ftFile a ft1 file's full path
 #' @return a list of MS1 scans with names of scan number
 #' @examples
 #' ft1 <- readAllScanMS1("demo.ft1")
 #' @export
-readScansMS1 <- function(ftFile, scanCount) {
-    .Call(`_Aerith_readScansMS1`, ftFile, scanCount)
-}
-
-#' readAllScanMS1
-#' @param ftFile a ft1 file's full path
-#' @export
 readAllScanMS1 <- function(ftFile) {
     .Call(`_Aerith_readAllScanMS1`, ftFile)
 }
 
-#' readScansMS2
+#' read MS2 scans with scanNumber as index in a range
 #' @param ftFile a ft2 file's full path
-#' @param scanNumber the scanNumber th scan
+#' @param startScanNumber read scans starting from this scanNumber
+#' @param endScanNumber read scans ending at this scanNumber
+#' @return a list of MS2 scans with names of scan number
+#' @examples
+#' ft2 <- readScansMS2("demo.ft2", 1, 10)
 #' @export
-readScansMS2 <- function(ftFile, scanCount) {
-    .Call(`_Aerith_readScansMS2`, ftFile, scanCount)
+readScansMS2 <- function(ftFile, startScanNumber, endScanNumber) {
+    .Call(`_Aerith_readScansMS2`, ftFile, startScanNumber, endScanNumber)
+}
+
+#' read MS2 scans with scanNumber as index in a vector
+#' @param ftFile a ft2 file's full path
+#' @param scanNumbersVector read scans starting of these scanNumbers
+#' @return a list of MS2 scans with names of scan number
+#' @examples
+#' ft2 <- readScansMS2("demo.ft2", c(9, 8, 7))
+#' @export
+readScansMS2Vector <- function(ftFile, scanNumbersVector) {
+    .Call(`_Aerith_readScansMS2Vector`, ftFile, scanNumbersVector)
 }
 
 #' read MS2 scans with scanNumber as index
@@ -282,6 +332,30 @@ readSpe2PepFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN = 
     .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2`, workingPath, pattern, topN)
 }
 
+#' readSpe2PepFilesScansTopPSMsFromEachFT2Parallel read each scan's top PSMs from multiple .Spe2PepFile.txt files of each .FT2 file
+#' @param workingPath a full path with .Spe2PepFile.txt files in it
+#' @param topN store top N PSMs of each scan of one .FT2 file
+#' @return a dataframe of top N PSMs
+#' @examples
+#' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3)
+#' @export
+readSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN = 5L) {
+    .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel`, workingPath, topN)
+}
+
+#' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel read each scan's top PSMs from multiple .Spe2PepFile.txt
+#' files of each .FT2 file and write them to one tsv file
+#' @param workingPath a full path with .Spe2PepFile.txt files in it
+#' @param topN store top N PSMs of each scan of one .FT2 file
+#' @param fileName the output path
+#' @return nothing but write a tsv of top N PSMs
+#' @examples
+#' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3, "test.tsv")
+#' @export
+writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN = 5L, fileName = "a.tsv") {
+    invisible(.Call(`_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel`, workingPath, topN, fileName))
+}
+
 #' scoreIntensity
 #' @param observed this peak is observed or not
 #' @param realIntensity real intensity in MS2 scan
@@ -324,20 +398,6 @@ scorePSM <- function(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob) {
 #' @export
 scorePSMold <- function(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob) {
     .Call(`_Aerith_scorePSMold`, realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
-}
-
-#' Simple sum
-#' @param x a numeric vector
-#' @export
-calc_sum <- function(x) {
-    .Call(`_Aerith_calc_sum`, x)
-}
-
-#' test ftFileReader
-#' @param ftFile a ft file's full path
-#' @export
-test_ftFileReader <- function(ftFile) {
-    invisible(.Call(`_Aerith_test_ftFileReader`, ftFile))
 }
 
 rankyfify <- function(a) {

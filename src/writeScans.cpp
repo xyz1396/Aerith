@@ -7,7 +7,7 @@ using namespace Rcpp;
 NumericVector rankyfify(NumericVector a)
 {
     ftFileWriter writer;
-    vector<double> b = as<vector<double>>(a);
+    std::vector<double> b = as<std::vector<double>>(a);
     return wrap(writer.rankify(b));
 }
 
@@ -29,19 +29,19 @@ List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float t
     DataFrame peaks;
     List newScanList = clone(scanList);
     peaks = scanList["peaks"];
-    scan.mz = as<vector<double>>(peaks["mz"]);
-    scan.intensity = as<vector<double>>(peaks["intensity"]);
-    scan.resolution = as<vector<int>>(peaks["resolution"]);
-    scan.baseLine = as<vector<float>>(peaks["baseLine"]);
-    scan.signalToNoise = as<vector<float>>(peaks["signalToNoise"]);
-    scan.charge = as<vector<int>>(peaks["charge"]);
+    scan.mz = as<std::vector<double>>(peaks["mz"]);
+    scan.intensity = as<std::vector<double>>(peaks["intensity"]);
+    scan.resolution = as<std::vector<int>>(peaks["resolution"]);
+    scan.baseLine = as<std::vector<float>>(peaks["baseLine"]);
+    scan.signalToNoise = as<std::vector<float>>(peaks["signalToNoise"]);
+    scan.charge = as<std::vector<int>>(peaks["charge"]);
     writer.denoiseMS2ScanHasCharge(scan, window, step, threshold);
     DataFrame newPeaks = DataFrame::create(Named("mz") = scan.mz,
-                                         _["intensity"] = scan.intensity,
-                                         _["resolution"] = scan.resolution,
-                                         _["baseLine"] = scan.baseLine,
-                                         _["signalToNoise"] = scan.signalToNoise,
-                                         _["charge"] = scan.charge);
+                                           _["intensity"] = scan.intensity,
+                                           _["resolution"] = scan.resolution,
+                                           _["baseLine"] = scan.baseLine,
+                                           _["signalToNoise"] = scan.signalToNoise,
+                                           _["charge"] = scan.charge);
     newScanList["peaks"] = newPeaks;
     return newScanList;
 }
@@ -57,16 +57,16 @@ List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float t
 //' writeAllScanMS2(header,ft2[1:10],"demo10.ft2")
 //' @export
 // [[Rcpp::export]]
-bool writeAllScanMS2(List header, List scansList, CharacterVector ftFile)
+bool writeAllScanMS2(List header, List scansList, const String &ftFile)
 {
-    ftFileWriter writer(as<string>(ftFile),
-                        as<string>(header["instrument"]),
-                        as<string>(header["scanType"]),
-                        as<string>(header["scanFilter"]),
+    ftFileWriter writer(ftFile,
+                        as<std::string>(header["instrument"]),
+                        as<std::string>(header["scanType"]),
+                        as<std::string>(header["scanFilter"]),
                         as<bool>(header["hasCharge"]), 2);
     if (!writer.isWriteable || !writer.hasCharge)
         return false;
-    vector<Scan> scans;
+    std::vector<Scan> scans;
     scans.reserve(scansList.size());
     Scan scan;
     List scanList;
@@ -82,12 +82,12 @@ bool writeAllScanMS2(List header, List scansList, CharacterVector ftFile)
         scan.precursorCharge = as<int>(scanList["precursorCharge"]);
 
         peaks = scanList["peaks"];
-        scan.mz = as<vector<double>>(peaks["mz"]);
-        scan.intensity = as<vector<double>>(peaks["intensity"]);
-        scan.resolution = as<vector<int>>(peaks["resolution"]);
-        scan.baseLine = as<vector<float>>(peaks["baseLine"]);
-        scan.signalToNoise = as<vector<float>>(peaks["signalToNoise"]);
-        scan.charge = as<vector<int>>(peaks["charge"]);
+        scan.mz = as<std::vector<double>>(peaks["mz"]);
+        scan.intensity = as<std::vector<double>>(peaks["intensity"]);
+        scan.resolution = as<std::vector<int>>(peaks["resolution"]);
+        scan.baseLine = as<std::vector<float>>(peaks["baseLine"]);
+        scan.signalToNoise = as<std::vector<float>>(peaks["signalToNoise"]);
+        scan.charge = as<std::vector<int>>(peaks["charge"]);
         scans.push_back(scan);
     }
     // cout << "convert down" << endl;

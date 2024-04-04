@@ -19,8 +19,10 @@ struct alignas(64) Scan
 
 	// only MS2 scan has follows
 	int precursorScanNumber;
-	double precursorMz;
 	int precursorCharge;
+	double isolationWindowCenterMZ;
+	std::vector<int> precursorCharges;
+	std::vector<double> precursorMZs;
 
 	// only orbitrap scan has follows
 	std::vector<int> resolution;
@@ -33,7 +35,8 @@ struct alignas(64) Scan
 	Scan(int mScanNumber, float mRetentionTime, double mTIC);
 	// for MS2 scans
 	Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecusorScanNumber,
-		 double mPrecusorMz, int mPrecusorCharge);
+		int mPrecursorCharge, double mIsolationWindowCenterMZ, 
+		std::vector<int> mPrecursorCharges, std::vector<double> mPrecusorMZs);
 };
 
 class ftFileReader
@@ -54,6 +57,7 @@ public:
 	Scan currentScan;
 	std::vector<Scan> Scans;
 	std::vector<std::string> tokens;
+	ftFileReader();
 	ftFileReader(std::string file);
 	~ftFileReader();
 	void splitString(const std::string &mString);

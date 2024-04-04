@@ -3,23 +3,31 @@
 Scan::Scan() : scanNumber(0),
 			   retentionTime(0),
 			   precursorScanNumber(0),
-			   precursorMz(0),
+			   isolationWindowCenterMZ(0),
 			   precursorCharge(0) {}
 
 Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC) : scanNumber(mScanNumber),
 																 retentionTime(mRetentionTime),
 																 TIC(mTIC),
 																 precursorScanNumber(0),
-																 precursorMz(0),
+																 isolationWindowCenterMZ(0),
 																 precursorCharge(0) {}
 
 Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecusorScanNumber,
-		   double mPrecusorMz, int mPrecusorCharge) : scanNumber(mScanNumber),
-													  retentionTime(mRetentionTime),
-													  TIC(mTIC),
-													  precursorScanNumber(mPrecusorScanNumber),
-													  precursorMz(mPrecusorMz),
-													  precursorCharge(mPrecusorCharge) {}
+		   int mPrecursorCharge, double mIsolationWindowCenterMZ,
+		   std::vector<int> mPrecursorCharges,
+		   std::vector<double> mPrecusorMZs) : scanNumber(mScanNumber),
+											   retentionTime(mRetentionTime),
+											   TIC(mTIC),
+											   precursorScanNumber(mPrecusorScanNumber),
+											   precursorCharge(mPrecursorCharge),
+											   isolationWindowCenterMZ(mIsolationWindowCenterMZ),
+											   precursorCharges(mPrecursorCharges),
+											   precursorMZs(mPrecusorMZs) {}
+
+ftFileReader::ftFileReader()
+{
+}
 
 ftFileReader::ftFileReader(std::string file) : ftFileName(file)
 {
@@ -145,11 +153,13 @@ Scan ftFileReader::readScanNumberRentionTimePrecursor()
 {
 	continueRead = true;
 	int mScanNumber = 0;
-	double mPrecusorMz = 0;
-	double mPrecusorCharge = 0;
+	double mIsolationWindowCenterMz = 0;
+	double mPrecursorCharge = 0;
 	float mRetentionTime = 0;
 	double mTIC = 0;
 	int mPrecusorScanNumber = 0;
+	std::vector<int> mPrecursorCharges;
+	std::vector<double> mPrecursorMZs;
 	while (continueRead)
 	{
 		splitString(currentLine);
@@ -158,11 +168,19 @@ Scan ftFileReader::readScanNumberRentionTimePrecursor()
 			if (tokens[0] == "S")
 			{
 				mScanNumber = stoi(tokens[1]);
-				mPrecusorMz = stod(tokens[2]);
+				mIsolationWindowCenterMz = stod(tokens[2]);
 				mTIC = stod(tokens[3]);
 			}
 			else if (tokens[0] == "Z")
-				mPrecusorCharge = stoi(tokens[1]);
+			{
+				mPrecursorCharge = stoi(tokens[1]);
+				// for DIA precursor and wide window DDA reading in isolation window
+				for (size_t i = 3; i + 1 < tokens.size(); i += 2)
+				{
+					mPrecursorCharges.push_back(stoi(tokens[i]));
+					mPrecursorMZs.push_back(stod(tokens[i + 1]));
+				}
+			}
 			else if (tokens[1] == "RetentionTime")
 				mRetentionTime = stof(tokens[2]);
 		}
@@ -174,7 +192,8 @@ Scan ftFileReader::readScanNumberRentionTimePrecursor()
 		getline(ftFileStream, currentLine);
 	}
 	return Scan(mScanNumber, mRetentionTime, mTIC, mPrecusorScanNumber,
-				mPrecusorMz, mPrecusorCharge);
+				mPrecursorCharge, mIsolationWindowCenterMz,
+				mPrecursorCharges, mPrecursorMZs);
 }
 
 void ftFileReader::readPeakCharge()
@@ -240,7 +259,7 @@ void ftFileReader::readNextScan()
 
 Scan ftFileReader::readOneScan(const size_t scanNumber)
 {
-	Scan emptyScan(0, 0, 0, 0, 0, 0);
+	Scan emptyScan(0, 0, 0, 0, 0, 0, {}, {});
 	if (!detectPrecursorAndCharge())
 	{
 		std::cout << "Cannot read the first scan" << std::endl;

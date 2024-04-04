@@ -16,8 +16,9 @@ List readSpe2Pep(String Spe2PepFile)
 {
     Spe2PepFileReader reader;
     reader.readOneFile(Spe2PepFile);
-    DataFrame psmDf = DataFrame::create(Named("scanNumbers") = reader.currentSipPSM.scanNumbers,
+    DataFrame psmDf = DataFrame::create(Named("scanNumbers") = reader.currentSipPSM.scanNumbers,                             
                                         _["parentCharges"] = reader.currentSipPSM.parentCharges,
+                                        _["isolationWindowCenterMZs"] = reader.currentSipPSM.isolationWindowCenterMZs,
                                         _["measuredParentMasses"] = reader.currentSipPSM.measuredParentMasses,
                                         _["calculatedParentMasses"] = reader.currentSipPSM.calculatedParentMasses,
                                         _["retentionTimes"] = reader.currentSipPSM.retentionTimes,
@@ -55,6 +56,7 @@ List readSpe2Peps(String workingPath)
         // use std::move to speed up copy vector
         DataFrame psmDf = DataFrame::create(Named("scanNumbers") = std::move(mPSM->scanNumbers),
                                             _["parentCharges"] = std::move(mPSM->parentCharges),
+                                            _["isolationWindowCenterMZs"] = std::move(mPSM->isolationWindowCenterMZs),
                                             _["measuredParentMasses"] = std::move(mPSM->measuredParentMasses),
                                             _["calculatedParentMasses"] = std::move(mPSM->calculatedParentMasses),
                                             _["retentionTimes"] = std::move(mPSM->retentionTimes),
@@ -91,6 +93,7 @@ DataFrame readSpe2PepFilesScansTopPSMs(String workingPath, size_t topN = 5)
     DataFrame psmDf = DataFrame::create(Named("fileNames") = std::move(topPSMs.fileNames),
                                         _["scanNumbers"] = std::move(topPSMs.scanNumbers),
                                         _["parentCharges"] = std::move(topPSMs.parentCharges),
+                                        _["isolationWindowCenterMZs"] = std::move(topPSMs.isolationWindowCenterMZs),
                                         _["measuredParentMasses"] = std::move(topPSMs.measuredParentMasses),
                                         _["calculatedParentMasses"] = std::move(topPSMs.calculatedParentMasses),
                                         _["searchNames"] = std::move(topPSMs.searchNames),
@@ -136,6 +139,7 @@ DataFrame readSpe2PepFilesScansTopPSMsFromOneFT2(String workingPath, String patt
     DataFrame psmDf = DataFrame::create(Named("fileNames") = std::move(topPSMs.fileNames),
                                         _["scanNumbers"] = std::move(topPSMs.scanNumbers),
                                         _["parentCharges"] = std::move(topPSMs.parentCharges),
+                                        _["isolationWindowCenterMZs"] = std::move(topPSMs.isolationWindowCenterMZs),
                                         _["measuredParentMasses"] = std::move(topPSMs.measuredParentMasses),
                                         _["calculatedParentMasses"] = std::move(topPSMs.calculatedParentMasses),
                                         _["searchNames"] = std::move(topPSMs.searchNames),
@@ -168,6 +172,7 @@ List readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t 
         DataFrame psmDf = DataFrame::create(Named("fileNames") = reader.sipPSMs[i].fileNames,
                                             _["scanNumbers"] = reader.sipPSMs[i].scanNumbers,
                                             _["parentCharges"] = reader.sipPSMs[i].parentCharges,
+                                            _["isolationWindowCenterMZs"] = reader.sipPSMs[i].isolationWindowCenterMZs,
                                             _["measuredParentMasses"] = reader.sipPSMs[i].measuredParentMasses,
                                             _["calculatedParentMasses"] = reader.sipPSMs[i].calculatedParentMasses,
                                             _["searchNames"] = reader.sipPSMs[i].searchNames,

@@ -48,17 +48,17 @@ void Spe2PepFileReader::fillVectors()
     size_t i = 0;
     splitString(Sep2PepFileChunkLines[i]);
     int scanNumber = stoi(tokens[2]);
-    int parentCharge = stoi(tokens[3]);
-    double measuredParentMass = stod(tokens[4]);
+    double isolationWindowCenter = stod(tokens[4]);
     float retentionTime = (stof(tokens[7]));
     i++;
     while (i < Sep2PepFileChunkLines.size())
     {
         splitString(Sep2PepFileChunkLines[i]);
         currentSipPSM.scanNumbers.push_back(scanNumber);
-        currentSipPSM.parentCharges.push_back(parentCharge);
-        currentSipPSM.measuredParentMasses.push_back(measuredParentMass);
+        currentSipPSM.isolationWindowCenterMZs.push_back(isolationWindowCenter);
         currentSipPSM.retentionTimes.push_back(retentionTime);
+        currentSipPSM.parentCharges.push_back(stoi(tokens[8]));
+        currentSipPSM.measuredParentMasses.push_back(stod(tokens[9]));
         currentSipPSM.calculatedParentMasses.push_back(stod(tokens[3]));
         currentSipPSM.ranks.push_back(i);
         currentSipPSM.MVHscores.push_back(stof(tokens[4]));
@@ -176,6 +176,7 @@ void Spe2PepFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, co
     size_t i = 0;
     bool insertSucced = false;
     scanTopPSM mScanTopPSM = scanTopPSM(currentSipPSM.parentCharges[psmIX],
+                                        currentSipPSM.isolationWindowCenterMZs[psmIX],
                                         currentSipPSM.measuredParentMasses[psmIX],
                                         currentSipPSM.calculatedParentMasses[psmIX],
                                         currentSipPSM.searchName,
@@ -242,6 +243,7 @@ sipPSM Spe2PepFileReader::convertFilesScansTopPSMs()
                 topPSMs.fileNames.push_back(fileIX.first);
                 topPSMs.scanNumbers.push_back(scanIX.first);
                 topPSMs.parentCharges.push_back(scanIX.second[i].parentCharge);
+                topPSMs.isolationWindowCenterMZs.push_back(scanIX.second[i].isolationWindowCenterMZ);
                 topPSMs.measuredParentMasses.push_back(scanIX.second[i].measuredParentMass);
                 topPSMs.calculatedParentMasses.push_back(scanIX.second[i].calculatedParentMass);
                 topPSMs.searchNames.push_back(scanIX.second[i].searchName);
@@ -264,15 +266,21 @@ void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const st
 {
     Spe2PepFileReader reader(workingPath);
     std::unordered_map<std::string, std::vector<std::string>> FT2map;
+    size_t pos;
     // group the .Spe2PepFile.txt files by FT2 name
     for (const auto &str : reader.sipFileNames)
     {
         // Extract the filename
         std::filesystem::path full_path(str);
         std::string filename = full_path.filename().string();
-        // get FT2 file name by substring before the first "." character
-        size_t pos = filename.find(".");
-        FT2map[filename.substr(0, pos)].push_back(str);
+        // get FT2 file name by substring before the last third "." character
+        pos = filename.find_last_of(".");
+        pos = filename.find_last_of(".", pos - 1);
+        pos = filename.find_last_of(".", pos - 1);
+        if (pos == std::string::npos)
+            std::cout << filename << " 's name style is not right" << std::endl;
+        else
+            FT2map[filename.substr(0, pos)].push_back(str);
     }
     FT2s.clear();
     for (auto const &pair : FT2map)
@@ -314,6 +322,8 @@ void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
        << "\t"
        << "parentCharges"
        << "\t"
+       << "isolationWindowCenterMZs"
+       << "\t"
        << "measuredParentMasses"
        << "\t"
        << "calculatedParentMasses"
@@ -344,6 +354,7 @@ void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
             {
                 ss << sipPSMs[i].fileNames[k] << "\t" << sipPSMs[i].scanNumbers[k] << "\t"
                    << sipPSMs[i].parentCharges[k] << "\t"
+                   << sipPSMs[i].isolationWindowCenterMZs[k] << "\t"
                    << sipPSMs[i].measuredParentMasses[k] << "\t" << sipPSMs[i].calculatedParentMasses[k] << "\t"
                    << sipPSMs[i].searchNames[k] << "\t" << sipPSMs[i].retentionTimes[k] << "\t" << sipPSMs[i].MVHscores[k] << "\t"
                    << sipPSMs[i].XcorrScores[k] << "\t" << sipPSMs[i].WDPscores[k] << "\t"

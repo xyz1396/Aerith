@@ -144,16 +144,13 @@ void sipFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, const 
                                         currentSipPSM.measuredParentMasses[psmIX],
                                         currentSipPSM.calculatedParentMasses[psmIX],
                                         currentSipPSM.searchName,
+                                        currentSipPSM.scores[psmIX],
                                         currentSipPSM.identifiedPeptides[psmIX],
                                         currentSipPSM.originalPeptides[psmIX],
-                                        currentSipPSM.proteinNames[psmIX],
-                                        currentSipPSM.retentionTimes[psmIX],
-                                        currentSipPSM.MVHscores[psmIX],
-                                        currentSipPSM.XcorrScores[psmIX],
-                                        currentSipPSM.WDPscores[psmIX]);
+                                        currentSipPSM.proteinNames[psmIX]);
     while (i < scanTopPSMs.size())
     {
-        if (currentSipPSM.WDPscores[psmIX] > scanTopPSMs[i].WDPscore)
+        if (currentSipPSM.scores[psmIX] > scanTopPSMs[i].score)
         {
             scanTopPSMs.insert(scanTopPSMs.begin() + i, mScanTopPSM);
             insertSucced = true;

@@ -1,4 +1,5 @@
 #pragma once
+#include "isotopicPeak.h"
 #include <string>
 #include <vector>
 
@@ -35,9 +36,18 @@ public:
     std::vector<double> isolationWindowCenterMZs;
 
     // new featuers
+    std::vector<int> precursorScanNumbers;
+    std::vector<bool> isDecoys;
+    std::vector<int> peptideLengths;
     std::vector<double> massErrors;
     std::vector<double> mzShiftFromisolationWindowCenters;
     std::vector<int> isotopicMassWindowShifts;
+    // isotopic envelope in MS1
+    std::vector<std::vector<isotopicPeak>> isotopicPeakss;
+    std::vector<int> istopicPeakNumbers;
+    std::vector<double> precursorIntensities; 
+    std::vector<double> MS1IsotopicAbundances;
+    std::vector<double> MS2IsotopicAbundances;
 };
 
 class alignas(64) scanTopPSM

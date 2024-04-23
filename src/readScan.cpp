@@ -23,9 +23,12 @@ List readOneScanMS2(const String &ftFile, const size_t scanNumber)
     List mScanList = List::create(Named("scanNumber") = mScan.scanNumber,
                                   _["retentionTime"] = mScan.retentionTime,
                                   _["precursorScanNumber"] = mScan.precursorScanNumber,
-                                  _["precursorMz"] = mScan.precursorMz,
                                   _["precursorCharge"] = mScan.precursorCharge,
-                                  _["peaks"] = peakDf);
+                                  _["isolationWindowCenterMZ"] = mScan.isolationWindowCenterMZ,
+                                  _["TIC"] = mScan.TIC,
+                                  _["precursorCharges"] = mScan.precursorCharges,
+                                  _["precursorMZs"] = mScan.precursorMZs,
+                                  _["peaks"] = std::move(peakDf));
     return mScanList;
 }
 

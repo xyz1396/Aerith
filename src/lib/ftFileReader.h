@@ -34,9 +34,9 @@ struct alignas(64) Scan
 	// for MS1 scans
 	Scan(int mScanNumber, float mRetentionTime, double mTIC);
 	// for MS2 scans
-	Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecusorScanNumber,
+	Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecursorScanNumber,
 		int mPrecursorCharge, double mIsolationWindowCenterMZ, 
-		std::vector<int> mPrecursorCharges, std::vector<double> mPrecusorMZs);
+		std::vector<int> mPrecursorCharges, std::vector<double> mPrecursorMZs);
 };
 
 class ftFileReader

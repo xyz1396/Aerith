@@ -1,7 +1,6 @@
 #include "lib/Spe2PepFileReader.h"
 #include <Rcpp.h>
 #include <regex>
-#include <omp.h>
 using namespace Rcpp;
 
 //' readSpe2Pep

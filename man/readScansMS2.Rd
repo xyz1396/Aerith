@@ -2,12 +2,12 @@
 % Please edit documentation in R/RcppExports.R
 \name{readScansMS2}
 \alias{readScansMS2}
-\title{readScansMS2}
+\title{read MS2 scans with scanNumber as index in a range}
 \usage{
 readScansMS2(ftFile, startScanNumber, endScanNumber)
 }
 \arguments{
-\item{ftFile}{a ft1 file's full path}
+\item{ftFile}{a ft2 file's full path}
 
 \item{startScanNumber}{read scans starting from this scanNumber}
 
@@ -17,8 +17,8 @@ readScansMS2(ftFile, startScanNumber, endScanNumber)
 a list of MS2 scans with names of scan number
 }
 \description{
-readScansMS2
+read MS2 scans with scanNumber as index in a range
 }
 \examples{
-ft2 <- readScansMS2("demo.ft2")
+ft2 <- readScansMS2("demo.ft2", 1, 10)
 }

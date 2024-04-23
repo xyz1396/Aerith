@@ -3,27 +3,27 @@
 Scan::Scan() : scanNumber(0),
 			   retentionTime(0),
 			   precursorScanNumber(0),
-			   isolationWindowCenterMZ(0),
-			   precursorCharge(0) {}
+			   precursorCharge(0),
+			   isolationWindowCenterMZ(0) {}
 
 Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC) : scanNumber(mScanNumber),
 																 retentionTime(mRetentionTime),
 																 TIC(mTIC),
 																 precursorScanNumber(0),
-																 isolationWindowCenterMZ(0),
-																 precursorCharge(0) {}
+																 precursorCharge(0),
+																 isolationWindowCenterMZ(0) {}
 
-Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecusorScanNumber,
+Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecursorScanNumber,
 		   int mPrecursorCharge, double mIsolationWindowCenterMZ,
 		   std::vector<int> mPrecursorCharges,
-		   std::vector<double> mPrecusorMZs) : scanNumber(mScanNumber),
+		   std::vector<double> mPrecursorMZs) : scanNumber(mScanNumber),
 											   retentionTime(mRetentionTime),
 											   TIC(mTIC),
-											   precursorScanNumber(mPrecusorScanNumber),
+											   precursorScanNumber(mPrecursorScanNumber),
 											   precursorCharge(mPrecursorCharge),
 											   isolationWindowCenterMZ(mIsolationWindowCenterMZ),
 											   precursorCharges(mPrecursorCharges),
-											   precursorMZs(mPrecusorMZs) {}
+											   precursorMZs(mPrecursorMZs) {}
 
 ftFileReader::ftFileReader()
 {
@@ -157,7 +157,7 @@ Scan ftFileReader::readScanNumberRentionTimePrecursor()
 	double mPrecursorCharge = 0;
 	float mRetentionTime = 0;
 	double mTIC = 0;
-	int mPrecusorScanNumber = 0;
+	int mPrecursorScanNumber = 0;
 	std::vector<int> mPrecursorCharges;
 	std::vector<double> mPrecursorMZs;
 	while (continueRead)
@@ -187,11 +187,11 @@ Scan ftFileReader::readScanNumberRentionTimePrecursor()
 		else
 		{
 			continueRead = false;
-			mPrecusorScanNumber = stoi(tokens[2]);
+			mPrecursorScanNumber = stoi(tokens[2]);
 		}
 		getline(ftFileStream, currentLine);
 	}
-	return Scan(mScanNumber, mRetentionTime, mTIC, mPrecusorScanNumber,
+	return Scan(mScanNumber, mRetentionTime, mTIC, mPrecursorScanNumber,
 				mPrecursorCharge, mIsolationWindowCenterMz,
 				mPrecursorCharges, mPrecursorMZs);
 }

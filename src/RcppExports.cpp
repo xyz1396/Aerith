@@ -10,6 +10,20 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// extractPSMfeatures
+List extractPSMfeatures(String Spe2PepFilePath, int topN, String ftFilepath, int ThreadNumber);
+RcppExport SEXP _Aerith_extractPSMfeatures(SEXP Spe2PepFilePathSEXP, SEXP topNSEXP, SEXP ftFilepathSEXP, SEXP ThreadNumberSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type Spe2PepFilePath(Spe2PepFilePathSEXP);
+    Rcpp::traits::input_parameter< int >::type topN(topNSEXP);
+    Rcpp::traits::input_parameter< String >::type ftFilepath(ftFilepathSEXP);
+    Rcpp::traits::input_parameter< int >::type ThreadNumber(ThreadNumberSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, ThreadNumber));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getUnfilteredPSMs
 DataFrame getUnfilteredPSMs(String sipPath, String ftPath, size_t topN);
 RcppExport SEXP _Aerith_getUnfilteredPSMs(SEXP sipPathSEXP, SEXP ftPathSEXP, SEXP topNSEXP) {
@@ -525,6 +539,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_Aerith_extractPSMfeatures", (DL_FUNC) &_Aerith_extractPSMfeatures, 4},
     {"_Aerith_getUnfilteredPSMs", (DL_FUNC) &_Aerith_getUnfilteredPSMs, 3},
     {"_Aerith_getUnfilteredPeptides", (DL_FUNC) &_Aerith_getUnfilteredPeptides, 1},
     {"_Aerith_getFilterThreshold", (DL_FUNC) &_Aerith_getFilterThreshold, 2},

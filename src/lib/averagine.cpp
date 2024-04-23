@@ -7,8 +7,37 @@ averagine::averagine(const int minPepLen, const int maxPepLen)
     averagineAtomCounts = ProNovoConfig::configIsotopologue.mResidueAtomicComposition[averagineResidue];
     ProNovoConfig::configIsotopologue.computeIsotopicDistribution(averagineAtomCounts,
                                                                   averagineSIPdistribution);
-    pepAtomCounts.resize(averagineAtomCounts.size());
     diffAtomCounts.resize(averagineAtomCounts.size());
+    C12Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vMass[0];
+    C13Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vMass[1];
+    C13Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vProb[1];
+    H1Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[1].vMass[0];
+    H2Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[1].vMass[1];
+    H2Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[1].vProb[1];
+    O16Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[2].vMass[0];
+    O17Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[2].vMass[1];
+    O17Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[2].vProb[1];
+    O18Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[2].vMass[2];
+    O18Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[2].vProb[2];
+    N14Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[3].vMass[0];
+    N15Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[3].vMass[1];
+    N15Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[3].vProb[1];
+    PfakeLowMass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[4].vMass[0];
+    PfakeMass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[4].vMass[1];
+    PfakeAbundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[4].vProb[1];
+    S32Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vMass[0];
+    S33Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vMass[1];
+    S33Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vProb[1];
+    S34Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vMass[2];
+    S34Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vProb[2];
+    S36Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vMass[3];
+    S36Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vProb[3];
+    adjustEstimatePrecursorMassbyNP();
+}
+
+averagine::averagine()
+{
+    diffAtomCounts.resize(6);
     C12Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vMass[0];
     C13Mass = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vMass[1];
     C13Abundance = &ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vProb[1];
@@ -191,7 +220,16 @@ double averagine::calNetronMass(const string &pepSeq)
     return neutronMass;
 }
 
-double averagine::calPrecusorMass(const string &pepSeq)
+double averagine::calPrecursorBaseMass(const string &pepSeq)
+{
+    calPepAtomCounts(pepSeq);
+    double baseMass = pepAtomCounts[0] * (*C12Mass) + pepAtomCounts[1] * (*H1Mass) + pepAtomCounts[2] * (*O16Mass) +
+                      pepAtomCounts[3] * (*N14Mass) + pepAtomCounts[4] * (*PfakeLowMass) +
+                      pepAtomCounts[5] * (*S32Mass);
+    return baseMass;
+}
+
+double averagine::calPrecursorMass(const string &pepSeq)
 {
     calPepAtomCounts(pepSeq);
     double neutronMass = calNetronMass(pepSeq);
@@ -205,13 +243,13 @@ double averagine::calPrecusorMass(const string &pepSeq)
 void averagine::calDiffAtomCounts(const string &pepSeq)
 {
     calPepAtomCounts(pepSeq);
-    diffAtomCounts = pepAtomCounts;
+    diffAtomCounts = vector<int>(pepAtomCounts.begin(), pepAtomCounts.end());
     vector<int> *averaginePepAtomCountPtr = getAveraginePepAtomCounts(pepSeq.length());
     for (size_t k = 0; k < diffAtomCounts.size(); k++)
         diffAtomCounts[k] -= (*averaginePepAtomCountPtr)[k];
 }
 
-void averagine::calPrecusorIsotopeDistribution(const string &pepSeq, IsotopeDistribution &tempSIPdistribution)
+void averagine::calPrecursorIsotopeDistribution(const string &pepSeq, IsotopeDistribution &tempSIPdistribution)
 {
     calDiffAtomCounts(pepSeq);
     ProNovoConfig::configIsotopologue.computeIsotopicDistribution(diffAtomCounts,

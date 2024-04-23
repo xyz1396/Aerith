@@ -18,13 +18,14 @@ public:
     // C,H,O,N,P,S count of averagine peptides at different length
     vector<vector<int>> averaginePepAtomCountss;
     // C,H,O,N,P,S Atom count of peptides
-    vector<int> pepAtomCounts;
+    std::array<int, 6> pepAtomCounts = {0};
     // Atom count difference bettween averagine and peptide
     vector<int> diffAtomCounts;
     IsotopeDistribution averagineSIPdistribution;
     vector<IsotopeDistribution> averaginePepSIPdistributions;
     int minPepLen, maxPepLen, pepLenRange, SIPatomIX;
     averagine(const int minPepLen, const int maxPepLen);
+    averagine();
     ~averagine();
     void changeAtomSIPabundance(const char SIPatom, const double pct);
     double weighted_mean(const std::vector<double> &values, const std::vector<double> &weights);
@@ -37,7 +38,9 @@ public:
     // init it in init function and changeAtomSIPabundance
     void adjustEstimatePrecursorMassbyNP(); 
     std::function<double(double, int, double)> estimatePrecursorMassbyNP;
-    double calPrecusorMass(const string &pepSeq);
+    // for peptide base mass without isotope
+    double calPrecursorBaseMass(const string &pepSeq);
+    double calPrecursorMass(const string &pepSeq);
     void calDiffAtomCounts(const string &pepSeq);
-    void calPrecusorIsotopeDistribution(const string &pepSeq, IsotopeDistribution &tempSIPdistribution);
+    void calPrecursorIsotopeDistribution(const string &pepSeq, IsotopeDistribution &tempSIPdistribution);
 };

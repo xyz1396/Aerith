@@ -173,9 +173,11 @@ List readScansMS2(const String ftFile, const size_t startScanNumber, const size_
         List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
                                       _["retentionTime"] = mScan->retentionTime,
                                       _["precursorScanNumber"] = mScan->precursorScanNumber,
-                                      _["precursorMz"] = mScan->precursorMz,
-                                      _["TIC"] = mScan->TIC,
                                       _["precursorCharge"] = mScan->precursorCharge,
+                                      _["isolationWindowCenterMZ"] = mScan->isolationWindowCenterMZ,
+                                      _["TIC"] = mScan->TIC,
+                                      _["precursorCharges"] = mScan->precursorCharges,
+                                      _["precursorMZs"] = mScan->precursorMZs,
                                       _["peaks"] = std::move(peakDf));
         scanList[i] = std::move(mScanList);
         scanNumbers[i] = std::to_string(mScan->scanNumber);
@@ -216,9 +218,11 @@ List readScansMS2Vector(const String ftFile, const NumericVector scanNumbersVect
         List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
                                       _["retentionTime"] = mScan->retentionTime,
                                       _["precursorScanNumber"] = mScan->precursorScanNumber,
-                                      _["precursorMz"] = mScan->precursorMz,
-                                      _["TIC"] = mScan->TIC,
                                       _["precursorCharge"] = mScan->precursorCharge,
+                                      _["isolationWindowCenterMZ"] = mScan->isolationWindowCenterMZ,
+                                      _["TIC"] = mScan->TIC,
+                                      _["precursorCharges"] = mScan->precursorCharges,
+                                      _["precursorMZs"] = mScan->precursorMZs,
                                       _["peaks"] = std::move(peakDf));
         scanList[i] = std::move(mScanList);
         scanNumbersStr[i] = std::to_string(mScan->scanNumber);
@@ -258,9 +262,11 @@ List readAllScanMS2(const String ftFile)
         List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
                                       _["retentionTime"] = mScan->retentionTime,
                                       _["precursorScanNumber"] = mScan->precursorScanNumber,
-                                      _["precursorMz"] = mScan->precursorMz,
-                                      _["TIC"] = mScan->TIC,
                                       _["precursorCharge"] = mScan->precursorCharge,
+                                      _["isolationWindowCenterMZ"] = mScan->isolationWindowCenterMZ,
+                                      _["TIC"] = mScan->TIC,
+                                      _["precursorCharges"] = mScan->precursorCharges,
+                                      _["precursorMZs"] = mScan->precursorMZs,
                                       _["peaks"] = std::move(peakDf));
         scanList[i] = std::move(mScanList);
         scanNumbers[i] = std::to_string(mScan->scanNumber);

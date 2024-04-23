@@ -50,7 +50,7 @@ std::vector<int> ftFileWriter::rankify(const std::vector<double> &A)
     }
     // Sort T according to first element
     std::sort(T.begin(), T.end(), [](const std::pair<double, int> &a, const std::pair<double, int> &b) -> bool
-         { return (a.first > b.first); });
+              { return (a.first > b.first); });
     for (int i = 0; i < n; i++)
     {
         R[T[i].second] = i;
@@ -150,10 +150,16 @@ void ftFileWriter::writeHeaderHasCharge()
 void ftFileWriter::writeMS2ScanHasCharge(Scan &mScan)
 {
     ftFileStream << std::fixed << std::setprecision(6);
-    ftFileStream << "S\t" << std::to_string(mScan.scanNumber) << "\t" << mScan.precursorMz
+    ftFileStream << "S\t" << std::to_string(mScan.scanNumber) << "\t" << mScan.isolationWindowCenterMZ
                  << std::setprecision(2) << "\t" << mScan.TIC << std::endl;
     ftFileStream << "Z\t" << std::to_string(mScan.precursorCharge)
-                 << std::setprecision(6) << "\t" << mScan.precursorMz * mScan.precursorCharge << std::endl;
+                 << std::setprecision(6) << "\t" << mScan.isolationWindowCenterMZ * mScan.precursorCharge;
+    for (size_t i = 0; i < mScan.precursorCharges.size(); i++)
+    {
+        ftFileStream << "\t" << std::to_string(mScan.precursorCharges[i]);
+        ftFileStream << "\t" << std::setprecision(6) << mScan.precursorMZs[i];
+    }
+    ftFileStream << std::endl;
     ftFileStream << "I\tRetentionTime\t" << mScan.retentionTime << std::endl;
     ftFileStream << "I\tScanType\t" << scanType << std::endl;
     ftFileStream << "I\tScanFilter\t" << scanFilter << std::endl;

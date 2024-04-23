@@ -165,7 +165,7 @@ NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVecto
 		for (int i = 0; i < AAstrs.size(); i++)
 		{
 			mAveragine.changeAtomSIPabundance(cAtom, Probs[i]);
-			v[i] = mAveragine.calPrecusorMass(as<std::string>((AAstrs[i])));
+			v[i] = mAveragine.calPrecursorMass(as<std::string>((AAstrs[i])));
 		}
 	}
 	return v;
@@ -269,7 +269,7 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 		DataFrame df;
 		for (int i = 0; i < AAstrs.size(); i++)
 		{
-			mAveragine.calPrecusorIsotopeDistribution(as<std::string>(AAstrs(i)), mSIP);
+			mAveragine.calPrecursorIsotopeDistribution(as<std::string>(AAstrs(i)), mSIP);
 			df =
 				DataFrame::create(Named("Mass") = move(mSIP.vMass), _["Prob"] = move(mSIP.vProb));
 			spectraList[i] = move(df);

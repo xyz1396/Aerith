@@ -77,9 +77,11 @@ bool writeAllScanMS2(List header, List scansList, const String &ftFile)
         scan.scanNumber = as<int>(scanList["scanNumber"]);
         scan.retentionTime = as<float>(scanList["retentionTime"]);
         scan.precursorScanNumber = as<int>(scanList["precursorScanNumber"]);
-        scan.precursorMz = as<double>(scanList["precursorMz"]);
+        scan.isolationWindowCenterMZ = as<double>(scanList["isolationWindowCenterMZ"]);
         scan.TIC = as<float>(scanList["TIC"]);
         scan.precursorCharge = as<int>(scanList["precursorCharge"]);
+        scan.precursorCharges = as<std::vector<int>>(scanList["precursorCharges"]);
+        scan.precursorMZs = as<std::vector<double>>(scanList["precursorMZs"]);
 
         peaks = scanList["peaks"];
         scan.mz = as<std::vector<double>>(peaks["mz"]);

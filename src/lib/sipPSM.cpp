@@ -1,6 +1,7 @@
 #include "sipPSM.h"
 
 scanTopPSM::scanTopPSM(int parentCharge,
+                       int precursorScanNumber,
                        double isolationWindowCenterMZ,
                        double measuredParentMass,
                        double calculatedParentMass,
@@ -12,6 +13,7 @@ scanTopPSM::scanTopPSM(int parentCharge,
                        float MVHscore,
                        float XcorrScore,
                        float WDPscore) : parentCharge(parentCharge),
+                                         precursorScanNumber(precursorScanNumber),
                                          isolationWindowCenterMZ(isolationWindowCenterMZ),
                                          measuredParentMass(measuredParentMass),
                                          calculatedParentMass(calculatedParentMass), searchName(searchName),

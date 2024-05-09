@@ -13,11 +13,12 @@
 using namespace std;
 
 /**/
-struct alignas(64) IsotopeDistribution
+class IsotopeDistribution
 {
 public:
 	IsotopeDistribution();
-	IsotopeDistribution(const vector<double> &vItsMass, const vector<double> &vItsProb);
+	IsotopeDistribution(vector<double> vItsMass, vector<double> vItsComposition);
+	~IsotopeDistribution();
 
 	vector<double> vMass;
 	vector<double> vProb;
@@ -27,9 +28,6 @@ public:
 	double getLowestMass();
 
 	void filterProbCutoff(double dProCutoff);
-	// filtering topN highest isotopic peak when SIP peaks is too wide 
-	// 50% 13C labeled for example
-	void filterProbCutoff(int topN);
 
 	// print out the isotoptic distribution
 	// this is mainly used for debuging
@@ -46,52 +44,51 @@ public:
 	bool setupIsotopologue(const string &sTable, const string &AtomNameInput);
 
 	// get the MostAbundant masses of  residues
-	bool getSingleResidueMostAbundantMasses(vector<string> &vsResidues, vector<double> &vdMostAbundantMasses, double &dTerminusMassN, double &dTerminusMassC);
+	bool getSingleResidueMostAbundantMasses(vector<string> &vsResidues, vector<double> &vdMostAbundantMasses, double &dTerminusMassN,
+											double &dTerminusMassC);
 
 	// compute the mass of the most abundant isotopologue
 	double computeMostAbundantMass(string sSequence);
 	double computeAverageMass(string sSequence);
 	double computeMonoisotopicMass(string sSequence);
 
+	// variables for this isotopologue
+	map<string, vector<int>> mResidueAtomicComposition;
+	vector<IsotopeDistribution> vAtomIsotopicDistribution;
+	map<string, IsotopeDistribution> vResidueIsotopicDistribution;
+
+	// emass functions for IsotopeDistribution's arithmetic
+	IsotopeDistribution sum(const IsotopeDistribution &distribution0, const IsotopeDistribution &distribution1);
+
 	// compute isotoptic distributions for all product ions of a sequence
 	// this isotopologue class is modified by only adding this function
 	// The first dimension of vvdYionMass and vvdYionProb is from y1, y2, ...
 	// The first dimension of vvdBionMass and vvdBionProb is from b1, b2, ...
 	// the mass is calculated assuming cleavage of the peptide bond
-	bool computeProductIon(string sSequence,
-						   vector<vector<double>> &vvdYionMass,
-						   vector<vector<double>> &vvdYionProb,
-						   vector<vector<double>> &vvdBionMass,
-						   vector<vector<double>> &vvdBionProb);
+	bool computeProductIon(string sSequence, vector<vector<double>> &vvdYionMass, vector<vector<double>> &vvdYionProb,
+						   vector<vector<double>> &vvdBionMass, vector<vector<double>> &vvdBionProb);
 
 	// compute isotoptic distribution for an amino acid sequence
 	bool computeIsotopicDistribution(string sSequence, IsotopeDistribution &myIsotopeDistribution);
 
 	// compute isotoptic distribution for a given atomic composition,
 	// which can be that of a residue's or a amino acid sequence's
-	bool computeIsotopicDistribution(vector<int> AtomicComposition,
-									 IsotopeDistribution &myIsotopeDistribution);
+	bool computeIsotopicDistribution(vector<int> AtomicComposition, IsotopeDistribution &myIsotopeDistribution);
 
 	// compute the atomic composition for an amino acid sequence
 	bool computeAtomicComposition(string sSequence, vector<int> &myAtomicComposition);
 
+	vector<IsotopeDistribution> &get_vAtomIsotopicDistribution()
+	{
+		return vAtomIsotopicDistribution;
+	}
+
+private:
 	// functions for IsotopeDistribution's arithmetic
-	IsotopeDistribution sum(const IsotopeDistribution &distribution0,
-							const IsotopeDistribution &distribution1);
+	IsotopeDistribution sum_backup(const IsotopeDistribution &distribution0, const IsotopeDistribution &distribution1);
 	IsotopeDistribution multiply(const IsotopeDistribution &distribution0, int count);
 	void shiftMass(IsotopeDistribution &distribution0, double dMass);
 
-	// variables for this isotopologue
-	map<string, vector<int>> mResidueAtomicComposition;
-	vector<IsotopeDistribution> vAtomIsotopicDistribution;
-	map<string, IsotopeDistribution> vResidueIsotopicDistribution;
-
-	// get topN filter treshold by isolation window width and precursor SIP distribution
-	int getFilterThresh(const float isolationWindow, const IsotopeDistribution &mDistribution);
-	// for isotopic peak filtering at abundance close to 50%
-	void filterHighIntensity(const int topN, vector<IsotopeDistribution> &vIonDistribution);
-
-private:
 	// implementation of max and min
 	double maximum(double a, double b)
 	{
@@ -115,6 +112,12 @@ private:
 
 	// the number of natural CHONPS and enriched CHONPS
 	unsigned int AtomNumber;
+
+	
+
+	// Sipros Ensemble
+	// emass needs the mass to be one nucleus difference
+	bool CheckMass(vector<double> &vdMass, vector<double> &vdNaturalCompositionTemp);
 };
 
 #endif // ISOTOPOLOGUE_H

@@ -73,8 +73,8 @@ List extractPSMfeatures(String Spe2PepFilePath, int topN,
                                to_string(sipPSMs[i].precursorScanNumbers[j]) + "\t" + sipPSMs[i].identifiedPeptides[j]);
         }
         isotopicPeaksList.names() = PSMnames;
-        psmList[i] = List::create(Named("PSMdataframe") = psmDf,
-                                  _("isotopicPeakList") = isotopicPeaksList);
+        psmList[i] = List::create(Named("PSMdataframe") = std::move(psmDf),
+                                  _("isotopicPeakList") = std::move(isotopicPeaksList));
     }
     psmList.names() = extractor.mSpe2PepFileReader.FT2s;
     return psmList;

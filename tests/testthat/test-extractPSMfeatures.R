@@ -1,5 +1,6 @@
 context("extractPSMfeatures")
 
 test_that("extractPSMfeatures works", {
-  psm <- extractPSMfeatures("/mnt/d/work/202404/sipPCT5/", 2, "/mnt/d/work/202404/sipPCT5/", 3)
+  psm <- extractPSMfeatures("/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Good",
+   5, "/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/FT", 8)
 })

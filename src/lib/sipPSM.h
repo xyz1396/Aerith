@@ -45,7 +45,7 @@ public:
     // isotopic envelope in MS1
     std::vector<std::vector<isotopicPeak>> isotopicPeakss;
     std::vector<int> istopicPeakNumbers;
-    std::vector<double> precursorIntensities; 
+    std::vector<double> precursorIntensities;
     std::vector<double> MS1IsotopicAbundances;
     std::vector<double> MS2IsotopicAbundances;
 };
@@ -54,6 +54,7 @@ class alignas(64) scanTopPSM
 {
 public:
     int parentCharge;
+    int precursorScanNumber; // for .Spe2Pep.txt file
     double isolationWindowCenterMZ;
     double measuredParentMass;
     double calculatedParentMass;
@@ -78,6 +79,7 @@ public:
                std::string proteinName);
     // for Spe2Pep.txt file
     scanTopPSM(int parentCharge,
+               int precursorScanNumber,
                double isolationWindowCenterMZ,
                double measuredParentMass,
                double calculatedParentMass,

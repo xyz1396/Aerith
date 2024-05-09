@@ -1,7 +1,11 @@
-
 #include "proNovoConfig.h"
 
 string ProNovoConfig::sFilename = "SiprosConfig.cfg";
+
+void ProNovoConfig::setFASTAfilename(const string &fastaFilename)
+{
+	sFASTAFilename = fastaFilename;
+}
 
 #if _WIN32
 string ProNovoConfig::sWorkingDirectory = ".\\";
@@ -29,7 +33,7 @@ double ProNovoConfig::dMassAccuracyParentIon = 0.05;
 double ProNovoConfig::dMassAccuracyFragmentIon = 0.05;
 vector<int> ProNovoConfig::viParentMassWindows;
 
-ProNovoConfig *ProNovoConfig::ProNovoConfigSingleton = 0;
+ProNovoConfig *ProNovoConfig::ProNovoConfigSingleton = NULL;
 
 vector<string> ProNovoConfig::vsSingleResidueNames;
 vector<double> ProNovoConfig::vdSingleResidueMasses;
@@ -46,11 +50,116 @@ vector<pair<double, double>> ProNovoConfig::vpPeptideMassWindowOffset;
 
 vector<pair<string, string>> ProNovoConfig::vpNeutralLossList;
 
+//---------------Comet Begin---------------------
+bool ProNovoConfig::bXcorrEnable = false;
+Options ProNovoConfig::options;
+double ProNovoConfig::dInverseBinWidth = 0;	  // this is used in BIN() many times so use inverse binWidth to do multiply vs. divide
+double ProNovoConfig::dOneMinusBinOffset = 0; // this is used in BIN() many times so calculate once
+IonInfo ProNovoConfig::ionInformation;
+int ProNovoConfig::iXcorrProcessingOffset = 75;
+PrecalcMasses ProNovoConfig::precalcMasses;
+double ProNovoConfig::dMaxMS2ScanMass = 0;
+double ProNovoConfig::dMaxPeptideMass = 0;
+// map<char, double> ProNovoConfig::pdAAMassFragment;
+AminoAcidMasses ProNovoConfig::pdAAMassFragment;
+double ProNovoConfig::dHighResFragmentBinSize = 0.02;
+double ProNovoConfig::dHighResFragmentBinStartOffset = 0;
+double ProNovoConfig::dLowResFragmentBinSize = 1.0005;
+double ProNovoConfig::dLowResFragmentBinStartOffset = 0.4;
+double ProNovoConfig::dHighResInverseBinWidth = 1.0 / ProNovoConfig::dHighResFragmentBinSize;
+double ProNovoConfig::dLowResInverseBinWidth = 1.0 / ProNovoConfig::dLowResFragmentBinSize;
+double ProNovoConfig::dHighResOneMinusBinOffset = 1.0 - ProNovoConfig::dHighResFragmentBinStartOffset;
+double ProNovoConfig::dLowResOneMinusBinOffset = 1.0 - ProNovoConfig::dLowResFragmentBinStartOffset;
+int ProNovoConfig::iMaxPercusorCharge = 0;
+//---------------Comet End-----------------------
+
+//---------------Myrimatch Begin-----------------
+bool ProNovoConfig::bMvhEnable = true;
+double ProNovoConfig::ClassSizeMultiplier = 2;
+int ProNovoConfig::NumIntensityClasses = 3;
+int ProNovoConfig::minIntensityClassCount = int((pow(ClassSizeMultiplier, NumIntensityClasses) - 1) / (ClassSizeMultiplier - 1));
+double ProNovoConfig::ticCutoffPercentage = 0.98;
+int ProNovoConfig::MaxPeakCount = 300;
+int ProNovoConfig::MinMatchedFragments = 5;
+double ProNovoConfig::minObservedMz = numeric_limits<double>::max();
+double ProNovoConfig::maxObservedMz = 0;
+//---------------Myrimatch End-------------------
+
+//---------------Sipros Score--------------------
+bool ProNovoConfig::bWeightDotSumEnable = false;
+bool ProNovoConfig::bLessIsotopicDistribution = false;
+bool ProNovoConfig::bMultiScores = true;
+string ProNovoConfig::sDecoyPrefix = "";
+int ProNovoConfig::INTTOPKEEP = 5;
+int ProNovoConfig::iRank = 0;
+//---------------Sipros Score--------------------
+
+double AminoAcidMasses::dNULL = -1;
+double AminoAcidMasses::dERROR = -2;
+
 string ProNovoConfig::SIPelement = "C";
-double ProNovoConfig::neutronMass = 1.003355;
-double ProNovoConfig::deductionCoefficient = 0;
 double ProNovoConfig::minValue = 0;
 double ProNovoConfig::fold = 0;
+double ProNovoConfig::deductionCoefficient = 0;
+string ProNovoConfig::fileNameSuffix = "ft2";
+// carbon isotopic delta mass in default
+double ProNovoConfig::neutronMass = 1.003355;
+
+AminoAcidMasses::AminoAcidMasses()
+{
+	vdMasses.clear();
+	vdMasses.resize(AminoAcidMassesSize, 0);
+	for (int i = 0; i < AminoAcidMassesSize; i++)
+	{
+		vdMasses.at(i) = dNULL;
+	}
+}
+
+void AminoAcidMasses::clear()
+{
+	for (int i = 0; i < AminoAcidMassesSize; i++)
+	{
+		vdMasses.at(i) = dNULL;
+	}
+}
+
+double AminoAcidMasses::end()
+{
+	return dNULL;
+}
+
+double AminoAcidMasses::find(char _cAminoAcid)
+{
+	/*
+	if (((int)_cAminoAcid) >= AminoAcidMassesSize ) {
+		cerr << "error AminoAcidMasses. " << endl;
+		exit(1);
+		return dERROR;
+	}*/
+	return vdMasses.at((int)_cAminoAcid);
+}
+
+double AminoAcidMasses::operator[](char _cAminoAcid) const
+{
+	/*
+	if (((int)_cAminoAcid) >= AminoAcidMassesSize) {
+		cerr << "error AminoAcidMasses. " << endl;
+		exit(1);
+		return dERROR;
+	}*/
+	return vdMasses.at((int)_cAminoAcid);
+}
+
+double &AminoAcidMasses::operator[](char _cAminoAcid)
+{
+	/*
+	if (_cAminoAcid >= AminoAcidMassesSize || _cAminoAcid < 0) {
+		cerr << "error AminoAcidMasses. " << endl;
+		exit(1);
+		return dERROR;
+	}*/
+	return vdMasses.at((int)_cAminoAcid);
+}
 
 ProNovoConfig::ProNovoConfig()
 {
@@ -58,7 +167,7 @@ ProNovoConfig::ProNovoConfig()
 
 bool ProNovoConfig::setFilename(const string &sConfigFileName)
 {
-	if (ProNovoConfigSingleton == 0)
+	if (ProNovoConfigSingleton == NULL)
 	{
 		ProNovoConfigSingleton = new ProNovoConfig;
 	}
@@ -83,7 +192,8 @@ bool ProNovoConfig::setFilename(const string &sConfigFileName)
 	// compute deduction coefficient in score function
 	// only suitbale for carbon SIP now
 	ProNovoConfigSingleton->setDeductionCoefficient();
-	// If everything goes fine return true.
+
+	// If everything goes fine return 0.
 	return true;
 }
 
@@ -110,9 +220,7 @@ char ProNovoConfig::getSeparator()
 #endif
 }
 
-bool ProNovoConfig::getAtomIsotopicComposition(char cAtom,
-											   vector<double> &vdAtomicMass,
-											   vector<double> &vdComposition)
+bool ProNovoConfig::getAtomIsotopicComposition(char cAtom, vector<double> &vdAtomicMass, vector<double> &vdComposition)
 {
 
 	// clear the input vectors
@@ -234,7 +342,7 @@ bool ProNovoConfig::getParameters()
 		issStream >> iMaxPTMcount;
 	}
 
-	getConfigValue("[Peptide_Identification]Mass_Tolerance_Parent_Ion", sTemp);
+	getConfigValue("[Peptide_Identification]Search_Mass_Tolerance_Parent_Ion", sTemp);
 	issStream.clear();
 	issStream.str(sTemp);
 	issStream >> dMassAccuracyParentIon;
@@ -454,9 +562,7 @@ bool ProNovoConfig::getConfigMasterKeyValue(string sMasterKey, map<string, strin
 	{
 		// cout << (*it).first << " => " << (*it).second << endl;
 		sCurrentKey = (*iter).first;
-		if ((sCurrentKey.substr(0, iKeyLength + 1) == (sMasterKey + "{")) &&
-			(sCurrentKey.at(sCurrentKey.length() - 1) == '}') &&
-			(sCurrentKey.length() > (iKeyLength + 2)))
+		if ((sCurrentKey.substr(0, iKeyLength + 1) == (sMasterKey + "{")) && (sCurrentKey.at(sCurrentKey.length() - 1) == '}') && (sCurrentKey.length() > (iKeyLength + 2)))
 		{
 			sCurrentCoreKey = sCurrentKey.substr(iKeyLength + 1, sCurrentKey.length() - iKeyLength - 2);
 			mapKeyValueSet.insert(pair<string, string>(sCurrentCoreKey, (*iter).second));
@@ -542,16 +648,14 @@ bool ProNovoConfig::calculatePeptideMassWindowOffset()
 				dLastUpperBound = dCurrentUpperBound;
 			else
 			{
-				vpPeptideMassWindowOffset.push_back(
-					pair<double, double>(dLastLowerBound, dLastUpperBound));
+				vpPeptideMassWindowOffset.push_back(pair<double, double>(dLastLowerBound, dLastUpperBound));
 				dLastLowerBound = dCurrentLowerBound;
 				dLastUpperBound = dCurrentUpperBound;
 			}
 		}
 	}
 	if (dLastUpperBound > -100)
-		vpPeptideMassWindowOffset.push_back(
-			pair<double, double>(dLastLowerBound, dLastUpperBound));
+		vpPeptideMassWindowOffset.push_back(pair<double, double>(dLastLowerBound, dLastUpperBound));
 
 	return bReVal;
 }
@@ -565,8 +669,7 @@ bool ProNovoConfig::getPeptideMassWindows(double dPeptideMass, vector<pair<doubl
 	{
 		dCurrentLowerBound = dPeptideMass + vpPeptideMassWindowOffset.at(i).first;
 		dCurrentUpperBound = dPeptideMass + vpPeptideMassWindowOffset.at(i).second;
-		vpPeptideMassWindows.push_back(
-			pair<double, double>(dCurrentLowerBound, dCurrentUpperBound));
+		vpPeptideMassWindows.push_back(pair<double, double>(dCurrentLowerBound, dCurrentUpperBound));
 	}
 	return bReVal;
 }
@@ -586,9 +689,9 @@ void ProNovoConfig::setDeductionCoefficient()
 		// average averagin delta mass in N15 labeling
 		neutronMass = 0.9991403;
 		deductionCoefficient =
-			-(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.vAtomIsotopicDistribution[3].vProb[1] - 0.5), 8));
+			-(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.get_vAtomIsotopicDistribution()[3].vProb[1] - 0.5), 8));
 	}
 	else
 		deductionCoefficient =
-			-(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.vAtomIsotopicDistribution[0].vProb[1] - 0.5), 8));
+			-(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.get_vAtomIsotopicDistribution()[0].vProb[1] - 0.5), 8));
 }

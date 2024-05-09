@@ -49,7 +49,8 @@ void Spe2PepFileReader::fillVectors()
     splitString(Sep2PepFileChunkLines[i]);
     int scanNumber = stoi(tokens[2]);
     double isolationWindowCenter = stod(tokens[4]);
-    float retentionTime = (stof(tokens[7]));
+    float retentionTime = stof(tokens[7]);
+    int precursorScanNumber = stoi(tokens[8]);
     i++;
     while (i < Sep2PepFileChunkLines.size())
     {
@@ -57,6 +58,7 @@ void Spe2PepFileReader::fillVectors()
         currentSipPSM.scanNumbers.push_back(scanNumber);
         currentSipPSM.isolationWindowCenterMZs.push_back(isolationWindowCenter);
         currentSipPSM.retentionTimes.push_back(retentionTime);
+        currentSipPSM.precursorScanNumbers.push_back(precursorScanNumber);
         currentSipPSM.parentCharges.push_back(stoi(tokens[8]));
         currentSipPSM.measuredParentMasses.push_back(stod(tokens[9]));
         currentSipPSM.calculatedParentMasses.push_back(stod(tokens[3]));
@@ -176,6 +178,7 @@ void Spe2PepFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, co
     size_t i = 0;
     bool insertSucced = false;
     scanTopPSM mScanTopPSM = scanTopPSM(currentSipPSM.parentCharges[psmIX],
+                                        currentSipPSM.precursorScanNumbers[psmIX],
                                         currentSipPSM.isolationWindowCenterMZs[psmIX],
                                         currentSipPSM.measuredParentMasses[psmIX],
                                         currentSipPSM.calculatedParentMasses[psmIX],
@@ -189,7 +192,8 @@ void Spe2PepFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, co
                                         currentSipPSM.WDPscores[psmIX]);
     while (i < scanTopPSMs.size())
     {
-        if (currentSipPSM.WDPscores[psmIX] > scanTopPSMs[i].WDPscore)
+        // according to the first score
+        if (currentSipPSM.MVHscores[psmIX] > scanTopPSMs[i].MVHscore)
         {
             scanTopPSMs.insert(scanTopPSMs.begin() + i, mScanTopPSM);
             insertSucced = true;
@@ -234,14 +238,18 @@ sipPSM Spe2PepFileReader::convertFilesScansTopPSMs()
 {
     // converted from filesScansTopPSMs
     sipPSM topPSMs;
+    std::map<int, std::vector<scanTopPSM>> orderedMap;
     for (auto &fileIX : filesScansTopPSMs)
     {
-        for (auto &scanIX : fileIX.second)
+        // sort by scan number
+        orderedMap = std::map<int, std::vector<scanTopPSM>>(fileIX.second.begin(), fileIX.second.end());
+        for (auto &scanIX : orderedMap)
         {
             for (size_t i = 0; i < scanIX.second.size(); i++)
             {
                 topPSMs.fileNames.push_back(fileIX.first);
                 topPSMs.scanNumbers.push_back(scanIX.first);
+                topPSMs.precursorScanNumbers.push_back(scanIX.second[i].precursorScanNumber);
                 topPSMs.parentCharges.push_back(scanIX.second[i].parentCharge);
                 topPSMs.isolationWindowCenterMZs.push_back(scanIX.second[i].isolationWindowCenterMZ);
                 topPSMs.measuredParentMasses.push_back(scanIX.second[i].measuredParentMass);
@@ -320,6 +328,8 @@ void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
        << "\t"
        << "scanNumbers"
        << "\t"
+       << "precursorScanNumbers"
+       << "\t"
        << "parentCharges"
        << "\t"
        << "isolationWindowCenterMZs"
@@ -350,19 +360,29 @@ void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
     {
         for (size_t j = 0; j < sipPSMs[i].fileNames.size(); j += chunkSize)
         {
-            for (size_t k = j; k < std::min(k + chunkSize, sipPSMs[i].fileNames.size()); ++k)
+            for (size_t k = j; k < std::min(j + chunkSize, sipPSMs[i].fileNames.size()); k++)
             {
-                ss << sipPSMs[i].fileNames[k] << "\t" << sipPSMs[i].scanNumbers[k] << "\t"
+                ss << sipPSMs[i].fileNames[k] << "\t"
+                   << sipPSMs[i].scanNumbers[k] << "\t"
+                   << sipPSMs[i].precursorScanNumbers[k] << "\t"
                    << sipPSMs[i].parentCharges[k] << "\t"
                    << sipPSMs[i].isolationWindowCenterMZs[k] << "\t"
-                   << sipPSMs[i].measuredParentMasses[k] << "\t" << sipPSMs[i].calculatedParentMasses[k] << "\t"
-                   << sipPSMs[i].searchNames[k] << "\t" << sipPSMs[i].retentionTimes[k] << "\t" << sipPSMs[i].MVHscores[k] << "\t"
-                   << sipPSMs[i].XcorrScores[k] << "\t" << sipPSMs[i].WDPscores[k] << "\t"
-                   << sipPSMs[i].ranks[k] << "\t" << sipPSMs[i].identifiedPeptides[k] << "\t"
-                   << sipPSMs[i].originalPeptides[k] << "\t" << sipPSMs[i].proteinNames[k] << "\n";
+                   << sipPSMs[i].measuredParentMasses[k] << "\t"
+                   << sipPSMs[i].calculatedParentMasses[k] << "\t"
+                   << sipPSMs[i].searchNames[k] << "\t"
+                   << sipPSMs[i].retentionTimes[k] << "\t"
+                   << sipPSMs[i].MVHscores[k] << "\t"
+                   << sipPSMs[i].XcorrScores[k] << "\t"
+                   << sipPSMs[i].WDPscores[k] << "\t"
+                   << sipPSMs[i].ranks[k] << "\t"
+                   << sipPSMs[i].identifiedPeptides[k] << "\t"
+                   << sipPSMs[i].originalPeptides[k] << "\t"
+                   << sipPSMs[i].proteinNames[k] << "\n";
             }
             file << ss.str();
-            ss.str(std::string()); // Clear the stringstream
+            // Clear the stringstream
+            ss.str(std::string());
+            ss.clear();
         }
     }
     file.close();

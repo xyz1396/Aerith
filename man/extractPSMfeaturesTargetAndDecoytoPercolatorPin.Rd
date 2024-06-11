@@ -11,6 +11,7 @@ extractPSMfeaturesTargetAndDecoytoPercolatorPin(
   topN,
   ftFilepath,
   ThreadNumber = 3L,
+  doProteinInference = FALSE,
   fileName = "a.pin"
 )
 }
@@ -25,10 +26,9 @@ extractPSMfeaturesTargetAndDecoytoPercolatorPin(
 
 \item{ThreadNumber}{read ThreadNumber of FT file at the same time, it will increase ram usage}
 
-\item{fileName}{read ThreadNumber of FT file at the same time, it will increase ram usage}
-}
-\value{
-the PSMs in a dataframe in a list
+\item{doProteinInference}{out put protein inference format or only PSM format}
+
+\item{fileName}{output path of the percolator tsv file}
 }
 \description{
 extractPSMfeaturesTargetAndDecoytoPercolatorPin extract featueres of top PSMs from target and decoy .Spe2Pep.txt files

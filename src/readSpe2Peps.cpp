@@ -28,6 +28,7 @@ List readSpe2Pep(String Spe2PepFile)
                                         _["ranks"] = reader.currentSipPSM.ranks,
                                         _["identifiedPeptides"] = reader.currentSipPSM.identifiedPeptides,
                                         _["originalPeptides"] = reader.currentSipPSM.originalPeptides,
+                                        _["nakePeptides"] = reader.currentSipPSM.nakePeptides,
                                         _["proteinNames"] = reader.currentSipPSM.proteinNames);
     List mSipList = List::create(Named("fileName") = reader.currentSipPSM.fileName,
                                  _["scanType"] = reader.currentSipPSM.scanType,
@@ -67,6 +68,7 @@ List readSpe2Peps(String workingPath)
                                             _["ranks"] = std::move(mPSM->ranks),
                                             _["identifiedPeptides"] = std::move(mPSM->identifiedPeptides),
                                             _["originalPeptides"] = std::move(mPSM->originalPeptides),
+                                            _["nakePeptides"] =  std::move(mPSM->nakePeptides),
                                             _["proteinNames"] = std::move(mPSM->proteinNames));
         List mSipList = List::create(Named("fileName") = mPSM->fileName,
                                      _["scanType"] = mPSM->scanType,
@@ -106,6 +108,7 @@ DataFrame readSpe2PepFilesScansTopPSMs(String workingPath, size_t topN = 5)
                                         _["ranks"] = std::move(topPSMs.ranks),
                                         _["identifiedPeptides"] = std::move(topPSMs.identifiedPeptides),
                                         _["originalPeptides"] = std::move(topPSMs.originalPeptides),
+                                        _["nakePeptides"] = std::move(topPSMs.nakePeptides),
                                         _["proteinNames"] = std::move(topPSMs.proteinNames));
     return psmDf;
 }
@@ -153,6 +156,7 @@ DataFrame readSpe2PepFilesScansTopPSMsFromOneFT2(String workingPath, String patt
                                         _["ranks"] = std::move(topPSMs.ranks),
                                         _["identifiedPeptides"] = std::move(topPSMs.identifiedPeptides),
                                         _["originalPeptides"] = std::move(topPSMs.originalPeptides),
+                                        _["nakePeptides"] = std::move(topPSMs.nakePeptides),
                                         _["proteinNames"] = std::move(topPSMs.proteinNames));
     return psmDf;
 }
@@ -187,6 +191,48 @@ List readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t 
                                             _["ranks"] = reader.sipPSMs[i].ranks,
                                             _["identifiedPeptides"] = reader.sipPSMs[i].identifiedPeptides,
                                             _["originalPeptides"] = reader.sipPSMs[i].originalPeptides,
+                                            _["nakePeptides"] = reader.sipPSMs[i].nakePeptides,
+                                            _["proteinNames"] = reader.sipPSMs[i].proteinNames);
+
+        psmList[i] = psmDf;
+    }
+    psmList.names() = reader.FT2s;
+    return psmList;
+}
+
+//' readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParalle read each scan's top PSMs from multiple .Spe2PepFile.txt files of each .FT2 file
+//' @param targetPath a full path with target .Spe2PepFile.txt files in it
+//' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
+//' @param topN store top N PSMs of each scan of one .FT2 file
+//' @return a dataframe of top N PSMs
+//' @examples
+//' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParalle("targetDir","decoyDir", 3)
+//' @export
+// [[Rcpp::export]]
+List readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(String targetPath, String decoyPath, size_t topN = 5)
+{
+    Spe2PepFileReader reader;
+    reader.readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(targetPath, decoyPath, topN);
+    List psmList(reader.sipPSMs.size());
+    for (size_t i = 0; i < reader.sipPSMs.size(); i++)
+    {
+        DataFrame psmDf = DataFrame::create(Named("fileNames") = reader.sipPSMs[i].fileNames,
+                                            _["isDecoys"] = reader.sipPSMs[i].isDecoys,
+                                            _["scanNumbers"] = reader.sipPSMs[i].scanNumbers,
+                                            _["precursorScanNumbers"] = reader.sipPSMs[i].precursorScanNumbers,
+                                            _["parentCharges"] = reader.sipPSMs[i].parentCharges,
+                                            _["isolationWindowCenterMZs"] = reader.sipPSMs[i].isolationWindowCenterMZs,
+                                            _["measuredParentMasses"] = reader.sipPSMs[i].measuredParentMasses,
+                                            _["calculatedParentMasses"] = reader.sipPSMs[i].calculatedParentMasses,
+                                            _["searchNames"] = reader.sipPSMs[i].searchNames,
+                                            _["retentionTimes"] = reader.sipPSMs[i].retentionTimes,
+                                            _["MVHscores"] = reader.sipPSMs[i].MVHscores,
+                                            _["XcorrScores"] = reader.sipPSMs[i].XcorrScores,
+                                            _["WDPscores"] = reader.sipPSMs[i].WDPscores,
+                                            _["ranks"] = reader.sipPSMs[i].ranks,
+                                            _["identifiedPeptides"] = reader.sipPSMs[i].identifiedPeptides,
+                                            _["originalPeptides"] = reader.sipPSMs[i].originalPeptides,
+                                            _["nakePeptides"] = reader.sipPSMs[i].nakePeptides,
                                             _["proteinNames"] = reader.sipPSMs[i].proteinNames);
 
         psmList[i] = psmDf;

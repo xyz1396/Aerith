@@ -10,8 +10,38 @@
 #' @examples
 #' psm <- extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, 3)
 #' @export
-extractPSMfeatures <- function(Spe2PepFilePath, topN, ftFilepath, ThreadNumber = 1L) {
+extractPSMfeatures <- function(Spe2PepFilePath, topN, ftFilepath, ThreadNumber = 3L) {
     .Call(`_Aerith_extractPSMfeatures`, Spe2PepFilePath, topN, ftFilepath, ThreadNumber)
+}
+
+#' extractPSMfeaturesTargetAndDecoy extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
+#' @param targetPath a full path with target .Spe2PepFile.txt files in it
+#' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
+#' @param topN store top N PSMs of each scan of one .FT2 file
+#' @param ftFilepath a full path with .FT1 and .FT2 files in it
+#' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
+#' @return the PSMs in a dataframe in a list
+#' @examples
+#' psm <- extractPSMfeaturesTargetAndDecoy("targetPath", "decoyPath", topN, "ftFilepath", 3)
+#' @export
+extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFilepath, ThreadNumber = 3L) {
+    .Call(`_Aerith_extractPSMfeaturesTargetAndDecoy`, targetPath, decoyPath, topN, ftFilepath, ThreadNumber)
+}
+
+#' extractPSMfeaturesTargetAndDecoytoPercolatorPin extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
+#' to pecorlator pin format
+#' @param targetPath a full path with target .Spe2PepFile.txt files in it
+#' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
+#' @param topN store top N PSMs of each scan of one .FT2 file
+#' @param ftFilepath a full path with .FT1 and .FT2 files in it
+#' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
+#' @param doProteinInference out put protein inference format or only PSM format
+#' @param fileName output path of the percolator tsv file
+#' @examples
+#' extractPSMfeaturesTargetAndDecoytoPercolatorPin("targetPath", "decoyPath", topN, "ftFilepath", 3, "a.pin")
+#' @export
+extractPSMfeaturesTargetAndDecoytoPercolatorPin <- function(targetPath, decoyPath, topN, ftFilepath, ThreadNumber = 3L, doProteinInference = FALSE, fileName = "a.pin") {
+    invisible(.Call(`_Aerith_extractPSMfeaturesTargetAndDecoytoPercolatorPin`, targetPath, decoyPath, topN, ftFilepath, ThreadNumber, doProteinInference, fileName))
 }
 
 #' getUnfilteredPSMs
@@ -354,6 +384,18 @@ readSpe2PepFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN = 
 #' @export
 readSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN = 5L) {
     .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel`, workingPath, topN)
+}
+
+#' readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParalle read each scan's top PSMs from multiple .Spe2PepFile.txt files of each .FT2 file
+#' @param targetPath a full path with target .Spe2PepFile.txt files in it
+#' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
+#' @param topN store top N PSMs of each scan of one .FT2 file
+#' @return a dataframe of top N PSMs
+#' @examples
+#' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParalle("targetDir","decoyDir", 3)
+#' @export
+readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel <- function(targetPath, decoyPath, topN = 5L) {
+    .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel`, targetPath, decoyPath, topN)
 }
 
 #' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel read each scan's top PSMs from multiple .Spe2PepFile.txt

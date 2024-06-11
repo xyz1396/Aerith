@@ -24,6 +24,37 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// extractPSMfeaturesTargetAndDecoy
+List extractPSMfeaturesTargetAndDecoy(String targetPath, String decoyPath, int topN, String ftFilepath, int ThreadNumber);
+RcppExport SEXP _Aerith_extractPSMfeaturesTargetAndDecoy(SEXP targetPathSEXP, SEXP decoyPathSEXP, SEXP topNSEXP, SEXP ftFilepathSEXP, SEXP ThreadNumberSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type targetPath(targetPathSEXP);
+    Rcpp::traits::input_parameter< String >::type decoyPath(decoyPathSEXP);
+    Rcpp::traits::input_parameter< int >::type topN(topNSEXP);
+    Rcpp::traits::input_parameter< String >::type ftFilepath(ftFilepathSEXP);
+    Rcpp::traits::input_parameter< int >::type ThreadNumber(ThreadNumberSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractPSMfeaturesTargetAndDecoy(targetPath, decoyPath, topN, ftFilepath, ThreadNumber));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extractPSMfeaturesTargetAndDecoytoPercolatorPin
+void extractPSMfeaturesTargetAndDecoytoPercolatorPin(String targetPath, String decoyPath, int topN, String ftFilepath, int ThreadNumber, bool doProteinInference, String fileName);
+RcppExport SEXP _Aerith_extractPSMfeaturesTargetAndDecoytoPercolatorPin(SEXP targetPathSEXP, SEXP decoyPathSEXP, SEXP topNSEXP, SEXP ftFilepathSEXP, SEXP ThreadNumberSEXP, SEXP doProteinInferenceSEXP, SEXP fileNameSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type targetPath(targetPathSEXP);
+    Rcpp::traits::input_parameter< String >::type decoyPath(decoyPathSEXP);
+    Rcpp::traits::input_parameter< int >::type topN(topNSEXP);
+    Rcpp::traits::input_parameter< String >::type ftFilepath(ftFilepathSEXP);
+    Rcpp::traits::input_parameter< int >::type ThreadNumber(ThreadNumberSEXP);
+    Rcpp::traits::input_parameter< bool >::type doProteinInference(doProteinInferenceSEXP);
+    Rcpp::traits::input_parameter< String >::type fileName(fileNameSEXP);
+    extractPSMfeaturesTargetAndDecoytoPercolatorPin(targetPath, decoyPath, topN, ftFilepath, ThreadNumber, doProteinInference, fileName);
+    return R_NilValue;
+END_RCPP
+}
 // getUnfilteredPSMs
 DataFrame getUnfilteredPSMs(String sipPath, String ftPath, size_t topN);
 RcppExport SEXP _Aerith_getUnfilteredPSMs(SEXP sipPathSEXP, SEXP ftPathSEXP, SEXP topNSEXP) {
@@ -428,6 +459,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel
+List readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(String targetPath, String decoyPath, size_t topN);
+RcppExport SEXP _Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(SEXP targetPathSEXP, SEXP decoyPathSEXP, SEXP topNSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< String >::type targetPath(targetPathSEXP);
+    Rcpp::traits::input_parameter< String >::type decoyPath(decoyPathSEXP);
+    Rcpp::traits::input_parameter< size_t >::type topN(topNSEXP);
+    rcpp_result_gen = Rcpp::wrap(readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(targetPath, decoyPath, topN));
+    return rcpp_result_gen;
+END_RCPP
+}
 // writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel
 void writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN, String fileName);
 RcppExport SEXP _Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(SEXP workingPathSEXP, SEXP topNSEXP, SEXP fileNameSEXP) {
@@ -540,6 +584,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_extractPSMfeatures", (DL_FUNC) &_Aerith_extractPSMfeatures, 4},
+    {"_Aerith_extractPSMfeaturesTargetAndDecoy", (DL_FUNC) &_Aerith_extractPSMfeaturesTargetAndDecoy, 5},
+    {"_Aerith_extractPSMfeaturesTargetAndDecoytoPercolatorPin", (DL_FUNC) &_Aerith_extractPSMfeaturesTargetAndDecoytoPercolatorPin, 7},
     {"_Aerith_getUnfilteredPSMs", (DL_FUNC) &_Aerith_getUnfilteredPSMs, 3},
     {"_Aerith_getUnfilteredPeptides", (DL_FUNC) &_Aerith_getUnfilteredPeptides, 1},
     {"_Aerith_getFilterThreshold", (DL_FUNC) &_Aerith_getFilterThreshold, 2},
@@ -573,6 +619,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_readSpe2PepFilesScansTopPSMs", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMs, 2},
     {"_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2, 3},
     {"_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel, 2},
+    {"_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel", (DL_FUNC) &_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel, 3},
     {"_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel", (DL_FUNC) &_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel, 3},
     {"_Aerith_scoreIntensity", (DL_FUNC) &_Aerith_scoreIntensity, 5},
     {"_Aerith_scoreIntensityByCE", (DL_FUNC) &_Aerith_scoreIntensityByCE, 2},

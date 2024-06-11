@@ -5,10 +5,20 @@ Spe2PepFileReader::Spe2PepFileReader()
 }
 
 // get all .Spe2Pep files' full path in workingPath
-Spe2PepFileReader::Spe2PepFileReader(std::string mWorkingPath) : workingPath(mWorkingPath)
+Spe2PepFileReader::Spe2PepFileReader(const std::string mWorkingPath) : workingPath(mWorkingPath)
 {
+    sipFileNames = getSpe2PepFiles(mWorkingPath);
+}
+
+Spe2PepFileReader::~Spe2PepFileReader()
+{
+}
+
+std::vector<std::string> Spe2PepFileReader::getSpe2PepFiles(const std::string &mWorkingPath)
+{
+    std::vector<std::string> spe2PepFiles;
     // recursive_directory_iterator can get .Spe2Pep file in all child path
-    for (auto &p : fs::directory_iterator(workingPath))
+    for (auto &p : fs::directory_iterator(mWorkingPath))
     {
         std::string stem = p.path().stem().string();
         std::string ext = p.path().extension().string();
@@ -16,15 +26,12 @@ Spe2PepFileReader::Spe2PepFileReader(std::string mWorkingPath) : workingPath(mWo
         if (stem.size() > 8)
         {
             if (ext == ".txt" && stem.substr(stem.size() - 8) == ".Spe2Pep")
-                sipFileNames.push_back(p.path().string());
+                spe2PepFiles.push_back(p.path().string());
         }
     }
-    if (sipFileNames.size() == 0)
-        std::cout << "no .Spe2Pep.txt file was found in " << workingPath << " !" << std::endl;
-}
-
-Spe2PepFileReader::~Spe2PepFileReader()
-{
+    if (spe2PepFiles.size() == 0)
+        std::cerr << "no .Spe2Pep.txt file was found in " << mWorkingPath << " !" << std::endl;
+    return spe2PepFiles;
 }
 
 void Spe2PepFileReader::splitString(const std::string &mString)
@@ -52,6 +59,8 @@ void Spe2PepFileReader::fillVectors()
     float retentionTime = stof(tokens[7]);
     int precursorScanNumber = stoi(tokens[8]);
     i++;
+    std::size_t start, end;
+    std::string nakeSeq;
     while (i < Sep2PepFileChunkLines.size())
     {
         splitString(Sep2PepFileChunkLines[i]);
@@ -68,6 +77,14 @@ void Spe2PepFileReader::fillVectors()
         currentSipPSM.WDPscores.push_back(stof(tokens[6]));
         currentSipPSM.identifiedPeptides.push_back(tokens[1]);
         currentSipPSM.originalPeptides.push_back(tokens[2]);
+        // init isDecoys
+        currentSipPSM.isDecoys.push_back(false);
+
+        start = tokens[1].find_first_of('[');
+        end = tokens[1].find_last_of(']');
+        nakeSeq = tokens[1].substr(start + 1, end - start - 1);
+        currentSipPSM.nakePeptides.push_back(nakeSeq);
+
         currentSipPSM.proteinNames.push_back(tokens[7]);
         i++;
     }
@@ -185,15 +202,19 @@ void Spe2PepFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, co
                                         currentSipPSM.searchName,
                                         currentSipPSM.identifiedPeptides[psmIX],
                                         currentSipPSM.originalPeptides[psmIX],
+                                        currentSipPSM.nakePeptides[psmIX],
                                         currentSipPSM.proteinNames[psmIX],
                                         currentSipPSM.retentionTimes[psmIX],
                                         currentSipPSM.MVHscores[psmIX],
                                         currentSipPSM.XcorrScores[psmIX],
-                                        currentSipPSM.WDPscores[psmIX]);
+                                        currentSipPSM.WDPscores[psmIX],
+                                        currentSipPSM.isDecoys[psmIX]);
     while (i < scanTopPSMs.size())
     {
         // according to the first score
         if (currentSipPSM.MVHscores[psmIX] > scanTopPSMs[i].MVHscore)
+        // // according to the WDP score
+        // if (currentSipPSM.WDPscores[psmIX] > scanTopPSMs[i].WDPscore)
         {
             scanTopPSMs.insert(scanTopPSMs.begin() + i, mScanTopPSM);
             insertSucced = true;
@@ -213,6 +234,7 @@ void Spe2PepFileReader::fillScanTopPSMs(std::vector<scanTopPSM> &scanTopPSMs, co
         for (size_t j = 0; j < scanTopPSMs.size(); j++)
         {
             if (mScanTopPSM.identifiedPeptide == scanTopPSMs[j].identifiedPeptide)
+            // if (mScanTopPSM.originalPeptide == scanTopPSMs[j].originalPeptide)
             {
                 // remove the inserted one if PSM with higher score and same squence has already existed
                 if (j < i)
@@ -259,24 +281,27 @@ sipPSM Spe2PepFileReader::convertFilesScansTopPSMs()
                 topPSMs.scores.push_back(scanIX.second[i].score);
                 topPSMs.identifiedPeptides.push_back(scanIX.second[i].identifiedPeptide);
                 topPSMs.originalPeptides.push_back(scanIX.second[i].originalPeptide);
+                topPSMs.nakePeptides.push_back(scanIX.second[i].nakePeptide);
                 topPSMs.proteinNames.push_back(scanIX.second[i].proteinName);
                 topPSMs.retentionTimes.push_back(scanIX.second[i].retentionTime);
                 topPSMs.MVHscores.push_back(scanIX.second[i].MVHscore);
                 topPSMs.XcorrScores.push_back(scanIX.second[i].XcorrScore);
                 topPSMs.WDPscores.push_back(scanIX.second[i].WDPscore);
+                topPSMs.isDecoys.push_back(scanIX.second[i].isDecoy);
             }
         }
     }
     return topPSMs;
 }
 
-void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const std::string &workingPath, size_t topN = 5)
+std::unordered_map<std::string, std::vector<std::string>> Spe2PepFileReader::
+    getFT2Spe2pepFileMap(const std::string &workingPath)
 {
-    Spe2PepFileReader reader(workingPath);
     std::unordered_map<std::string, std::vector<std::string>> FT2map;
     size_t pos;
+    std::vector<std::string> spe2PepFiles = getSpe2PepFiles(workingPath);
     // group the .Spe2PepFile.txt files by FT2 name
-    for (const auto &str : reader.sipFileNames)
+    for (const auto &str : spe2PepFiles)
     {
         // Extract the filename
         std::filesystem::path full_path(str);
@@ -290,14 +315,21 @@ void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const st
         else
             FT2map[filename.substr(0, pos)].push_back(str);
     }
-    FT2s.clear();
+    return FT2map;
+}
+
+void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const std::string &mWorkingPath,
+                                                                        size_t topN = 5)
+{
+    std::unordered_map<std::string, std::vector<std::string>> FT2map = getFT2Spe2pepFileMap(mWorkingPath);
+    FT2s.reserve(FT2map.size());
     for (auto const &pair : FT2map)
     {
         FT2s.push_back(pair.first);
     }
     sipPSMs = std::vector<sipPSM>(FT2s.size());
     int num_cores = omp_get_num_procs();
-    // Set the number of threads to the lesser of num_cores and 10
+    // Set the number of threads to the lesse of num_cores and 10
     int num_threads = std::min(num_cores, 10);
     omp_set_num_threads(num_threads);
 #pragma omp parallel for
@@ -308,6 +340,107 @@ void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const st
         reader.topN = topN;
         reader.readAllFilesTopPSMs();
         sipPSMs[i] = reader.convertFilesScansTopPSMs();
+    }
+}
+
+void Spe2PepFileReader::mergeDecoyToTarget(Spe2PepFileReader &targetReader,
+                                           Spe2PepFileReader &decoyReader)
+{
+    std::unordered_set<std::string> targetSeqs;
+    targetSeqs.reserve(10000);
+    for (auto &targetFileIX : targetReader.filesScansTopPSMs)
+    {
+        for (auto &targetScanIX : targetFileIX.second)
+        {
+            for (auto &psm : targetScanIX.second)
+            {
+                psm.isDecoy = false;
+                targetSeqs.insert(psm.nakePeptide);
+            }
+        }
+    }
+    for (auto &decoyFileIX : decoyReader.filesScansTopPSMs)
+    {
+        for (auto &decoyScanIX : decoyFileIX.second)
+        {
+            for (size_t i = 0; i < decoyScanIX.second.size(); i++)
+            {
+                if (targetSeqs.find(decoyScanIX.second[i].nakePeptide) == targetSeqs.end())
+                {
+                    decoyScanIX.second[i].isDecoy = true;
+                }
+                else
+                    // remove decoy with the same pep seq as target
+                    decoyScanIX.second.erase(decoyScanIX.second.begin() + i);
+            }
+        }
+    }
+    for (auto &decoyFileIX : decoyReader.filesScansTopPSMs)
+    {
+        auto targetFileIX = targetReader.filesScansTopPSMs.find(decoyFileIX.first);
+        if (targetFileIX != targetReader.filesScansTopPSMs.end())
+        {
+            for (auto &decoyScanIX : decoyFileIX.second)
+            {
+                auto targetScanIX = targetFileIX->second.find(decoyScanIX.first);
+                if (targetScanIX != targetFileIX->second.end())
+                {
+                    targetScanIX->second.insert(targetScanIX->second.end(),
+                                                decoyScanIX.second.begin(), decoyScanIX.second.end());
+                }
+                else
+                {
+                    targetFileIX->second.insert(decoyScanIX);
+                }
+            }
+        }
+        else
+        {
+            targetReader.filesScansTopPSMs.insert(decoyFileIX);
+            std::cerr << "target decoy files not match, " << decoyFileIX.first << " only exists in decoy" << std::endl;
+        }
+    }
+    for (auto &targetFileIX : targetReader.filesScansTopPSMs)
+    {
+        for (auto &targetScanIX : targetFileIX.second)
+        {
+            std::sort(targetScanIX.second.begin(), targetScanIX.second.end(), [](const scanTopPSM &psm1, const scanTopPSM &psm2)
+                        { return psm1.MVHscore > psm2.MVHscore; });
+                    //   { return psm1.WDPscore > psm2.WDPscore; });
+        }
+    }
+}
+
+void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(
+    const std::string &targetPath, const std::string &decoyPath, size_t topN)
+{
+    std::unordered_map<std::string, std::vector<std::string>> targetFT2map =
+        getFT2Spe2pepFileMap(targetPath);
+    std::unordered_map<std::string, std::vector<std::string>> decoyFT2map =
+        getFT2Spe2pepFileMap(decoyPath);
+    FT2s.reserve(targetFT2map.size());
+    for (auto const &pair : targetFT2map)
+    {
+        FT2s.push_back(pair.first);
+    }
+    sipPSMs = std::vector<sipPSM>(FT2s.size());
+    int num_cores = omp_get_num_procs();
+    // Set the number of threads to the lesse of num_cores and 10
+    int num_threads = std::min(num_cores, 10);
+    omp_set_num_threads(num_threads);
+#pragma omp parallel for
+    for (size_t i = 0; i < FT2s.size(); i++)
+    {
+        Spe2PepFileReader targetReader;
+        targetReader.sipFileNames = targetFT2map[FT2s[i]];
+        targetReader.topN = topN;
+        targetReader.readAllFilesTopPSMs();
+        Spe2PepFileReader decoyReader;
+        decoyReader.sipFileNames = decoyFT2map[FT2s[i]];
+        decoyReader.topN = topN;
+        decoyReader.readAllFilesTopPSMs();
+        mergeDecoyToTarget(targetReader, decoyReader);
+        sipPSMs[i] = targetReader.convertFilesScansTopPSMs();
     }
 }
 
@@ -354,6 +487,8 @@ void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
        << "\t"
        << "originalPeptides"
        << "\t"
+       << "nakePeptides"
+       << "\t"
        << "proteinNames"
        << "\n";
     for (size_t i = 0; i < sipPSMs.size(); i++)
@@ -377,6 +512,7 @@ void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
                    << sipPSMs[i].ranks[k] << "\t"
                    << sipPSMs[i].identifiedPeptides[k] << "\t"
                    << sipPSMs[i].originalPeptides[k] << "\t"
+                   << sipPSMs[i].nakePeptides[k] << "\t"
                    << sipPSMs[i].proteinNames[k] << "\n";
             }
             file << ss.str();

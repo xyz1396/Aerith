@@ -4,7 +4,7 @@
 \alias{extractPSMfeatures}
 \title{extractPSMfeatures extract featueres of top PSMs from multiple .Spe2Pep.txt files}
 \usage{
-extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, ThreadNumber = 1L)
+extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, ThreadNumber = 3L)
 }
 \arguments{
 \item{Spe2PepFilePath}{a full path with .Spe2Pep.txt files in it}

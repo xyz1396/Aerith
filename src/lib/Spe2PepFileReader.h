@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <unordered_set>
 #include <unordered_map>
 #include <map>
 #include <omp.h>
+#include <algorithm>
 #include "sipPSM.h"
 namespace fs = std::filesystem;
 
@@ -32,8 +34,9 @@ public:
     // for single file
     Spe2PepFileReader();
     // for multi files;
-    Spe2PepFileReader(std::string mWorkingPath);
+    Spe2PepFileReader(const std::string mWorkingPath);
     ~Spe2PepFileReader();
+    std::vector<std::string> getSpe2PepFiles(const std::string &mWorkingPath);
     void splitString(const std::string &mString);
     // fill std::vectors in currentSipPSM
     void fillVectors();
@@ -45,6 +48,11 @@ public:
     // converted from filesScansTopPSMs
     // make it good for output
     sipPSM convertFilesScansTopPSMs();
+    std::unordered_map<std::string, std::vector<std::string>>
+    getFT2Spe2pepFileMap(const std::string &workingPath);
     void readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const std::string &workingPath, size_t topN);
+    void mergeDecoyToTarget(Spe2PepFileReader &targetReader, Spe2PepFileReader &decoyReader);
+    void readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(
+        const std::string &targetPath, const std::string &decoyPath, size_t topN = 5);
     void writeTSV(const std::string fileName);
 };

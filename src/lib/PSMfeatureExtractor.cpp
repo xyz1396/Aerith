@@ -21,26 +21,23 @@ size_t PSMfeatureExtractor::binarySearchPeak(const Scan *mScan, double Mz, int c
         if (diff <= mzTolerance)
         {
             // find the peak with highest intensity in tolerance range
-            if (mScan->charge[mid] == charge && mScan->intensity[mid] > currentIntensity)
+            // if (mScan->charge[mid] == charge && mScan->intensity[mid] > currentIntensity)
+            if (mScan->intensity[mid] > currentIntensity)
             {
                 peakIX = mid;
                 currentIntensity = mScan->intensity[mid];
-                // in case matched the first peak in mScan
-                if (mid == 0)
-                    break;
             }
         }
+        // in case searched the first peak in mScan
+        if (mid == 0)
+            break;
         if (mScan->mz[mid] < Mz) // Search the right half
         {
             low = mid + 1;
         }
         else // Search the left half
         {
-            // in case matched the first peak in mScan
-            if (mid == 0)
-                high = 0;
-            else
-                high = mid - 1;
+            high = mid - 1;
         }
     }
     return peakIX;
@@ -72,6 +69,7 @@ void PSMfeatureExtractor::filterIsotopicPeaks(std::vector<isotopicPeak> &isotopi
             closestVertexIX = vertexIXs[i];
         }
     }
+    // go left slope of isotopic envelope
     int currentPeakIX = closestVertexIX - 1;
     while (currentPeakIX >= 0)
     {
@@ -85,6 +83,7 @@ void PSMfeatureExtractor::filterIsotopicPeaks(std::vector<isotopicPeak> &isotopi
         }
         currentPeakIX--;
     }
+    // go right slope of isotopic envelope
     currentPeakIX = closestVertexIX + 1;
     while (currentPeakIX < (int)isotopicPeaks.size())
     {
@@ -168,14 +167,14 @@ std::vector<isotopicPeak> PSMfeatureExtractor::
     return isotopicPeaks;
 }
 
-double PSMfeatureExtractor::getSIPelementAbundanceFromMS1(const std::string &peptideSeq,
+double PSMfeatureExtractor::getSIPelementAbundanceFromMS1(const std::string &nakePeptide,
                                                           const std::vector<isotopicPeak> &isotopicPeaks,
                                                           const int precursorCharge)
 {
-    std::size_t start = peptideSeq.find_first_of('[');
-    std::size_t end = peptideSeq.find_last_of(']');
-    std::string seq = peptideSeq.substr(start + 1, end - start - 1);
-    double baseMass = mAveragine.calPrecursorBaseMass(seq);
+    // in case of no isotopic peaks
+    if (isotopicPeaks.size() == 0)
+        return 0.0;
+    double baseMass = mAveragine.calPrecursorBaseMass(nakePeptide);
     int charge = precursorCharge;
     double baseMZ = baseMass / charge + ProNovoConfig::getProtonMass();
     double MZthreshold = baseMZ - 0.5 / charge;
@@ -205,7 +204,60 @@ double PSMfeatureExtractor::getSIPelementAbundanceFromMS1(const std::string &pep
     }
     double atomCnumber = mAveragine.pepAtomCounts[0];
     pct /= atomCnumber;
+    pct *= 100.;
     return pct;
+}
+
+std::pair<int, int> PSMfeatureExtractor::getSeqLengthAndMissCleavageSiteNumber(const std::string &peptideSeq)
+{
+    std::size_t start = peptideSeq.find_first_of('[');
+    std::size_t end = peptideSeq.find_last_of(']');
+    int seqLength = end - start - 1;
+    // find miss cleavage site not at margin
+    std::string seq = peptideSeq.substr(start + 2, end - start - 3);
+    int count = 0;
+    for (char &A : cleavageSites)
+    {
+        for (char &S : seq)
+        {
+            if (S == A)
+                count++;
+        }
+    }
+    return {seqLength, count};
+}
+
+std::pair<int, double> PSMfeatureExtractor::getMassWindowShiftAndError(const double observedPrecursorMass,
+                                                                       const double calculatedPrecursorMass)
+{
+    int massWindowShift = static_cast<int>(round(std::abs(observedPrecursorMass - calculatedPrecursorMass) /
+                                                 ProNovoConfig::getNeutronMass()));
+    double massError = std::fmod(std::abs(observedPrecursorMass - calculatedPrecursorMass),
+                                 ProNovoConfig::getNeutronMass());
+    if (massError > ProNovoConfig::getNeutronMass() / 2)
+    {
+        massError = ProNovoConfig::getNeutronMass() - massError;
+    }
+    // convert it to ppm
+    massError = massError / calculatedPrecursorMass * 1000000;
+    return {massWindowShift, massError};
+}
+
+double PSMfeatureExtractor::getMS2IsotopicAbundance(const std::string &searchName)
+{
+    if (searchName == "SE")
+        return 1.07;
+    std::string pct = searchName;
+    std::string delimiter = "_";
+    size_t pos = 0;
+    while ((pos = pct.find(delimiter)) != std::string::npos)
+    {
+        pct.erase(0, pos + delimiter.length());
+    }
+    pct = pct.substr(0, pct.size() - 3);
+    double pct_num = std::stod(pct);
+    pct_num = pct_num / 1000;
+    return pct_num;
 }
 
 void PSMfeatureExtractor::loadFT1(const std::string &FTfileBasePath)
@@ -272,16 +324,42 @@ void ompForDemo()
 
 void PSMfeatureExtractor::extractFeaturesOfEachPSM()
 {
+    float topMVHscore = 0;
     for (size_t i = 0; i < mSipPSM->isotopicPeakss.size(); i++)
     {
         mSipPSM->isotopicPeakss[i] = findIsotopicPeaks(mSipPSM->precursorScanNumbers[i],
                                                        mSipPSM->parentCharges[i],
                                                        mSipPSM->measuredParentMasses[i],
                                                        mSipPSM->calculatedParentMasses[i]);
-        mSipPSM->istopicPeakNumbers[i] = mSipPSM->isotopicPeakss[i].size();
-        mSipPSM->MS1IsotopicAbundances[i] = getSIPelementAbundanceFromMS1(mSipPSM->identifiedPeptides[i],
+        mSipPSM->isotopicPeakNumbers[i] = mSipPSM->isotopicPeakss[i].size();
+        mSipPSM->MS1IsotopicAbundances[i] = getSIPelementAbundanceFromMS1(mSipPSM->nakePeptides[i],
                                                                           mSipPSM->isotopicPeakss[i],
                                                                           mSipPSM->parentCharges[i]);
+        std::tie(mSipPSM->peptideLengths[i], mSipPSM->missCleavageSiteNumbers[i]) =
+            getSeqLengthAndMissCleavageSiteNumber(mSipPSM->originalPeptides[i]);
+
+        if (mSipPSM->ranks[i] == 1)
+        {
+            topMVHscore = mSipPSM->MVHscores[i];
+            // topMVHscore = mSipPSM->WDPscores[i];
+        }
+        mSipPSM->MVHdiffScores[i] = topMVHscore - mSipPSM->MVHscores[i];
+        // mSipPSM->MVHdiffScores[i] = topMVHscore - mSipPSM->WDPscores[i];
+
+        mSipPSM->mzShiftFromisolationWindowCenters[i] = std::abs(
+            mSipPSM->isolationWindowCenterMZs[i] -
+            mSipPSM->measuredParentMasses[i] / mSipPSM->parentCharges[i] - ProNovoConfig::getProtonMass());
+        std::tie(mSipPSM->isotopicMassWindowShifts[i], mSipPSM->massErrors[i]) = getMassWindowShiftAndError(
+            mSipPSM->measuredParentMasses[i], mSipPSM->calculatedParentMasses[i]);
+
+        mSipPSM->precursorIntensities[i] = 0;
+        for (auto &peak : mSipPSM->isotopicPeakss[i])
+        {
+            mSipPSM->precursorIntensities[i] += peak.intensity;
+        }
+
+        mSipPSM->MS2IsotopicAbundances[i] = getMS2IsotopicAbundance(mSipPSM->searchNames[i]);
+        mSipPSM->isotopicAbundanceDiffs[i] = mSipPSM->MS1IsotopicAbundances[i] - mSipPSM->MS2IsotopicAbundances[i];
     }
 }
 
@@ -296,15 +374,24 @@ void PSMfeatureExtractor::extractPSMfeature(const std::string &Spe2PepFilePath, 
         mSipPSM = &mSpe2PepFileReader.sipPSMs[i];
         // init vectors for features to be extracted;
         mSipPSM->isotopicPeakss = std::vector<std::vector<isotopicPeak>>(mSipPSM->scanNumbers.size());
-        mSipPSM->istopicPeakNumbers = std::vector<int>(mSipPSM->scanNumbers.size());
+        mSipPSM->isotopicPeakNumbers = std::vector<int>(mSipPSM->scanNumbers.size());
+        mSipPSM->MS1IsotopicAbundances = std::vector<double>(mSipPSM->scanNumbers.size());
+        mSipPSM->MS2IsotopicAbundances = std::vector<double>(mSipPSM->scanNumbers.size());
+        mSipPSM->isotopicAbundanceDiffs = std::vector<double>(mSipPSM->scanNumbers.size());
+        mSipPSM->peptideLengths = std::vector<int>(mSipPSM->scanNumbers.size());
+        mSipPSM->missCleavageSiteNumbers = std::vector<int>(mSipPSM->scanNumbers.size());
+        mSipPSM->MVHdiffScores = std::vector<float>(mSipPSM->scanNumbers.size());
+        mSipPSM->mzShiftFromisolationWindowCenters = std::vector<double>(mSipPSM->scanNumbers.size());
+        mSipPSM->isotopicMassWindowShifts = std::vector<int>(mSipPSM->scanNumbers.size());
+        mSipPSM->massErrors = std::vector<double>(mSipPSM->scanNumbers.size());
+        mSipPSM->precursorIntensities = std::vector<double>(mSipPSM->scanNumbers.size(), 0);
         extractFeaturesOfEachPSM();
     }
 }
 
-void PSMfeatureExtractor::extractPSMfeatureParallel(const std::string &Spe2PepFilePath, const int topN,
-                                                    const std::string &ftFilepath, const int threadNumber)
+void PSMfeatureExtractor::extractPSMfeatureParallel(
+    const std::string &ftFilepath, const int threadNumber)
 {
-    mSpe2PepFileReader.readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(Spe2PepFilePath, topN);
     int num_cores = omp_get_num_procs();
     // Set the number of threads to the lesser of num_cores and 10
     int num_threads = std::min(num_cores, 10);
@@ -321,10 +408,34 @@ void PSMfeatureExtractor::extractPSMfeatureParallel(const std::string &Spe2PepFi
         mExtractor.mSipPSM = &mSpe2PepFileReader.sipPSMs[i];
         // init vectors for features to be extracted;
         mExtractor.mSipPSM->isotopicPeakss = std::vector<std::vector<isotopicPeak>>(mExtractor.mSipPSM->scanNumbers.size());
-        mExtractor.mSipPSM->istopicPeakNumbers = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->isotopicPeakNumbers = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->MS1IsotopicAbundances = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->MS2IsotopicAbundances = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->isotopicAbundanceDiffs = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->peptideLengths = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->missCleavageSiteNumbers = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->MVHdiffScores = std::vector<float>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->mzShiftFromisolationWindowCenters = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->isotopicMassWindowShifts = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->massErrors = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->precursorIntensities = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size(), 0);
         mExtractor.extractFeaturesOfEachPSM();
     }
+}
+
+void PSMfeatureExtractor::extractPSMfeatureParallel(const std::string &Spe2PepFilePath, const int topN,
+                                                    const std::string &ftFilepath, const int threadNumber)
+{
+    mSpe2PepFileReader.readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(Spe2PepFilePath, topN);
+    extractPSMfeatureParallel(ftFilepath, threadNumber);
+}
+
+void PSMfeatureExtractor::extractPSMfeatureParallel(const std::string &targetPath, const std::string &decoyPath, const int topN,
+                                                    const std::string &ftFilepath, const int threadNumber)
+{
+    mSpe2PepFileReader.readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(
+        targetPath, decoyPath, topN);
+    extractPSMfeatureParallel(ftFilepath, threadNumber);
 }
 
 void PSMfeatureExtractor::writeTSV(const std::string &fileName)
@@ -377,7 +488,7 @@ void PSMfeatureExtractor::writeTSV(const std::string &fileName)
     {
         for (size_t j = 0; j < sipPSMs[i].fileNames.size(); j += chunkSize)
         {
-            for (size_t k = j; k < std::min(k + chunkSize, sipPSMs[i].fileNames.size()); ++k)
+            for (size_t k = j; k < std::min(j + chunkSize, sipPSMs[i].fileNames.size()); ++k)
             {
                 ss << sipPSMs[i].fileNames[k] << "\t" << sipPSMs[i].scanNumbers[k] << "\t"
                    << sipPSMs[i].precursorScanNumbers[k] << "\t"
@@ -388,6 +499,128 @@ void PSMfeatureExtractor::writeTSV(const std::string &fileName)
                    << sipPSMs[i].XcorrScores[k] << "\t" << sipPSMs[i].WDPscores[k] << "\t"
                    << sipPSMs[i].ranks[k] << "\t" << sipPSMs[i].identifiedPeptides[k] << "\t"
                    << sipPSMs[i].originalPeptides[k] << "\t" << sipPSMs[i].proteinNames[k] << "\n";
+            }
+            file << ss.str();
+            ss.str(std::string()); // Clear the stringstream
+        }
+    }
+    file.close();
+}
+
+void PSMfeatureExtractor::writePecorlatorPin(const std::string &fileName, bool doProteinInference)
+{
+    setlocale(LC_ALL, "C");
+    std::ios_base::sync_with_stdio(false);
+    std::ofstream file(fileName);
+    if (!file)
+    {
+        std::cerr << "Unable to open file for writing.\n";
+    }
+    file << std::fixed << std::setprecision(6);
+
+    const size_t chunkSize = 10000;
+    std::stringstream ss;
+    ss << "SpecId"
+       << "\t"
+       << "Label"
+       << "\t"
+       << "ScanNr"
+       << "\t"
+       << "ExpMass"
+       << "\t"
+       << "retentiontime"
+       << "\t"
+       << "ranks"
+       << "\t"
+       << "parentCharges"
+       << "\t"
+       << "massErrors"
+       << "\t"
+       << "isotopicMassWindowShifts"
+       << "\t"
+       << "mzShiftFromisolationWindowCenters"
+       << "\t"
+       << "peptideLengths"
+       << "\t"
+       << "missCleavageSiteNumbers"
+       << "\t"
+       << "istopicPeakNumbers"
+       << "\t"
+       << "MS1IsotopicAbundances"
+       << "\t"
+       << "isotopicAbundanceDiffs"
+       << "\t"
+       << "MVHscores"
+       << "\t"
+       << "XcorrScores"
+       << "\t"
+       << "WDPscores"
+       << "\t"
+       << "MVHdiffScores"
+       << "\t"
+       << "log10_precursorIntensities"
+       << "\t"
+       << "Peptide"
+       << "\t"
+       << "Proteins"
+       << "\n";
+    std::string proteinName;
+    std::string peptideSeq;
+    std::vector<sipPSM> &sipPSMs = mSpe2PepFileReader.sipPSMs;
+    for (size_t i = 0; i < sipPSMs.size(); i++)
+    {
+        for (size_t j = 0; j < sipPSMs[i].fileNames.size(); j += chunkSize)
+        {
+            for (size_t k = j; k < std::min(j + chunkSize, sipPSMs[i].fileNames.size()); ++k)
+            {
+                ss << sipPSMs[i].fileNames[k] << "." << sipPSMs[i].scanNumbers[k] << "." << sipPSMs[i].ranks[k] << "\t";
+                ss << (sipPSMs[i].isDecoys[k] ? -1 : 1) << "\t";
+                ss << sipPSMs[i].scanNumbers[k] << "\t"
+                   << sipPSMs[i].calculatedParentMasses[k] << "\t"
+                   << sipPSMs[i].retentionTimes[k] << "\t"
+                   << sipPSMs[i].ranks[k] << "\t"
+                   << sipPSMs[i].parentCharges[k] << "\t"
+                   << sipPSMs[i].massErrors[k] << "\t"
+                   << sipPSMs[i].isotopicMassWindowShifts[k] << "\t"
+                   << sipPSMs[i].mzShiftFromisolationWindowCenters[k] << "\t"
+                   << sipPSMs[i].peptideLengths[k] << "\t"
+                   << sipPSMs[i].missCleavageSiteNumbers[k] << "\t"
+                   << sipPSMs[i].isotopicPeakNumbers[k] << "\t"
+                   << sipPSMs[i].MS1IsotopicAbundances[k] << "\t"
+                   << sipPSMs[i].isotopicAbundanceDiffs[k] << "\t"
+                   << sipPSMs[i].MVHscores[k] << "\t"
+                   << sipPSMs[i].XcorrScores[k] << "\t"
+                   << sipPSMs[i].WDPscores[k] << "\t"
+                   << sipPSMs[i].MVHdiffScores[k] << "\t"
+                   << (sipPSMs[i].precursorIntensities[k] > 0
+                           ? std::log10(sipPSMs[i].precursorIntensities[k])
+                           : 0)
+                   << "\t";
+
+                if (doProteinInference)
+                {
+                    // for percolator protein inference format
+                    peptideSeq = sipPSMs[i].originalPeptides[k];
+                    if (peptideSeq.front() == '[')
+                        peptideSeq.insert(peptideSeq.begin(), 'n');
+                    if (peptideSeq.back() == ']')
+                        peptideSeq.push_back('n');
+                    std::replace(peptideSeq.begin(), peptideSeq.end(), '[', '.');
+                    std::replace(peptideSeq.begin(), peptideSeq.end(), ']', '.');
+                }
+                else
+                    peptideSeq = sipPSMs[i].identifiedPeptides[k];
+                ss << peptideSeq << "\t";
+
+                proteinName = sipPSMs[i].proteinNames[k];
+                if (doProteinInference)
+                {
+                    // for percolator protein inference format
+                    proteinName = proteinName.substr(1, sipPSMs[i].proteinNames[k].length() - 2);
+                    std::replace(proteinName.begin(), proteinName.end(), ',', '\t');
+                }
+                ss << proteinName;
+                ss << "\n";
             }
             file << ss.str();
             ss.str(std::string()); // Clear the stringstream

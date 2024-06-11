@@ -5,6 +5,7 @@
 #include "isotopicPeak.h"
 #include <unordered_map>
 #include <omp.h>
+#include <array>
 
 class PSMfeatureExtractor
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "proNovoConfig.h"
 #include <numeric>
+#include <functional>
 
 class averagine
 {

@@ -18,5 +18,5 @@ AAspectra object
 Get AAspectra object of precursor from AA sequence with natural SIP abundance
 }
 \examples{
-getPrecursorSpectra("KHRIP",1:2)
+getPrecursorSpectra("KHRIP", 1:2)
 }

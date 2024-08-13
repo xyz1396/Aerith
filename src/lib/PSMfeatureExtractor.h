@@ -36,6 +36,7 @@ public:
     double getSIPelementAbundanceFromMS1(const std::string &peptideSeq,
                                          const std::vector<isotopicPeak> &isotopicPeaks, const int precursorCharge);
     std::pair<int, int> getSeqLengthAndMissCleavageSiteNumber(const std::string &peptideSeq);
+    int getPTMnumber(const std::string &peptideSeq);
     std::pair<int, double> getMassWindowShiftAndError(const double observedPrecursorMass,
                                                       const double calculatedPrecursorMass);
     double getMS2IsotopicAbundance(const std::string &searchName);

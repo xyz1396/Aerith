@@ -28,15 +28,15 @@ size_t PSMfeatureExtractor::binarySearchPeak(const Scan *mScan, double Mz, int c
                 currentIntensity = mScan->intensity[mid];
             }
         }
-        // in case searched the first peak in mScan
-        if (mid == 0)
-            break;
         if (mScan->mz[mid] < Mz) // Search the right half
         {
             low = mid + 1;
         }
         else // Search the left half
         {
+            // in case searched the first peak in mScan
+            if (mid == 0)
+                break;
             high = mid - 1;
         }
     }
@@ -227,6 +227,19 @@ std::pair<int, int> PSMfeatureExtractor::getSeqLengthAndMissCleavageSiteNumber(c
     return {seqLength, count};
 }
 
+int PSMfeatureExtractor::getPTMnumber(const std::string &peptideSeq)
+{
+    int count = 0;
+    for (char c : peptideSeq)
+    {
+        if (!isalpha(c))
+        {
+            count++;
+        }
+    }
+    return count;
+}
+
 std::pair<int, double> PSMfeatureExtractor::getMassWindowShiftAndError(const double observedPrecursorMass,
                                                                        const double calculatedPrecursorMass)
 {
@@ -337,6 +350,7 @@ void PSMfeatureExtractor::extractFeaturesOfEachPSM()
                                                                           mSipPSM->parentCharges[i]);
         std::tie(mSipPSM->peptideLengths[i], mSipPSM->missCleavageSiteNumbers[i]) =
             getSeqLengthAndMissCleavageSiteNumber(mSipPSM->originalPeptides[i]);
+        mSipPSM->PTMnumbers[i] = getPTMnumber(mSipPSM->nakePeptides[i]);
 
         if (mSipPSM->ranks[i] == 1)
         {
@@ -414,6 +428,7 @@ void PSMfeatureExtractor::extractPSMfeatureParallel(
         mExtractor.mSipPSM->isotopicAbundanceDiffs = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->peptideLengths = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->missCleavageSiteNumbers = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->PTMnumbers = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->MVHdiffScores = std::vector<float>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->mzShiftFromisolationWindowCenters = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->isotopicMassWindowShifts = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
@@ -544,6 +559,8 @@ void PSMfeatureExtractor::writePecorlatorPin(const std::string &fileName, bool d
        << "\t"
        << "missCleavageSiteNumbers"
        << "\t"
+       << "PTMnumbers"
+       << "\t"
        << "istopicPeakNumbers"
        << "\t"
        << "MS1IsotopicAbundances"
@@ -585,6 +602,7 @@ void PSMfeatureExtractor::writePecorlatorPin(const std::string &fileName, bool d
                    << sipPSMs[i].mzShiftFromisolationWindowCenters[k] << "\t"
                    << sipPSMs[i].peptideLengths[k] << "\t"
                    << sipPSMs[i].missCleavageSiteNumbers[k] << "\t"
+                   << sipPSMs[i].PTMnumbers[k] << "\t"
                    << sipPSMs[i].isotopicPeakNumbers[k] << "\t"
                    << sipPSMs[i].MS1IsotopicAbundances[k] << "\t"
                    << sipPSMs[i].isotopicAbundanceDiffs[k] << "\t"

@@ -1,6 +1,7 @@
 #include "lib/peptide.h"
 #include "lib/ms2scan.h"
 #include "lib/initSIP.h"
+#include "lib/PSMpeakAnnotator.h"
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -390,14 +391,22 @@ double scoreIntensityByCE(const NumericVector &expectedIntensity, const NumericV
 //' scorePSM
 //' @param realMZ mz vector in MS2 scan
 //' @param realIntensity intensity vector in MS2 scan
+//' @param realCharge charge vector in MS2 scan
+//' @param parentCharge int parent charge of MS2 scan
 //' @param pepSeq a string of peptide
 //' @param Atom "C13" or "N15"
 //' @param Prob its SIP abundance (0.0~1.0)
 //' @return a score of this PSM
+//' @examples
+//' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+//' score <- scorePSM(scan1$peaks$mz,
+//'         scan1$peaks$intensity, scan1$peaks$charge, 2,
+//'         "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107)
 //' @export
 // [[Rcpp::export]]
 double scorePSM(const NumericVector &realMZ, const NumericVector &realIntensity,
-                const NumericVector &realCharge, const String &pepSeq, const String &Atom, double Prob)
+                const NumericVector &realCharge, int parentCharge,
+                const String &pepSeq, const String &Atom, double Prob)
 {
     // read default config
     string config = get_extdata();
@@ -423,9 +432,98 @@ double scorePSM(const NumericVector &realMZ, const NumericVector &realIntensity,
     myScan.vdIntensity = as<vector<double>>(realIntensity);
     myScan.vdMZ = as<vector<double>>(realMZ);
     myScan.viCharge = as<vector<int>>(realCharge);
+    myScan.iParentChargeState = parentCharge;
     myScan.preprocess();
     myScan.scoreWeightSumHighMS2(&myPep);
     return myScan.vpWeightSumTopPeptides[0]->dScore;
+}
+
+std::vector<std::string> enumsToStrings(std::vector<PSMpeakAnnotator::ionKind> ionKinds)
+{
+    std::vector<std::string> ionKindStrs(ionKinds.size());
+    for (size_t i = 0; i < ionKinds.size(); i++)
+    {
+        switch (ionKinds[i])
+        {
+        case PSMpeakAnnotator::ionKind::B:
+            ionKindStrs[i] = "B";
+            break;
+        case PSMpeakAnnotator::ionKind::Y:
+            ionKindStrs[i] = "Y";
+            break;
+        case PSMpeakAnnotator::ionKind::BisotopicPeak:
+            ionKindStrs[i] = "BisotopicPeak";
+            break;
+        case PSMpeakAnnotator::ionKind::YisotopicPeak:
+            ionKindStrs[i] = "YisotopicPeak";
+            break;
+        default:
+            ionKindStrs[i] = "UNKNOWN";
+            break;
+        }
+    }
+    return ionKindStrs;
+}
+
+//' annotatePSM
+//' @param realMZ mz vector in MS2 scan
+//' @param realIntensity intensity vector in MS2 scan
+//' @param realCharge charge vector in MS2 scan
+//' @param pepSeq a string of peptide
+//' @param charges charges of product ions in consideration
+//' @param Atom "C13" or "N15"
+//' @param Prob its SIP abundance (0.0~1.0)
+//' @param isoCenter isolation window center, set it 0 as default if not remove peaks in isolation window
+//' @param isoWidth isolation window width, set it 0 as default if not remove peaks in isolation window
+//' @return a List about matched peaks information of this PSM
+//' @examples
+//' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+//' anno <- annotatePSM(
+//'   scan1$peaks$mz, scan1$peaks$intensity,
+//'   scan1$peaks$charge,
+//'   "HSQVFSTAEDNQSAVTIHVLQGER", 1:2, "C13",
+//'   0.0107, 886.65, 4.0
+//' )
+//' @export
+// [[Rcpp::export]]
+List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity,
+                 const NumericVector &realCharge, const String &pepSeq, const NumericVector charges,
+                 const String &Atom, double Prob,
+                 const double isoCenter = 0, const double isoWidth = 0)
+{
+    // read default config
+    string config = get_extdata();
+    ProNovoConfig::setFilename(config);
+    // compute residue mass and prob again
+    computeResidueMassIntensityAgain(Atom, Prob);
+    Scan mScan;
+    mScan.mz = as<vector<double>>(realMZ);
+    mScan.intensity = as<vector<double>>(realIntensity);
+    mScan.charge = as<vector<int>>(realCharge);
+    // set tolerance in ppm
+    PSMpeakAnnotator mAnnotator(10);
+    if (mScan.mz.size() > 10 && mScan.intensity.size() > 10)
+        mAnnotator.analyzePSM(pepSeq, &mScan, as<vector<int>>(charges), isoCenter, isoWidth);
+    else
+    {
+        Rcerr << "Too less peaks or empty Scan" << endl;
+        return List();
+    }
+    std::vector<std::string> ionKindStrs = enumsToStrings(mAnnotator.getIonKinds());
+    DataFrame ExpectedBYions = DataFrame::create(Named("mz") = mAnnotator.getExpectedMZs(),
+                                                 _("intensity") = mAnnotator.getExpectedIntensities(),
+                                                 _("charge") = mAnnotator.getExpectedCharges(),
+                                                 _("ionkind") = ionKindStrs,
+                                                 _("residuePositions") = mAnnotator.getResiduePositions(),
+                                                 _("matchedIndices") = mAnnotator.getMatchedIndices());
+    DataFrame realPeaks = DataFrame::create(Named("mz") = mScan.mz,
+                                            _("intensity") = mScan.intensity,
+                                            _("charge") = mScan.charge);
+    List re = List::create(Named("ExpectedBYions") = ExpectedBYions,
+                           _("RealPeaks") = realPeaks,
+                           _("MatchedSpectraEntropy") = mAnnotator.getMatchedSpectraEntropy(),
+                           _("Peptide") = pepSeq);
+    return re;
 }
 
 //' scorePSMold old function of scoreWeightSumHighMS2

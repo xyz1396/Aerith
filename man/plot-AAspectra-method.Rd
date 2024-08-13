@@ -16,6 +16,6 @@ a ggplot2 object
 Draw AAspectra MS plot
 }
 \examples{
-a<-getPrecursorSpectra("KHRIP",2)
+a <- getPrecursorSpectra("KHRIP", 2)
 plot(a)
 }

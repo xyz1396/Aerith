@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotAAspectra.R
 \name{getSipBYionSpectra}
 \alias{getSipBYionSpectra}
-\title{Get AAspectra object  of B and Y ions from AA sequence
+\title{Get AAspectra object of B and Y ions from AA sequence
 with labeled SIP abundance}
 \usage{
 getSipBYionSpectra(
@@ -28,7 +28,7 @@ getSipBYionSpectra(
 AAspectra object
 }
 \description{
-Get AAspectra object  of B and Y ions from AA sequence
+Get AAspectra object of B and Y ions from AA sequence
 with labeled SIP abundance
 }
 \examples{

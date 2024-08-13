@@ -12,15 +12,15 @@ test_that("extractPSMfeatures works", {
   #   "/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/FT", 8
   # )
 
-  # a <- extractPSMfeaturesTargetAndDecoy(
+  # psm <- extractPSMfeaturesTargetAndDecoy(
   #   "/mnt/d/work/202405/X3_guessCharge15precursor/target/",
-  #   "/mnt/d/work/202405/X3_guessCharge15precursor/decoy/", 3,
-  #   "/mnt/d/work/202405/X3_guessCharge15precursor/FT", 1
+  #   "/mnt/d/work/202405/X3_guessCharge15precursor/decoy/", 20,
+  #   "/mnt/d/work/202405/X3_guessCharge15precursor/FT", 8
   # )
 
-    a <- extractPSMfeaturesTargetAndDecoy(
-    "/mnt/d/work/202405/X2_15precursor/target/",
-    "/mnt/d/work/202405/X2_15precursor/decoy/", 3,
-    "/mnt/d/work/202405/X2_15precursor/FT", 8
-  )
+  #   a <- extractPSMfeaturesTargetAndDecoy(
+  #   "/mnt/d/work/202405/X2_15precursor/target/",
+  #   "/mnt/d/work/202405/X2_15precursor/decoy/", 3,
+  #   "/mnt/d/work/202405/X2_15precursor/FT", 8
+  # )
 })

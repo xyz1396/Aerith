@@ -15,5 +15,6 @@ LinkingTo:
     Rcpp
 Imports: 
     Rcpp,
-    ggplot2
+    ggplot2,
+    ggrepel
 SystemRequirements: C++17

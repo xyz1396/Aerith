@@ -434,13 +434,44 @@ scoreIntensityByCE <- function(expectedIntensity, observedIntensity) {
 #' scorePSM
 #' @param realMZ mz vector in MS2 scan
 #' @param realIntensity intensity vector in MS2 scan
+#' @param realCharge charge vector in MS2 scan
+#' @param parentCharge int parent charge of MS2 scan
 #' @param pepSeq a string of peptide
 #' @param Atom "C13" or "N15"
 #' @param Prob its SIP abundance (0.0~1.0)
 #' @return a score of this PSM
+#' @examples
+#' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+#' score <- scorePSM(scan1$peaks$mz,
+#'         scan1$peaks$intensity, scan1$peaks$charge, 2,
+#'         "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107)
 #' @export
-scorePSM <- function(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob) {
-    .Call(`_Aerith_scorePSM`, realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
+scorePSM <- function(realMZ, realIntensity, realCharge, parentCharge, pepSeq, Atom, Prob) {
+    .Call(`_Aerith_scorePSM`, realMZ, realIntensity, realCharge, parentCharge, pepSeq, Atom, Prob)
+}
+
+#' annotatePSM
+#' @param realMZ mz vector in MS2 scan
+#' @param realIntensity intensity vector in MS2 scan
+#' @param realCharge charge vector in MS2 scan
+#' @param pepSeq a string of peptide
+#' @param charges charges of product ions in consideration
+#' @param Atom "C13" or "N15"
+#' @param Prob its SIP abundance (0.0~1.0)
+#' @param isoCenter isolation window center, set it 0 as default if not remove peaks in isolation window
+#' @param isoWidth isolation window width, set it 0 as default if not remove peaks in isolation window
+#' @return a List about matched peaks information of this PSM
+#' @examples
+#' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+#' anno <- annotatePSM(
+#'   scan1$peaks$mz, scan1$peaks$intensity,
+#'   scan1$peaks$charge,
+#'   "HSQVFSTAEDNQSAVTIHVLQGER", 1:2, "C13",
+#'   0.0107, 886.65, 4.0
+#' )
+#' @export
+annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter = 0, isoWidth = 0) {
+    .Call(`_Aerith_annotatePSM`, realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter, isoWidth)
 }
 
 #' scorePSMold old function of scoreWeightSumHighMS2

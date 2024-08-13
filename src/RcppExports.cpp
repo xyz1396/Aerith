@@ -512,8 +512,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // scorePSM
-double scorePSM(const NumericVector& realMZ, const NumericVector& realIntensity, const NumericVector& realCharge, const String& pepSeq, const String& Atom, double Prob);
-RcppExport SEXP _Aerith_scorePSM(SEXP realMZSEXP, SEXP realIntensitySEXP, SEXP realChargeSEXP, SEXP pepSeqSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
+double scorePSM(const NumericVector& realMZ, const NumericVector& realIntensity, const NumericVector& realCharge, int parentCharge, const String& pepSeq, const String& Atom, double Prob);
+RcppExport SEXP _Aerith_scorePSM(SEXP realMZSEXP, SEXP realIntensitySEXP, SEXP realChargeSEXP, SEXP parentChargeSEXP, SEXP pepSeqSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type realMZ(realMZSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type realIntensity(realIntensitySEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type realCharge(realChargeSEXP);
+    Rcpp::traits::input_parameter< int >::type parentCharge(parentChargeSEXP);
+    Rcpp::traits::input_parameter< const String& >::type pepSeq(pepSeqSEXP);
+    Rcpp::traits::input_parameter< const String& >::type Atom(AtomSEXP);
+    Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
+    rcpp_result_gen = Rcpp::wrap(scorePSM(realMZ, realIntensity, realCharge, parentCharge, pepSeq, Atom, Prob));
+    return rcpp_result_gen;
+END_RCPP
+}
+// annotatePSM
+List annotatePSM(const NumericVector& realMZ, const NumericVector& realIntensity, const NumericVector& realCharge, const String& pepSeq, const NumericVector charges, const String& Atom, double Prob, const double isoCenter, const double isoWidth);
+RcppExport SEXP _Aerith_annotatePSM(SEXP realMZSEXP, SEXP realIntensitySEXP, SEXP realChargeSEXP, SEXP pepSeqSEXP, SEXP chargesSEXP, SEXP AtomSEXP, SEXP ProbSEXP, SEXP isoCenterSEXP, SEXP isoWidthSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -521,9 +538,12 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const NumericVector& >::type realIntensity(realIntensitySEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type realCharge(realChargeSEXP);
     Rcpp::traits::input_parameter< const String& >::type pepSeq(pepSeqSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type charges(chargesSEXP);
     Rcpp::traits::input_parameter< const String& >::type Atom(AtomSEXP);
     Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
-    rcpp_result_gen = Rcpp::wrap(scorePSM(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob));
+    Rcpp::traits::input_parameter< const double >::type isoCenter(isoCenterSEXP);
+    Rcpp::traits::input_parameter< const double >::type isoWidth(isoWidthSEXP);
+    rcpp_result_gen = Rcpp::wrap(annotatePSM(realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter, isoWidth));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -623,7 +643,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel", (DL_FUNC) &_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel, 3},
     {"_Aerith_scoreIntensity", (DL_FUNC) &_Aerith_scoreIntensity, 5},
     {"_Aerith_scoreIntensityByCE", (DL_FUNC) &_Aerith_scoreIntensityByCE, 2},
-    {"_Aerith_scorePSM", (DL_FUNC) &_Aerith_scorePSM, 6},
+    {"_Aerith_scorePSM", (DL_FUNC) &_Aerith_scorePSM, 7},
+    {"_Aerith_annotatePSM", (DL_FUNC) &_Aerith_annotatePSM, 9},
     {"_Aerith_scorePSMold", (DL_FUNC) &_Aerith_scorePSMold, 6},
     {"_Aerith_rankyfify", (DL_FUNC) &_Aerith_rankyfify, 1},
     {"_Aerith_denoiseOneMS2ScanHasCharge", (DL_FUNC) &_Aerith_denoiseOneMS2ScanHasCharge, 4},

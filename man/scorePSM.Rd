@@ -4,12 +4,16 @@
 \alias{scorePSM}
 \title{scorePSM}
 \usage{
-scorePSM(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
+scorePSM(realMZ, realIntensity, realCharge, parentCharge, pepSeq, Atom, Prob)
 }
 \arguments{
 \item{realMZ}{mz vector in MS2 scan}
 
 \item{realIntensity}{intensity vector in MS2 scan}
+
+\item{realCharge}{charge vector in MS2 scan}
+
+\item{parentCharge}{int parent charge of MS2 scan}
 
 \item{pepSeq}{a string of peptide}
 
@@ -22,4 +26,10 @@ a score of this PSM
 }
 \description{
 scorePSM
+}
+\examples{
+scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+score <- scorePSM(scan1$peaks$mz,
+        scan1$peaks$intensity, scan1$peaks$charge, 2,
+        "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107)
 }

@@ -41,6 +41,7 @@ public:
     std::vector<bool> isDecoys;
     std::vector<int> peptideLengths;
     std::vector<int> missCleavageSiteNumbers;
+    std::vector<int> PTMnumbers;
     std::vector<float> MVHdiffScores;
     std::vector<double> mzShiftFromisolationWindowCenters;
     std::vector<int> isotopicMassWindowShifts;

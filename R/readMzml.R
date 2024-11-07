@@ -1,4 +1,4 @@
-#' Read MS1 spectras from .mzML file
+#' Read MS1 spectra from .mzML file
 #'
 #' @param ms A .mzML files's path
 #'
@@ -19,26 +19,28 @@ readMzmlMS1 <- function(ms) {
   TICs <- meta$totIonCurrent
   peakss <- peakss[scanNumbers]
   scans <-
-    mapply(function(scanNumber, retentionTime, TIC, peaks) {
-      return(
-        list(
-          scanNumber = scanNumber,
-          retentionTime = retentionTime,
-          TIC = TIC,
-          peaks = as.data.frame(peaks)
+    mapply(
+      function(scanNumber, retentionTime, TIC, peaks) {
+        return(
+          list(
+            scanNumber = scanNumber,
+            retentionTime = retentionTime,
+            TIC = TIC,
+            peaks = as.data.frame(peaks)
+          )
         )
-      )
-    },
-    scanNumbers,
-    retentionTimes,
-    TICs,
-    peakss,
-    SIMPLIFY = F)
+      },
+      scanNumbers,
+      retentionTimes,
+      TICs,
+      peakss,
+      SIMPLIFY = F
+    )
   names(scans) <- as.character(scanNumbers)
   return(scans)
 }
 
-#' Read MS2 spectras from .mzML file
+#' Read MS2 spectra from .mzML file
 #'
 #' @param ms A .mzML files's path
 #'
@@ -52,7 +54,7 @@ readMzmlMS1 <- function(ms) {
 readMzmlMS2 <- function(ms) {
   ms <- mzR::openMSfile(ms)
   meta <- mzR::header(ms)
-  meta <- meta[meta$msLevel == 2,]
+  meta <- meta[meta$msLevel == 2, ]
   peakss <- mzR::peaks(ms)
   scanNumbers <- meta$seqNum
   precursorScanNumbers <- meta$precursorScanNum
@@ -93,4 +95,53 @@ readMzmlMS2 <- function(ms) {
     )
   names(scans) <- as.character(scanNumbers)
   return(scans)
+}
+
+#' Read PSM table from .pepXML file
+#'
+#' @param ms A .pepXML files's path
+#'
+#' @return A dataframe of psm table
+#' @export
+#'
+#' @examples
+#' # mzR can be installed from bioconductor
+#' library(mzR)
+#' a <- readPepXMLtable("demo.pepXML")
+readPepXMLtable <- function(pepXML) {
+  pepXML <- mzR::openIDfile(pepXML)
+  psm <- mzR::psms(pepXML)
+  scores <- mzR::score(pepXML)
+  modification <- mzR::modifications(pepXML)
+  psmTable <- cbind(scores, psm[, colnames(psm) != "spectrumID"])
+  psmTable <- dplyr::group_by(psmTable, across(all_of(setdiff(
+    names(psmTable),
+    c("DatabaseAccess", "DatabaseDescription")
+  ))))
+  psmTable <- dplyr::summarise(psmTable,
+    DatabaseAccess = stringr::str_c(DatabaseAccess, collapse = ","),
+    DatabaseDescription = stringr::str_c(DatabaseDescription, collapse = ",")
+  )
+  psmTable <- cbind(
+    psmID = stringr::str_c(psmTable$spectrumID,
+      psmTable$peptideRef,
+      sep = "_"
+    ),
+    psmTable
+  )
+  modification <- cbind(psmID = stringr::str_c(modification$spectrumID,
+    modification$peptideRef,
+    sep = "_"
+  ), modification)
+  modification <- modification[, setdiff(
+    names(modification),
+    c(
+      "spectrumID", "sequence",
+      "peptideRef"
+    )
+  )]
+  psmTable <- dplyr::left_join(psmTable, modification,
+    by = c("psmID" = "psmID"),relationship="many-to-many"
+  )
+  return(as.data.frame(psmTable))
 }

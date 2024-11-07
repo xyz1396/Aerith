@@ -2,7 +2,7 @@
 % Please edit documentation in R/readMzml.R
 \name{readMzmlMS1}
 \alias{readMzmlMS1}
-\title{Read MS1 spectras from .mzML file}
+\title{Read MS1 spectra from .mzML file}
 \usage{
 readMzmlMS1(ms)
 }
@@ -13,7 +13,7 @@ readMzmlMS1(ms)
 A list of MS1 scans with names of scan number
 }
 \description{
-Read MS1 spectras from .mzML file
+Read MS1 spectra from .mzML file
 }
 \examples{
 # mzR can be installed from bioconductor

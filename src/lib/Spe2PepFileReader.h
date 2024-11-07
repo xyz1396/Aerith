@@ -38,9 +38,11 @@ public:
     ~Spe2PepFileReader();
     std::vector<std::string> getSpe2PepFiles(const std::string &mWorkingPath);
     void splitString(const std::string &mString);
+    void splitStringView(std::string_view str, char delimiter);
     // fill std::vectors in currentSipPSM
     void fillVectors();
     void readOneFile(std::string sipFileName);
+    void readOneEntireFile(const std::string& sipFileName);
     void readFileChunk();
     void readAllFiles();
     void readAllFilesTopPSMs();

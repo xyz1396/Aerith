@@ -413,12 +413,12 @@ plotRealScan <- function(spect) {
 #'   observedSpect = a,
 #'   pep = "HSQVFSTAEDNQSAVTIHVLQGER", Atom = "C13", Prob = 0.01,
 #'   charges = c(2), isoCenter = 886.65, isoWidth = 4.0,
-#'   ifRemoveNotFoundIon = False
+#'   ifRemoveNotFoundIon = FALSE
 #' )
 #' p
 plotPSMannotation <- function(observedSpect, pep, Atom, Prob, charges,
                               isoCenter = 0, isoWidth = 0,
-                              ifRemoveNotFoundIon = False) {
+                              ifRemoveNotFoundIon = FALSE) {
   anno <- annotatePSM(
     observedSpect@spectra$Mass, observedSpect@spectra$Prob,
     observedSpect@spectra$Charge,

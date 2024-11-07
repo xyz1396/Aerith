@@ -16,20 +16,20 @@ public:
     std::vector<Scan> FT1Scans;
     std::vector<Scan> FT2Scans;
     sipPSM *mSipPSM;
-    std::unordered_map<size_t, Scan *> scanNumerFT1ScanMap;
-    std::unordered_map<size_t, Scan *> scanNumerFT2ScanMap;
+    std::unordered_map<size_t, Scan *> scanNumerFT1ScanMap, scanNumerFT2ScanMap;
     // N isotopic peaks on each side to consider
     const static int NisotopicPeak = 20;
     std::vector<int> vertexIXs;
     std::array<char, 2> cleavageSites = {'K', 'R'};
 
     void loadFT1(const std::string &FTfileBasePath);
+    void loadFT2(const std::string &FTfileBasePath);
     void loadFT1FT2fileParallel(const std::string &FTfileBasePath);
     size_t binarySearchPeak(const Scan *mScan, double Mz, int charge);
     // filter isotopic peaks by isotopic envolope shape
     void filterIsotopicPeaks(std::vector<isotopicPeak> &isotopicPeaks, const double calculatedPrecursorMZ);
     // return precursor scan number and isotopic peaks
-    std::vector<isotopicPeak> findIsotopicPeaks(const size_t MS1ScanNumber,
+    std::vector<isotopicPeak> findIsotopicPeaks(int &MS1ScanNumber,
                                                 const int precursorCharge,
                                                 const double observedPrecursorMass,
                                                 const double calculatedPrecursorMass);

@@ -98,7 +98,7 @@ void PSMfeatureExtractor::filterIsotopicPeaks(std::vector<isotopicPeak> &isotopi
 }
 
 std::vector<isotopicPeak> PSMfeatureExtractor::
-    findIsotopicPeaks(const size_t MS1ScanNumber,
+    findIsotopicPeaks(int &MS1ScanNumber,
                       const int precursorCharge,
                       const double observedPrecursorMass,
                       const double calculatedPrecursorMass)
@@ -107,7 +107,21 @@ std::vector<isotopicPeak> PSMfeatureExtractor::
     double observedPrecursorMZ = observedPrecursorMass / precursorCharge + ProNovoConfig::getProtonMass();
     double calculatedPrecursorMZ = calculatedPrecursorMass / precursorCharge + ProNovoConfig::getProtonMass();
     Scan *MS1Scan = scanNumerFT1ScanMap[MS1ScanNumber];
-    size_t peakIX = binarySearchPeak(MS1Scan, observedPrecursorMZ, precursorCharge);
+    size_t peakIX = std::numeric_limits<size_t>::max();
+    // if first search failed, search 2 scans before it
+    for (int i = 0; i < 3; i++)
+    {
+        peakIX = binarySearchPeak(MS1Scan, observedPrecursorMZ, precursorCharge);
+        if (peakIX != std::numeric_limits<size_t>::max())
+        {
+            MS1ScanNumber = MS1Scan->scanNumber;
+            break;
+        }
+        else if (MS1Scan != FT1Scans.data())
+            MS1Scan--;
+        else
+            break;
+    }
     size_t currentIX = 0;
     size_t foundIX = 0;
     double currentMass = 0;
@@ -269,7 +283,7 @@ double PSMfeatureExtractor::getMS2IsotopicAbundance(const std::string &searchNam
     }
     pct = pct.substr(0, pct.size() - 3);
     double pct_num = std::stod(pct);
-    pct_num = pct_num / 1000;
+    pct_num = pct_num;
     return pct_num;
 }
 
@@ -286,34 +300,27 @@ void PSMfeatureExtractor::loadFT1(const std::string &FTfileBasePath)
     }
 }
 
+void PSMfeatureExtractor::loadFT2(const std::string &FTfileBasePath)
+{
+    ftFileReader FT2FileReader(FTfileBasePath + ".FT2");
+    FT2FileReader.readAllScan();
+    FT2Scans = std::move(FT2FileReader.Scans);
+    FT2FileReader.Scans = {};
+    scanNumerFT2ScanMap.reserve(FT2Scans.size());
+    for (size_t i = 0; i < FT2Scans.size(); i++)
+    {
+        scanNumerFT2ScanMap.insert({FT2Scans[i].scanNumber, FT2Scans.data() + i});
+    }
+}
+
 void PSMfeatureExtractor::loadFT1FT2fileParallel(const std::string &FTfileBasePath)
 {
 #pragma omp parallel sections
     {
 #pragma omp section
-        {
-            ftFileReader FT2FileReader(FTfileBasePath + ".FT2");
-            FT2FileReader.readAllScan();
-            FT2Scans = std::move(FT2FileReader.Scans);
-            FT2FileReader.Scans = {};
-            scanNumerFT2ScanMap.reserve(FT2Scans.size());
-            for (size_t i = 0; i < FT2Scans.size(); i++)
-            {
-                scanNumerFT2ScanMap.insert({FT2Scans[i].scanNumber, FT2Scans.data() + i});
-            }
-        }
+        loadFT1(FTfileBasePath);
 #pragma omp section
-        {
-            ftFileReader FT1FileReader(FTfileBasePath + ".FT1");
-            FT1FileReader.readAllScan();
-            FT1Scans = std::move(FT1FileReader.Scans);
-            FT1FileReader.Scans = {};
-            scanNumerFT1ScanMap.reserve(FT1Scans.size());
-            for (size_t i = 0; i < FT1Scans.size(); i++)
-            {
-                scanNumerFT1ScanMap.insert({FT1Scans[i].scanNumber, FT1Scans.data() + i});
-            }
-        }
+        loadFT2(FTfileBasePath);
     }
 }
 
@@ -337,7 +344,7 @@ void ompForDemo()
 
 void PSMfeatureExtractor::extractFeaturesOfEachPSM()
 {
-    float topMVHscore = 0;
+    float topScore = 0;
     for (size_t i = 0; i < mSipPSM->isotopicPeakss.size(); i++)
     {
         mSipPSM->isotopicPeakss[i] = findIsotopicPeaks(mSipPSM->precursorScanNumbers[i],
@@ -354,11 +361,11 @@ void PSMfeatureExtractor::extractFeaturesOfEachPSM()
 
         if (mSipPSM->ranks[i] == 1)
         {
-            topMVHscore = mSipPSM->MVHscores[i];
-            // topMVHscore = mSipPSM->WDPscores[i];
+            // topScore = mSipPSM->MVHscores[i];
+            topScore = mSipPSM->WDPscores[i];
         }
-        mSipPSM->MVHdiffScores[i] = topMVHscore - mSipPSM->MVHscores[i];
-        // mSipPSM->MVHdiffScores[i] = topMVHscore - mSipPSM->WDPscores[i];
+        // mSipPSM->MVHdiffScores[i] = topMVHscore - mSipPSM->MVHscores[i];
+        mSipPSM->diffScores[i] = topScore - mSipPSM->WDPscores[i];
 
         mSipPSM->mzShiftFromisolationWindowCenters[i] = std::abs(
             mSipPSM->isolationWindowCenterMZs[i] -
@@ -394,7 +401,7 @@ void PSMfeatureExtractor::extractPSMfeature(const std::string &Spe2PepFilePath, 
         mSipPSM->isotopicAbundanceDiffs = std::vector<double>(mSipPSM->scanNumbers.size());
         mSipPSM->peptideLengths = std::vector<int>(mSipPSM->scanNumbers.size());
         mSipPSM->missCleavageSiteNumbers = std::vector<int>(mSipPSM->scanNumbers.size());
-        mSipPSM->MVHdiffScores = std::vector<float>(mSipPSM->scanNumbers.size());
+        mSipPSM->diffScores = std::vector<float>(mSipPSM->scanNumbers.size());
         mSipPSM->mzShiftFromisolationWindowCenters = std::vector<double>(mSipPSM->scanNumbers.size());
         mSipPSM->isotopicMassWindowShifts = std::vector<int>(mSipPSM->scanNumbers.size());
         mSipPSM->massErrors = std::vector<double>(mSipPSM->scanNumbers.size());
@@ -429,7 +436,7 @@ void PSMfeatureExtractor::extractPSMfeatureParallel(
         mExtractor.mSipPSM->peptideLengths = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->missCleavageSiteNumbers = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->PTMnumbers = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
-        mExtractor.mSipPSM->MVHdiffScores = std::vector<float>(mExtractor.mSipPSM->scanNumbers.size());
+        mExtractor.mSipPSM->diffScores = std::vector<float>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->mzShiftFromisolationWindowCenters = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->isotopicMassWindowShifts = std::vector<int>(mExtractor.mSipPSM->scanNumbers.size());
         mExtractor.mSipPSM->massErrors = std::vector<double>(mExtractor.mSipPSM->scanNumbers.size());
@@ -565,15 +572,17 @@ void PSMfeatureExtractor::writePecorlatorPin(const std::string &fileName, bool d
        << "\t"
        << "MS1IsotopicAbundances"
        << "\t"
+       << "MS2IsotopicAbundances"
+       << "\t"
        << "isotopicAbundanceDiffs"
-       << "\t"
-       << "MVHscores"
-       << "\t"
-       << "XcorrScores"
        << "\t"
        << "WDPscores"
        << "\t"
-       << "MVHdiffScores"
+       << "XcorrScores"
+       << "\t"
+       << "MVHscores"
+       << "\t"
+       << "diffScores"
        << "\t"
        << "log10_precursorIntensities"
        << "\t"
@@ -605,11 +614,12 @@ void PSMfeatureExtractor::writePecorlatorPin(const std::string &fileName, bool d
                    << sipPSMs[i].PTMnumbers[k] << "\t"
                    << sipPSMs[i].isotopicPeakNumbers[k] << "\t"
                    << sipPSMs[i].MS1IsotopicAbundances[k] << "\t"
+                   << sipPSMs[i].MS2IsotopicAbundances[k] << "\t"
                    << sipPSMs[i].isotopicAbundanceDiffs[k] << "\t"
-                   << sipPSMs[i].MVHscores[k] << "\t"
-                   << sipPSMs[i].XcorrScores[k] << "\t"
                    << sipPSMs[i].WDPscores[k] << "\t"
-                   << sipPSMs[i].MVHdiffScores[k] << "\t"
+                   << sipPSMs[i].XcorrScores[k] << "\t"
+                   << sipPSMs[i].MVHscores[k] << "\t"
+                   << sipPSMs[i].diffScores[k] << "\t"
                    << (sipPSMs[i].precursorIntensities[k] > 0
                            ? std::log10(sipPSMs[i].precursorIntensities[k])
                            : 0)

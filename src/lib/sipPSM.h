@@ -42,7 +42,7 @@ public:
     std::vector<int> peptideLengths;
     std::vector<int> missCleavageSiteNumbers;
     std::vector<int> PTMnumbers;
-    std::vector<float> MVHdiffScores;
+    std::vector<float> diffScores;
     std::vector<double> mzShiftFromisolationWindowCenters;
     std::vector<int> isotopicMassWindowShifts;
     std::vector<double> massErrors;

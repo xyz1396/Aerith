@@ -63,6 +63,7 @@ getMZ <- function(spectra, charges = 1:2) {
   nMass <- nrow(spectra)
   # duplicate spectra for MZ calculation
   spectra <- spectra[rep(1:nMass, length(charges)), ]
+  rownames(spectra) <- NULL
   spectra$Charge <- rep(charges, each = nMass)
   spectra$MZ <- spectra$Mass / spectra$Charge
   # add proton's MZ
@@ -70,8 +71,9 @@ getMZ <- function(spectra, charges = 1:2) {
   # for plot
   maxProb <- max(spectra$Prob)
   spectra$Prob <- spectra$Prob / maxProb * 100
-  # remove peaks with large MZ
-  return(spectra[spectra$MZ <= 2000, ])
+  # # remove peaks with large MZ
+  # return(spectra[spectra$MZ <= 2000, ])
+  return(spectra)
 }
 
 #' Get AAspectra object of precursor from AA sequence with natural SIP abundance
@@ -279,7 +281,7 @@ plot.AAspectra <- function(x) {
         color = Kind
       )
     ) +
-      ggplot2::geom_linerange(size = 0.1) +
+      ggplot2::geom_linerange(linewidth = 0.1) +
       ggplot2::scale_x_continuous(breaks = seq(0, 2000, by = 100)) +
       ggplot2::scale_y_continuous(
         breaks = seq(-100, 100, by = 25),

@@ -20,6 +20,11 @@ public:
     vector<vector<int>> averaginePepAtomCountss;
     // C,H,O,N,P,S Atom count of peptides
     std::array<int, 6> pepAtomCounts = {0};
+    // C,H,O,N,P,S Atom count of BYions
+    std::vector<std::array<int, 6>> BionsAtomCounts;
+    std::vector<std::array<int, 6>> YionsAtomCounts;
+    std::vector<double> BionsBaseMasses;
+    std::vector<double> YionsBaseMasses;
     // Atom count difference bettween averagine and peptide
     vector<int> diffAtomCounts;
     IsotopeDistribution averagineSIPdistribution;
@@ -36,11 +41,13 @@ public:
     void calAveraginePepSIPdistributions();
     IsotopeDistribution *getAveraginePepSIPdistribution(const int pepLen);
     void calPepAtomCounts(const string &pepSeq);
+    void calBYionsAtomCounts(const string &pepSeq);
     // init it in init function and changeAtomSIPabundance
     void adjustEstimatePrecursorMassbyNP(); 
     std::function<double(double, int, double)> estimatePrecursorMassbyNP;
     // for peptide base mass without isotope
     double calPrecursorBaseMass(const string &pepSeq);
+    void calBYionBaseMasses(const string &pepSeq);
     double calPrecursorMass(const string &pepSeq);
     void calDiffAtomCounts(const string &pepSeq);
     void calPrecursorIsotopeDistribution(const string &pepSeq, IsotopeDistribution &tempSIPdistribution);

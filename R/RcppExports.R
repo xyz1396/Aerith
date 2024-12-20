@@ -154,6 +154,16 @@ calPepAtomCount <- function(AAstrs) {
     .Call(`_Aerith_calPepAtomCount`, AAstrs)
 }
 
+#' Simple calculator of CHONPS atom count and mass without isotope of B Y ions
+#' @param AAstr a CharacterVector of peptides
+#' @return a list of data.frame of CHONPS atom count and each data.frame is for one peptide
+#' @export
+#' @examples
+#' peps <- calBYAtomCountAndBaseMass(c("HK~FL","AD!CH","~ILKMV"))
+calBYAtomCountAndBaseMass <- function(AAstrs) {
+    .Call(`_Aerith_calBYAtomCountAndBaseMass`, AAstrs)
+}
+
 #' Simple calculator of peptide precursor mass by binomial NP
 #' @param AAstr a CharacterVector of peptides
 #' @param Atom a Character of "C13", "H2", "O18", or "N15"

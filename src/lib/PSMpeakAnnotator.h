@@ -23,6 +23,8 @@ public:
     double getMatchedSpectraEntropy();
     std::vector<int> getMatchedIndices();
     std::vector<ionKind> getIonKinds();
+    // get SIP abundance from BY ion isotopic envelope by binomial distribution estimation
+    std::vector<double> getSIPabundances();
     std::vector<int> getResiduePositions();
     std::vector<double> getExpectedMZs();
     std::vector<double> getExpectedIntensities();
@@ -30,6 +32,7 @@ public:
 
 private:
     std::string peptide;
+    averagine mAveragine = averagine();
     Scan *realScan;
     // unit is ppm
     double tolerancePPM = 10;
@@ -43,6 +46,8 @@ private:
     std::vector<ionKind> ionKinds;
     // residue position of BY ions
     std::vector<int> residuePositions, matchedIndices;
+    // SIP abundance from BY ion isotopic envelope by binomial distribution estimation
+    std::vector<double> SIPabundances;
 
     void generateTheoreticalSpectra(const std::string &peptide);
     void removePeaksInIsolationWindow(Scan *mScan, const double isoCenter, const double isoWidth);
@@ -53,6 +58,11 @@ private:
                            const int residuePosition,
                            const int charge,
                            const PSMpeakAnnotator::ionKind BYkind);
+    // calculate SIP abundance from BY ion isotopic envelope by binomial distribution estimation
+    double calSIPabundancesOfBYion(const double baseMass,
+                                   const std::vector<int> &matchedIXs,
+                                   const Scan *mScan, const int SIPelementCount,
+                                   const int charge);
     void matchIsotopicEnvelopes(Scan *mRealScan, const int charge);
     void calMatchedSpectraEntropy();
     double scorePSM();

@@ -67,6 +67,57 @@ size_t PSMpeakAnnotator::binarySearchPeak(const Scan *mScan, double Mz)
     return peakIX;
 }
 
+double PSMpeakAnnotator::calSIPabundancesOfBYion(
+    const double baseMass,
+    const std::vector<int> &matchedIXs,
+    const Scan *mScan, const int SIPelementCount, const int charge)
+{
+    double baseMZ = baseMass / charge + ProNovoConfig::getProtonMass();
+    double sumOfIntensities = 0;
+    size_t i = 0;
+    int firstDeltaNeutron = 0;
+    vector<double> matchedIntensities;
+    matchedIntensities.reserve(matchedIXs.size());
+    while (i < matchedIXs.size())
+    {
+        if (matchedIXs[i] != -1)
+        {
+            sumOfIntensities += mScan->intensity[matchedIXs[i]];
+            firstDeltaNeutron = static_cast<int>(std::round((mScan->mz[matchedIXs[i]] - baseMZ) /
+                                                            ProNovoConfig::getNeutronMass() * charge));
+            matchedIntensities.push_back(mScan->intensity[matchedIXs[i]]);
+            break;
+        }
+        i++;
+    }
+    i++;
+    while (i < matchedIXs.size())
+    {
+        if (matchedIXs[i] != -1)
+        {
+            sumOfIntensities += mScan->intensity[matchedIXs[i]];
+            matchedIntensities.push_back(mScan->intensity[matchedIXs[i]]);
+        }
+        i++;
+    }
+    if (matchedIntensities.size() == 0)
+    {
+        return -1.0;
+    }
+    for (auto &intensity : matchedIntensities)
+    {
+        intensity /= sumOfIntensities;
+    }
+    double pct = 0.0;
+    for (size_t i = 0; i < matchedIntensities.size(); i++)
+    {
+        pct += matchedIntensities[i] * (i + firstDeltaNeutron);
+    }
+    pct /= SIPelementCount;
+    pct *= 100.;
+    return pct;
+}
+
 void PSMpeakAnnotator::
     findIsotopicPeaks(
         const std::vector<double> &ionMasses,
@@ -138,12 +189,32 @@ void PSMpeakAnnotator::
             }
         }
     }
+
+    double pct = 0;
+    if (BYkind == B)
+    {
+        pct = calSIPabundancesOfBYion(mAveragine.BionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
+                                      mAveragine.BionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
+    }
+    else
+    {
+        pct = calSIPabundancesOfBYion(mAveragine.YionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
+                                      mAveragine.YionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
+    }
+    std::vector<double> pcts(mMatchedIndices.size(), -1);
+    for (size_t i = 0; i < mMatchedIndices.size(); i++)
+    {
+        if (mMatchedIndices[i] != -1)
+            pcts[i] = pct;
+    }
+
     expectedMZs.insert(expectedMZs.end(), ionMZs.begin(), ionMZs.end());
     expectedIntensities.insert(expectedIntensities.end(), ionIntensities.begin(), ionIntensities.end());
     expectedCharges.insert(expectedCharges.end(), ionCharges.begin(), ionCharges.end());
     ionKinds.insert(ionKinds.end(), mIonKinds.begin(), mIonKinds.end());
     residuePositions.insert(residuePositions.end(), mPositions.begin(), mPositions.end());
     matchedIndices.insert(matchedIndices.end(), mMatchedIndices.begin(), mMatchedIndices.end());
+    SIPabundances.insert(SIPabundances.end(), pcts.begin(), pcts.end());
 }
 
 void PSMpeakAnnotator::matchIsotopicEnvelopes(Scan *mRealScan, const int charge)
@@ -193,6 +264,7 @@ void PSMpeakAnnotator::analyzePSM(const std::string &peptide, Scan *realScan,
     if (isoCenter != 0 && isoWidth != 0)
         removePeaksInIsolationWindow(realScan, isoCenter, isoWidth);
     generateTheoreticalSpectra(peptide);
+    mAveragine.calBYionBaseMasses(peptide);
     for (int charge : charges)
     {
         matchIsotopicEnvelopes(realScan, charge);
@@ -218,6 +290,11 @@ std::vector<int> PSMpeakAnnotator::getMatchedIndices()
 std::vector<PSMpeakAnnotator::ionKind> PSMpeakAnnotator::getIonKinds()
 {
     return ionKinds;
+}
+
+std::vector<double> PSMpeakAnnotator::getSIPabundances()
+{
+    return SIPabundances;
 }
 
 std::vector<int> PSMpeakAnnotator::getResiduePositions()

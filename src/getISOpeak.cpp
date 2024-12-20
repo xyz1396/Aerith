@@ -115,6 +115,63 @@ DataFrame calPepAtomCount(StringVector AAstrs)
 	return df;
 }
 
+//' Simple calculator of CHONPS atom count and mass without isotope of B Y ions
+//' @param AAstr a CharacterVector of peptides
+//' @return a list of data.frame of CHONPS atom count and each data.frame is for one peptide
+//' @export
+//' @examples
+//' peps <- calBYAtomCountAndBaseMass(c("HK~FL","AD!CH","~ILKMV"))
+// [[Rcpp::export]]
+List calBYAtomCountAndBaseMass(StringVector AAstrs)
+{
+	string config = get_extdata();
+	ProNovoConfig::setFilename(config);
+	averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
+						 ProNovoConfig::getMaxPeptideLength());
+	List pepBYs(AAstrs.size());
+	for (int i = 0; i < (int)AAstrs.size(); i++)
+	{
+		mAveragine.calBYionBaseMasses(as<std::string>((AAstrs[i])));
+		int BYionsSize = mAveragine.BionsBaseMasses.size() + mAveragine.YionsBaseMasses.size();
+		vector<int> C(BYionsSize, 0);
+		vector<int> H, O, N, P, S;
+		H = O = N = P = S = C;
+		vector<string> BYkinds(BYionsSize);
+		vector<double> BYbaseMasses(BYionsSize);
+		for (size_t j = 0; j < mAveragine.BionsBaseMasses.size(); j++)
+		{
+			C[j] = mAveragine.BionsAtomCounts[j][0];
+			H[j] = mAveragine.BionsAtomCounts[j][1];
+			O[j] = mAveragine.BionsAtomCounts[j][2];
+			N[j] = mAveragine.BionsAtomCounts[j][3];
+			P[j] = mAveragine.BionsAtomCounts[j][4];
+			S[j] = mAveragine.BionsAtomCounts[j][5];
+			BYkinds[j] = "B" + to_string(j + 1);
+			BYbaseMasses[j] = mAveragine.BionsBaseMasses[j];
+		}
+		int start = mAveragine.BionsBaseMasses.size();
+		for (size_t j = 0; j < mAveragine.YionsBaseMasses.size(); j++)
+		{
+			C[j + start] = mAveragine.YionsAtomCounts[j][0];
+			H[j + start] = mAveragine.YionsAtomCounts[j][1];
+			O[j + start] = mAveragine.YionsAtomCounts[j][2];
+			N[j + start] = mAveragine.YionsAtomCounts[j][3];
+			P[j + start] = mAveragine.YionsAtomCounts[j][4];
+			S[j + start] = mAveragine.YionsAtomCounts[j][5];
+			BYkinds[j + start] = "Y" + to_string(j + 1);
+			BYbaseMasses[j + start] = mAveragine.YionsBaseMasses[j];
+		}
+		DataFrame df = DataFrame::create(Named("C") = C, _("H") = H,
+										 _("O") = O, _("N") = N,
+										 _("P") = P, _("S") = S, _("Kind") = BYkinds,
+										 _("BaseMass") = BYbaseMasses);
+		pepBYs[i] = df;
+	}
+	pepBYs.names() = AAstrs;
+	ProNovoConfig::unSetFilename();
+	return pepBYs;
+}
+
 //' Simple calculator of peptide precursor mass by binomial NP
 //' @param AAstr a CharacterVector of peptides
 //' @param Atom a Character of "C13", "H2", "O18", or "N15"

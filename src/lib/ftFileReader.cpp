@@ -17,13 +17,13 @@ Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecursorSca
 		   int mPrecursorCharge, double mIsolationWindowCenterMZ,
 		   std::vector<int> mPrecursorCharges,
 		   std::vector<double> mPrecursorMZs) : scanNumber(mScanNumber),
-											   retentionTime(mRetentionTime),
-											   TIC(mTIC),
-											   precursorScanNumber(mPrecursorScanNumber),
-											   precursorCharge(mPrecursorCharge),
-											   isolationWindowCenterMZ(mIsolationWindowCenterMZ),
-											   precursorCharges(mPrecursorCharges),
-											   precursorMZs(mPrecursorMZs) {}
+												retentionTime(mRetentionTime),
+												TIC(mTIC),
+												precursorScanNumber(mPrecursorScanNumber),
+												precursorCharge(mPrecursorCharge),
+												isolationWindowCenterMZ(mIsolationWindowCenterMZ),
+												precursorCharges(mPrecursorCharges),
+												precursorMZs(mPrecursorMZs) {}
 
 ftFileReader::ftFileReader()
 {
@@ -149,6 +149,19 @@ Scan ftFileReader::readScanNumberRentionTime()
 	return Scan(mScanNumber, mRetentionTime, mTIC);
 }
 
+int safe_stoi(const std::string &s)
+{
+	try
+	{
+		return std::stoi(s);
+	}
+	catch (const std::invalid_argument &e)
+	{
+		std::cerr << s << " is not a valid integer" << '\n';
+		return 0;
+	}
+}
+
 Scan ftFileReader::readScanNumberRentionTimePrecursor()
 {
 	continueRead = true;
@@ -207,7 +220,8 @@ void ftFileReader::readPeakCharge()
 			{
 				currentScan.mz.push_back(stod(tokens[0]));
 				currentScan.intensity.push_back(stod(tokens[1]));
-				currentScan.resolution.push_back(stoi(tokens[2]));
+				// some times resolution is ∞
+				currentScan.resolution.push_back(safe_stoi(tokens[2]));
 				currentScan.baseLine.push_back(stof(tokens[3]));
 				currentScan.signalToNoise.push_back(stof(tokens[4]));
 				currentScan.charge.push_back(stoi(tokens[5]));

@@ -113,8 +113,6 @@ private:
 	// the number of natural CHONPS and enriched CHONPS
 	unsigned int AtomNumber;
 
-	
-
 	// Sipros Ensemble
 	// emass needs the mass to be one nucleus difference
 	bool CheckMass(vector<double> &vdMass, vector<double> &vdNaturalCompositionTemp);

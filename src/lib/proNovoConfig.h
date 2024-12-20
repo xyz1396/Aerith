@@ -169,6 +169,7 @@ public:
 	 */
 
 	static bool setFilename(const string &sConfigFileName);
+	static void unSetFilename();
 
 	static bool setWorkingDirectory(const string &sDirectoryName);
 

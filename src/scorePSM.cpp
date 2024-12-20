@@ -515,7 +515,8 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
                                                  _("charge") = mAnnotator.getExpectedCharges(),
                                                  _("ionkind") = ionKindStrs,
                                                  _("residuePositions") = mAnnotator.getResiduePositions(),
-                                                 _("matchedIndices") = mAnnotator.getMatchedIndices());
+                                                 _("matchedIndices") = mAnnotator.getMatchedIndices(),
+                                                 _("SIPabundances") = mAnnotator.getSIPabundances());
     DataFrame realPeaks = DataFrame::create(Named("mz") = mScan.mz,
                                             _("intensity") = mScan.intensity,
                                             _("charge") = mScan.charge);

@@ -194,6 +194,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calBYAtomCountAndBaseMass
+List calBYAtomCountAndBaseMass(StringVector AAstrs);
+RcppExport SEXP _Aerith_calBYAtomCountAndBaseMass(SEXP AAstrsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< StringVector >::type AAstrs(AAstrsSEXP);
+    rcpp_result_gen = Rcpp::wrap(calBYAtomCountAndBaseMass(AAstrs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // calPepPrecursorMass
 NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVector Probs);
 RcppExport SEXP _Aerith_calPepPrecursorMass(SEXP AAstrsSEXP, SEXP AtomSEXP, SEXP ProbsSEXP) {
@@ -617,6 +628,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_residue_peak_calculator_DIY", (DL_FUNC) &_Aerith_residue_peak_calculator_DIY, 3},
     {"_Aerith_precursor_peak_calculator_DIY", (DL_FUNC) &_Aerith_precursor_peak_calculator_DIY, 3},
     {"_Aerith_calPepAtomCount", (DL_FUNC) &_Aerith_calPepAtomCount, 1},
+    {"_Aerith_calBYAtomCountAndBaseMass", (DL_FUNC) &_Aerith_calBYAtomCountAndBaseMass, 1},
     {"_Aerith_calPepPrecursorMass", (DL_FUNC) &_Aerith_calPepPrecursorMass, 3},
     {"_Aerith_calPepNeutronMass", (DL_FUNC) &_Aerith_calPepNeutronMass, 3},
     {"_Aerith_precursor_peak_calculator_DIY_averagine", (DL_FUNC) &_Aerith_precursor_peak_calculator_DIY_averagine, 3},

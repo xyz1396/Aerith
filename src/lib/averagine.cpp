@@ -188,11 +188,88 @@ void averagine::calPepAtomCounts(const string &pepSeq)
         pepAtomCounts[j] += residueAtomCounts->operator[](j);
     for (size_t i = 0; i < pepSeq.size(); i++)
     {
+        if (ProNovoConfig::configIsotopologue
+                .mResidueAtomicComposition.find(pepSeq.substr(i, 1)) == ProNovoConfig::configIsotopologue
+                                                                            .mResidueAtomicComposition.end())
+        {
+            cerr << "ERROR: cannot find " << pepSeq.substr(i, 1) << " residue or PTM in the config file." << endl;
+            return;
+        }
         residueAtomCounts = &ProNovoConfig::configIsotopologue
                                  .mResidueAtomicComposition[pepSeq.substr(i, 1)];
         for (size_t j = 0; j < residueAtomCounts->size(); j++)
             pepAtomCounts[j] += residueAtomCounts->operator[](j);
     }
+}
+
+void averagine::calBYionsAtomCounts(const string &pepSeq)
+{
+    int peptideLength = pepSeq.size();
+    BionsAtomCounts.clear();
+    YionsAtomCounts.clear();
+    BionsAtomCounts.reserve(peptideLength);
+    YionsAtomCounts.reserve(peptideLength);
+    // one hydrogen atom shifts from b ion to its conuterpart when cleavage
+    std::array<int, 6> bIonCounts = {0, 0, 0, 0, 0, 0};
+    // one hydrogen atom shifts to y ion from its conuterpart when cleavage
+    std::array<int, 6> yIonCounts = {0, 2, 1, 0, 0, 0};
+    vector<int> *residueAtomCounts;
+    // Calculate atom counts for B ions
+    for (int i = 0; i < peptideLength; i++)
+    {
+        if (ProNovoConfig::configIsotopologue
+                .mResidueAtomicComposition.find(pepSeq.substr(i, 1)) == ProNovoConfig::configIsotopologue
+                                                                            .mResidueAtomicComposition.end())
+        {
+            cerr << "ERROR: cannot find " << pepSeq.substr(i, 1) << " residue or PTM in the config file." << endl;
+            return;
+        }
+        if (!isalpha(pepSeq[i]))
+        {
+            string ptmSymbol = pepSeq.substr(i, 1);
+            residueAtomCounts =
+                &ProNovoConfig::configIsotopologue
+                     .mResidueAtomicComposition[ptmSymbol];
+            for (size_t k = 0; k < residueAtomCounts->size(); ++k)
+                bIonCounts[k] += residueAtomCounts->operator[](k);
+            // if the PTM is not at Nterm
+            if (BionsAtomCounts.size() > 0)
+                BionsAtomCounts.back() = bIonCounts;
+            continue; // Move to the next character
+        }
+        const string residue = pepSeq.substr(i, 1);
+        residueAtomCounts =
+            &ProNovoConfig::configIsotopologue.mResidueAtomicComposition[residue];
+        for (size_t k = 0; k < residueAtomCounts->size(); ++k)
+            bIonCounts[k] += residueAtomCounts->operator[](k);
+        BionsAtomCounts.push_back(bIonCounts);
+    }
+    // remove the last element, which is the full peptide without cterm
+    BionsAtomCounts.pop_back();
+
+    // Calculate atom counts for Y ions
+    for (int i = peptideLength - 1; i >= 0; i--)
+    {
+        if (!isalpha(pepSeq[i]))
+        {
+            string ptmSymbol = pepSeq.substr(i, 1);
+            residueAtomCounts =
+                &ProNovoConfig::configIsotopologue
+                     .mResidueAtomicComposition[ptmSymbol];
+            for (size_t k = 0; k < residueAtomCounts->size(); ++k)
+                yIonCounts[k] += residueAtomCounts->operator[](k);
+            continue; // Move to the next character
+        }
+        const string residue = pepSeq.substr(i, 1);
+        residueAtomCounts =
+            &ProNovoConfig::configIsotopologue.mResidueAtomicComposition[residue];
+        // Sum the counts
+        for (size_t k = 0; k < residueAtomCounts->size(); ++k)
+            yIonCounts[k] += residueAtomCounts->operator[](k);
+        YionsAtomCounts.push_back(yIonCounts);
+    }
+    // remove the last element, which is the full peptide without nterm
+    YionsAtomCounts.pop_back();
 }
 
 double averagine::weighted_mean(const std::vector<double> &values, const std::vector<double> &weights)
@@ -227,6 +304,31 @@ double averagine::calPrecursorBaseMass(const string &pepSeq)
                       pepAtomCounts[3] * (*N14Mass) + pepAtomCounts[4] * (*PfakeLowMass) +
                       pepAtomCounts[5] * (*S32Mass);
     return baseMass;
+}
+
+void averagine::calBYionBaseMasses(const string &pepSeq)
+{
+    calBYionsAtomCounts(pepSeq);
+    BionsBaseMasses.clear();
+    YionsBaseMasses.clear();
+    BionsBaseMasses.reserve(BionsAtomCounts.size());
+    YionsBaseMasses.reserve(YionsAtomCounts.size());
+    for (size_t i = 0; i < BionsAtomCounts.size(); i++)
+    {
+        BionsBaseMasses.push_back(
+            BionsAtomCounts[i][0] * (*C12Mass) + BionsAtomCounts[i][1] * (*H1Mass) +
+            BionsAtomCounts[i][2] * (*O16Mass) + BionsAtomCounts[i][3] * (*N14Mass) +
+            BionsAtomCounts[i][4] * (*PfakeLowMass) +
+            BionsAtomCounts[i][5] * (*S32Mass));
+    }
+    for (size_t i = 0; i < YionsAtomCounts.size(); i++)
+    {
+        YionsBaseMasses.push_back(
+            YionsAtomCounts[i][0] * (*C12Mass) + YionsAtomCounts[i][1] * (*H1Mass) +
+            YionsAtomCounts[i][2] * (*O16Mass) + YionsAtomCounts[i][3] * (*N14Mass) +
+            YionsAtomCounts[i][4] * (*PfakeLowMass) +
+            YionsAtomCounts[i][5] * (*S32Mass));
+    }
 }
 
 double averagine::calPrecursorMass(const string &pepSeq)

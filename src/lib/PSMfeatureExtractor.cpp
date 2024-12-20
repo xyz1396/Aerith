@@ -216,7 +216,7 @@ double PSMfeatureExtractor::getSIPelementAbundanceFromMS1(const std::string &nak
     {
         pct += usefulIsotopicPeakIntensity[i] * (i + firstDeltaNeutron);
     }
-    double atomCnumber = mAveragine.pepAtomCounts[0];
+    double atomCnumber = mAveragine.pepAtomCounts[mAveragine.SIPatomIX];
     pct /= atomCnumber;
     pct *= 100.;
     return pct;

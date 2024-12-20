@@ -197,6 +197,16 @@ bool ProNovoConfig::setFilename(const string &sConfigFileName)
 	return true;
 }
 
+void ProNovoConfig::unSetFilename()
+{
+	if (ProNovoConfigSingleton != NULL)
+	{
+		delete ProNovoConfigSingleton;
+		ProNovoConfigSingleton = NULL;
+	}
+	sFilename.clear();
+}
+
 bool ProNovoConfig::setWorkingDirectory(const string &sDirectoryName)
 {
 	if (sDirectoryName[sDirectoryName.size() - 1] == ProNovoConfig::getSeparator())

@@ -12,7 +12,7 @@ plotPSMannotation(
   charges,
   isoCenter = 0,
   isoWidth = 0,
-  ifRemoveNotFoundIon = False
+  ifRemoveNotFoundIon = FALSE
 )
 }
 \arguments{
@@ -45,7 +45,7 @@ p <- plotPSMannotation(
   observedSpect = a,
   pep = "HSQVFSTAEDNQSAVTIHVLQGER", Atom = "C13", Prob = 0.01,
   charges = c(2), isoCenter = 886.65, isoWidth = 4.0,
-  ifRemoveNotFoundIon = False
+  ifRemoveNotFoundIon = FALSE
 )
 p
 }

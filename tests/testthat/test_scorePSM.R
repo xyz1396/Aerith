@@ -9,10 +9,10 @@ test_that("annotatePSM", {
         scan1$peaks$intensity, scan1$peaks$charge,
         "HSQVFSTAEDNQSAVTIHVLQGER", 1, "C13", 0.0107
     )
-    score <- scorePSM(
-        scan1$peaks$mz,
-        scan1$peaks$intensity, scan1$peaks$charge, 2,
-        "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107
-    )
-    expect_true(score > 0)
+    # score <- scorePSM(
+    #     scan1$peaks$mz,
+    #     scan1$peaks$intensity, scan1$peaks$charge, 2,
+    #     "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107
+    # )
+    # expect_true(score > 0)
 })

@@ -166,7 +166,7 @@ cal_isotope_numbers <- function(formula, num_simulations = 10000) {
     element_array <- parse_chemical_formula(formula)
     isotopic_df <- data.frame(matrix(ncol = length(shared_env$isotopic_abundances), nrow = num_simulations))
     colnames(isotopic_df) <- names(shared_env$isotopic_abundances)
-    for (i in 1:length(element_array))
+    for (i in seq_along(element_array))
     {
         if (element_array[i] > 0) {
             isotopes <- unlist(supported_isotopes[names(element_array)[i]])

@@ -46,9 +46,8 @@ cal_isotope_abundance_fft <- function(element_array, N_width) {
 #' Calculate Isotope Peaks using FFT
 #'
 #' This function calculates the isotope peaks for a given chemical formula using 
-#' Fast Fourier Transform (FFT). It allows for customization of the width of the 
-#' FFT and the minimum abundance threshold for the peaks. It approximates the delta 
-#' mass of isotopes is one neutron mass and ignore the fine structure of isotopes.
+#' Fast Fourier Transform (FFT).  It approximates the delta mass of isotopes is one neutron mass
+#' and ignore the fine structure of isotopes.
 #'
 #' @param formula A character string representing the chemical formula.
 #' @param N_width An integer specifying the width of the FFT. Default is 100. 

@@ -697,10 +697,31 @@ void ProNovoConfig::setDeductionCoefficient()
 	if (getSetSIPelement() == "N")
 	{
 		// average averagin delta mass in N15 labeling
-		neutronMass = 0.9991403;
+		neutronMass = 0.997035;
 		deductionCoefficient =
 			-(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.get_vAtomIsotopicDistribution()[3].vProb[1] - 0.5), 8));
 	}
+    else if (getSetSIPelement() == "H")
+    {
+        // average averagin delta mass in H2 labeling
+        neutronMass = 1.006277;
+        deductionCoefficient =
+            -(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.get_vAtomIsotopicDistribution()[1].vProb[1] - 0.5), 8));
+    }
+    else if (getSetSIPelement() == "O")
+    {
+        // average averagin delta mass in O18 labeling
+        neutronMass = 2.004245 / 2.0;
+        deductionCoefficient =
+            -(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.get_vAtomIsotopicDistribution()[2].vProb[2] - 0.5), 8));
+    }
+    else if (getSetSIPelement() == "S")
+    {
+        // average averagin delta mass in S34 labeling
+        neutronMass = 1.995796 / 2.0;
+        deductionCoefficient =
+            -(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.get_vAtomIsotopicDistribution()[5].vProb[2] - 0.5), 8));
+    }
 	else
 		deductionCoefficient =
 			-(getSetMinValue() + getSetFold() * std::pow((configIsotopologue.get_vAtomIsotopicDistribution()[0].vProb[1] - 0.5), 8));

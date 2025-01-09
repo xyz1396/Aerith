@@ -24,10 +24,10 @@ test_that("extractPSMfeatures works", {
   #   "/mnt/d/work/202405/X2_15precursor/FT", 8
   # )
 
-  extractPSMfeaturesTargetAndDecoytoPercolatorPin("/mnt/d/work/202412/E5/target",
-   "/mnt/d/work/202412/E5/decoy",
-    topN = 10,
-    ftFilepath = "/mnt/d/work/202412/E5/", ThreadNumber = 8, doProteinInference = F,
-    fileName = "/mnt/d/work/202412/E5/a.pin"
-  )
+#   extractPSMfeaturesTargetAndDecoytoPercolatorPin("/mnt/d/work/202412/E5/target",
+#    "/mnt/d/work/202412/E5/decoy",
+#     topN = 10,
+#     ftFilepath = "/mnt/d/work/202412/E5/", ThreadNumber = 8, doProteinInference = F,
+#     fileName = "/mnt/d/work/202412/E5/a.pin"
+#   )
 })

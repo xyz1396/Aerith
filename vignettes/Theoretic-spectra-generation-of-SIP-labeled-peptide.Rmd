@@ -1,0 +1,155 @@
+---
+title: "Theoretic-spectra-generation-of-SIP-labeled-peptide"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Theoretic-spectra-generation-of-SIP-labeled-peptide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10
+)
+```
+
+```{r setup}
+library(Aerith)
+library(ggplot2)
+```
+
+### Unlabeled Spectra 
+
+#### Get precursor mass
+
+```{r}
+# calculates the isotopic distribution of a peptide
+a <- precursor_peak_calculator("PEPTIDECCCC")
+head(a, 5)
+# calculates the element atom composition of peptide
+calPepAtomCount("PEPTIDECCCC")
+# estimate precursor mass by binomial distribution
+calPepPrecursorMass("PEPTIDECCCC", "C13", 0.0107)
+```
+
+```{r include=FALSE}
+calPepAtomCount("PEPTIDECCCC")
+calPepPrecursorMass("PEPTIDECCCC", "C13", 0.0107)
+calPepPrecursorMass("PEPTIDECCCC", "C13", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "H2", 0.000115)
+calPepPrecursorMass("PEPTIDECCCC", "H2", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "N15", 0.00368)
+calPepPrecursorMass("PEPTIDECCCC", "N15", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "O18", 0.00205)
+calPepPrecursorMass("PEPTIDECCCC", "O18", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "S34", 0.0429)
+calPepPrecursorMass("PEPTIDECCCC", "S34", 0.5)
+```
+
+
+#### Plot precursor's theoretical spectra
+
+```{r}
+a <- getPrecursorSpectra("PEPTIDE", 2)
+plot(a) + scale_x_continuous(breaks = seq(400, 405, by = 1)) + geom_linerange(linewidth = 0.2)
+a <- getPrecursorSpectra("PEPTIDE", 1:2)
+plot(a)
+```
+
+#### Get peptide fragments' mass
+
+```{r}
+# get Mass
+df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.0107)
+head(df, 5)
+```
+
+```{r include=FALSE}
+calPepAtomCount("PEPTIDECCCC")
+df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.0107)
+df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.5)
+df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "H2", 0.000115)
+df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "H2", 0.5)
+df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.00368)
+df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.5)
+df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.00205)
+df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.5)
+df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "S34", 0.0429)
+df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "S34", 0.5)
+```
+
+#### Plot peptide fragments' theoretical spectra
+
+```{r}
+a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 2)
+plot(a) + plotSipBYionLabel(a)
+```
+
+```{r include=FALSE}
+a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 0)
+plot(a) + plotSipBYionLabel(a)
+a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 2:3)
+plot(a) + plotSipBYionLabel(a)
+```
+
+### Labeled Spectra 
+
+#### Get precursor mass
+
+```{r}
+# calculates the isotopic distribution of a peptide
+a <- precursor_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.55)
+head(a, 5)
+# estimate precursor mass by binomial distribution
+calPepPrecursorMass("PEPTIDECCCC", "C13", 0.55)
+```
+
+```{r include=FALSE}
+calPepAtomCount("PEPTIDECCCC")
+df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.00205)
+df$Mass[which.max(df$Prob)]
+df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.5)
+df$Mass[which.max(df$Prob)]
+df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "S34", 0.0429)
+df$Mass[which.max(df$Prob)]
+df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "S34", 0.5)
+df$Mass[which.max(df$Prob)]
+```
+
+
+#### Plot precursor's theoretical spectra
+
+```{r}
+a <- getSipPrecursorSpectra("PEPTIDE", "C13", 0.55, 2)
+plot(a) + scale_x_continuous(breaks = seq(400, 420, by = 1)) + geom_linerange(linewidth = 0.2)
+a <- getSipPrecursorSpectra("PEPTIDE", "C13", 0.55, 1:2)
+plot(a)
+```
+
+#### Get peptide fragments' mass
+
+```{r}
+# get Mass
+df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.55)
+head(df, 5)
+```
+
+#### Plot peptide fragments' theoretical spectra
+
+```{r}
+a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 2)
+plot(a) + plotSipBYionLabel(a)
+```
+
+```{r include=FALSE}
+a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 0)
+plot(a) + plotSipBYionLabel(a)
+a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 2:3)
+plot(a) + plotSipBYionLabel(a)
+```

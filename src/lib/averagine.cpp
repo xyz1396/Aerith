@@ -98,6 +98,13 @@ void averagine::adjustEstimatePrecursorMassbyNP()
         { return (baseMass +
                   std::round(atomCount * (*N15Abundance) + pepAtomCounts[0] * (*C13Abundance)) * neutronMass); };
     }
+    else if (ProNovoConfig::getSetSIPelement() == "S")
+    {
+        SIPatomIX = 5;
+        estimatePrecursorMassbyNP = [&](double baseMass, int atomCount, double neutronMass)
+        { return (baseMass +
+                  std::round(2 * atomCount * (*S34Abundance) + pepAtomCounts[0] * (*C13Abundance)) * neutronMass); };
+    }
 }
 
 void averagine::changeAtomSIPabundance(const char SIPatom, const double pct)
@@ -118,8 +125,18 @@ void averagine::changeAtomSIPabundance(const char SIPatom, const double pct)
         adjustEstimatePrecursorMassbyNP();
         ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[SIPatomIX].vProb[0] =
             1.0 - pct;
-        ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[SIPatomIX].vProb[1] =
+        // for O18 and S34
+        if (SIPatom == 'O' || SIPatom == 'S')
+        {            
+            ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[SIPatomIX].vProb[2] =
             pct;
+        }
+        // for C13, H2, N15
+        else
+        {
+            ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[SIPatomIX].vProb[1] =
+            pct;
+        }
         ProNovoConfig::configIsotopologue.computeIsotopicDistribution(
             ProNovoConfig::configIsotopologue.mResidueAtomicComposition[averagineResidue],
             averagineSIPdistribution);

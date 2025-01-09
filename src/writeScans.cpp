@@ -46,6 +46,51 @@ List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float t
     return newScanList;
 }
 
+//' write all MS1 scans has charge
+//' @param header a list of FT file header
+//' @param scans a list of scans for output
+//' @param ftFile a ft1 file's output path
+//' @return void
+//' @examples
+//' header <- readFTheader("demo.ft1")
+//' ft1 <- readAllScanMS1("demo.ft1")
+//' writeAllScanMS1(header,ft1[1:10],"demo10.ft1")
+//' @export
+// [[Rcpp::export]]
+bool writeAllScanMS1(List header, List scansList, const String &ftFile)
+{
+    ftFileWriter writer(ftFile,
+                        as<std::string>(header["instrument"]),
+                        as<std::string>(header["scanType"]),
+                        as<std::string>(header["scanFilter"]),
+                        as<bool>(header["hasCharge"]), 1);
+    if (!writer.isWriteable || !writer.hasCharge)
+        return false;
+    std::vector<Scan> scans;
+    scans.reserve(scansList.size());
+    Scan scan;
+    List scanList;
+    DataFrame peaks;
+    for (int i = 0; i < scansList.size(); i++)
+    {
+        scanList = scansList[i];
+        scan.scanNumber = as<int>(scanList["scanNumber"]);
+        scan.retentionTime = as<float>(scanList["retentionTime"]);
+        scan.TIC = as<float>(scanList["TIC"]);
+
+        peaks = scanList["peaks"];
+        scan.mz = as<std::vector<double>>(peaks["mz"]);
+        scan.intensity = as<std::vector<double>>(peaks["intensity"]);
+        scan.resolution = as<std::vector<int>>(peaks["resolution"]);
+        scan.baseLine = as<std::vector<float>>(peaks["baseLine"]);
+        scan.signalToNoise = as<std::vector<float>>(peaks["signalToNoise"]);
+        scan.charge = as<std::vector<int>>(peaks["charge"]);
+        scans.push_back(scan);
+    }
+    writer.writeAllScanMS1(scans);
+    return true;
+}
+
 //' write all MS2 scans has charge
 //' @param header a list of FT file header
 //' @param scans a list of scans for output

@@ -97,6 +97,57 @@ readMzmlMS2 <- function(ms) {
   return(scans)
 }
 
+#' Read spectra from .mgf file
+#'
+#' @param mgf A .mgf file's path
+#'
+#' @return A list of spectra with names of scan number
+#' @export
+#'
+#' @examples
+#' # MSnbase can be installed from bioconductor
+#' library(MSnbase)
+#' a <- readMgf("demo.mgf")
+readMgf <- function(mgf) {
+  spectra <- MSnbase::readMgfData(mgf)
+  scanNumbers <- MSnbase::fData(spectra)$SCANS
+  scans <- lapply(seq_along(spectra), function(i) {
+    scan <- spectra[[i]]
+    list(
+      scanNumber = scan@scanIndex,
+      retentionTime = scan@rt / 60,
+      precursorScanNumber = scan@precScanNum,
+      precursorMz = scan@precursorMz,
+      TIC = scan@tic,
+      precursorCharge = scan@precursorCharge,
+      peaks = data.frame(mz = scan@mz, intensity = scan@intensity)
+    )
+  })
+  names(scans) <- scanNumbers
+  return(scans)
+}
+
+#' Read PSM TSV File
+#'
+#' This function reads a Peptide-Spectrum Match (PSM) file in TSV (Tab-Separated Values) format.
+#'
+#' @param file_path A character string specifying the path to the PSM TSV file.
+#'
+#' @return A data frame containing the data from the PSM TSV file.
+#'
+#' @examples
+#' psm <- readPSMtsv("demo.psm.txt")
+#'
+#' @export
+readPSMtsv <- function(tsv) {
+    tb <- read.table(tsv,
+      sep = "\t",
+      quote = "",
+      header = T
+    )
+    return(tb)
+}
+
 #' Read PSM table from .pepXML file
 #'
 #' @param ms A .pepXML files's path
@@ -141,7 +192,7 @@ readPepXMLtable <- function(pepXML) {
     )
   )]
   psmTable <- dplyr::left_join(psmTable, modification,
-    by = c("psmID" = "psmID"),relationship="many-to-many"
+    by = c("psmID" = "psmID"), relationship = "many-to-many"
   )
   return(as.data.frame(psmTable))
 }

@@ -2,17 +2,25 @@
 % Please edit documentation in R/RcppExports.R
 \name{BYion_peak_calculator_DIY}
 \alias{BYion_peak_calculator_DIY}
-\title{peak calculator of B Y ione from of one peptide using user defined isotopic distribution}
+\title{BY Ion Peak Calculator with User-Defined Isotopic Distribution}
 \usage{
 BYion_peak_calculator_DIY(AAstr, Atom, Prob)
 }
 \arguments{
-\item{AAstr}{a CharacterVector}
+\item{AAstr}{A string representing the amino acid sequence.}
 
-\item{Atom}{a CharacterVector C13 or N15}
+\item{Atom}{A string representing the isotope ("C13", "N15", "H2", "O18", "S34").}
 
-\item{Prob}{a NumericVector for its abundance}
+\item{Prob}{A double representing the abundance of the specified isotope (0.0 to 1.0).}
+}
+\value{
+A DataFrame with three columns: "Mass" containing the mass of each ion, "Prob" containing the probability of each ion, and "Kind" indicating whether the ion is a B or Y ion.
 }
 \description{
-peak calculator of B Y ione from of one peptide using user defined isotopic distribution
+This function calculates the isotopic distribution of B and Y ions for a given amino acid string with a user-defined isotopic distribution and returns a DataFrame containing the mass, probability, and type of each ion.
+}
+\examples{
+# Example usage
+df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.2)
+df <- BYion_peak_calculator_DIY("PEPTIDE", "N15", 0.5)
 }

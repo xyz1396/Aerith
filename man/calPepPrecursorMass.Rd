@@ -7,7 +7,7 @@
 calPepPrecursorMass(AAstrs, Atom, Probs)
 }
 \arguments{
-\item{Atom}{a Character of "C13", "H2", "O18", or "N15"}
+\item{Atom}{a Character of "C13", "H2", "O18", "N15", or "S34"}
 
 \item{Probs}{a NumericVector with the same length of AAstr for SIP abundances}
 

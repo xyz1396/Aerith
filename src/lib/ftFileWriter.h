@@ -27,5 +27,7 @@ public:
                                  const float &threshold);
     void writeHeaderHasCharge();
     void writeMS2ScanHasCharge(Scan &mScan);
+    void writeMS1ScanHasCharge(Scan &mScan);
     void writeAllScanMS2(std::vector<Scan> &mScans);
+    void writeAllScanMS1(std::vector<Scan> &mScans);
 };

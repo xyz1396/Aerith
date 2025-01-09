@@ -4,20 +4,20 @@
 
 using namespace Rcpp;
 
-//' Simple peak calculator of natural isotopic distribution
-//' @param AAstr a CharacterVector
+//' @title Precursor Peak Calculator
+//' @description This function calculates the isotopic distribution of a given amino acid string and returns a DataFrame containing the mass and probability of each isotope.
+//' @param AAstr A string representing the amino acid sequence.
+//' @return A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
+//' @examples
+//' a <- precursor_peak_calculator("PEPTIDE")
 //' @export
 // [[Rcpp::export]]
-DataFrame precursor_peak_calculator(CharacterVector AAstr)
-{
-	if (AAstr.length() > 1)
-		Rcerr << "only one string one time" << endl;
+DataFrame precursor_peak_calculator(String AAstr)
+{ 
 	string config = get_extdata();
 	ProNovoConfig::setFilename(config);
 	IsotopeDistribution myIso;
-	string AAstr_str = as<std::string>(AAstr);
-	ProNovoConfig::configIsotopologue.computeIsotopicDistribution(AAstr_str,
-																  myIso);
+	ProNovoConfig::configIsotopologue.computeIsotopicDistribution(AAstr, myIso);
 	DataFrame df =
 		DataFrame::create(Named("Mass") = myIso.vMass, _["Prob"] = myIso.vProb);
 	return df;
@@ -25,8 +25,11 @@ DataFrame precursor_peak_calculator(CharacterVector AAstr)
 
 //' Simple residue peak calculator of user defined isotopic distribution of one residue
 //' @param residue residue name
-//' @param Atom "C13" or "N15"
+//' @param Atom isotopes of "C13", "N15", "H2", "O18", "S34"
 //' @param Prob its SIP abundance (0.0~1.0)
+//' @return A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
+//' @examples
+//' df <- residue_peak_calculator_DIY("A", "C13", 0.2)
 //' @export
 // [[Rcpp::export]]
 DataFrame residue_peak_calculator_DIY(String residue, String Atom,
@@ -50,42 +53,39 @@ DataFrame residue_peak_calculator_DIY(String residue, String Atom,
 	return df;
 }
 
-//' Simple peak calculator of user defined isotopic distribution of one peptide
-//' @param AAstr a CharacterVector
-//' @param Atom a CharacterVector C13 or N15
-//' @param Prob a NumericVector for its abundance
+//' @title Precursor Peak Calculator with User-Defined Isotopic Distribution
+//' @description This function calculates the isotopic distribution of a given amino acid string with a user-defined isotopic distribution and returns a DataFrame containing the mass and probability of each isotope.
+//' @param AAstr A string representing the amino acid sequence.
+//' @param Atom A string representing the isotope ("C13", "N15", "H2", "O18", "S34").
+//' @param Prob A double representing the abundance of the specified isotope (0.0 to 1.0).
+//' @return A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
+//' @examples
+//' # Example usage
+//' df <- precursor_peak_calculator_DIY("PEPTIDE", "C13", 0.2)
+//' df <- precursor_peak_calculator_DIY("PEPTIDE", "N15", 0.5)
 //' @export
 // [[Rcpp::export]]
-DataFrame precursor_peak_calculator_DIY(CharacterVector AAstr, CharacterVector Atom,
-										NumericVector Prob)
+DataFrame precursor_peak_calculator_DIY(String AAstr, String Atom,
+										double Prob)
 {
-	// check and convert input
-	if (AAstr.length() > 1 || Atom.length() > 1 || Prob.length() > 1)
-		Rcerr << "only one string one time" << endl;
-	string Atom_str = as<string>(Atom);
-	double Prob_d = as<double>(Prob);
-	if (Prob_d < 0 || Prob_d > 1)
+	
+	if (Prob < 0 || Prob > 1)
 		Rcout << "Wrong isotopic percentage" << endl;
 	// read default config
 	string config = get_extdata();
 	ProNovoConfig::setFilename(config);
 	// compute residue mass and prob again
-	computeResidueMassIntensityAgain(Atom_str, Prob_d);
-	// test if prob change take effct
-	// ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].print();
-	// ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[3].print();
+	computeResidueMassIntensityAgain(Atom, Prob);
 	IsotopeDistribution myIso;
-	string AAstr_str = as<std::string>(AAstr);
-	ProNovoConfig::configIsotopologue.computeIsotopicDistribution(AAstr_str,
-																  myIso);
+	ProNovoConfig::configIsotopologue.computeIsotopicDistribution(AAstr, myIso);
 	DataFrame df =
 		DataFrame::create(Named("Mass") = myIso.vMass, _["Prob"] = myIso.vProb);
 	return df;
 }
 
-//' Simple calculator of CHONPS atom count of peptide
+//' Simple calculator of C H O N P S atom count of peptide
 //' @param AAstr a CharacterVector of peptides
-//' @return a dataframe of CHONPS atom count each row is for one peptide
+//' @return a dataframe of C H O N P S atom count each row is for one peptide
 //' @export
 //' @examples
 //' df <- calPepAtomCount(c("HKFL","ADCH"))
@@ -115,9 +115,9 @@ DataFrame calPepAtomCount(StringVector AAstrs)
 	return df;
 }
 
-//' Simple calculator of CHONPS atom count and mass without isotope of B Y ions
+//' Simple calculator of C H O N P S atom count and mass without isotope of B Y ions
 //' @param AAstr a CharacterVector of peptides
-//' @return a list of data.frame of CHONPS atom count and each data.frame is for one peptide
+//' @return a list of data.frame of C H O N P S atom count and each data.frame is for one peptide
 //' @export
 //' @examples
 //' peps <- calBYAtomCountAndBaseMass(c("HK~FL","AD!CH","~ILKMV"))
@@ -174,7 +174,7 @@ List calBYAtomCountAndBaseMass(StringVector AAstrs)
 
 //' Simple calculator of peptide precursor mass by binomial NP
 //' @param AAstr a CharacterVector of peptides
-//' @param Atom a Character of "C13", "H2", "O18", or "N15"
+//' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 //' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 //' @return a vector of peptide precursor masses
 //' @export
@@ -206,6 +206,8 @@ NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVecto
 		cAtom = 'O';
 	else if (Atom == "N15")
 		cAtom = 'N';
+    else if (Atom == "S34")
+		cAtom = 'S';
 	else
 	{
 		goodInput = false;
@@ -230,7 +232,7 @@ NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVecto
 
 //' Simple calculator neutron mass by average delta mass of each isotope
 //' @param AAstr a CharacterVector of peptides
-//' @param Atom a Character of "C13", "H2", "O18", or "N15"
+//' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 //' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 //' @return a vector of peptide neutron masses
 //' @export
@@ -262,6 +264,8 @@ NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector 
 		cAtom = 'O';
 	else if (Atom == "N15")
 		cAtom = 'N';
+    else if (Atom == "S34")
+		cAtom = 'S';
 	else
 	{
 		goodInput = false;
@@ -303,12 +307,18 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 	char cAtom = 'C';
 	if (Atom == "C13")
 		cAtom = 'C';
+	else if (Atom == "H2")
+		cAtom = 'H';
+	else if (Atom == "O18")
+		cAtom = 'O';
 	else if (Atom == "N15")
 		cAtom = 'N';
+    else if (Atom == "S34")
+		cAtom = 'S';
 	else
 	{
 		goodInput = false;
-		cout << Atom.get_cstring() << " element not support!" << endl;
+		cout << Atom.get_cstring() << " element not supported!" << endl;
 	}
 	List spectraList(AAstrs.size());
 	if (goodInput)
@@ -335,29 +345,30 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 	return spectraList;
 }
 
-//' peak calculator of B Y ione from of one peptide using user defined isotopic distribution
-//' @param AAstr a CharacterVector
-//' @param Atom a CharacterVector C13 or N15
-//' @param Prob a NumericVector for its abundance
+//' @title BY Ion Peak Calculator with User-Defined Isotopic Distribution
+//' @description This function calculates the isotopic distribution of B and Y ions for a given amino acid string with a user-defined isotopic distribution and returns a DataFrame containing the mass, probability, and type of each ion.
+//' @param AAstr A string representing the amino acid sequence.
+//' @param Atom A string representing the isotope ("C13", "N15", "H2", "O18", "S34").
+//' @param Prob A double representing the abundance of the specified isotope (0.0 to 1.0).
+//' @return A DataFrame with three columns: "Mass" containing the mass of each ion, "Prob" containing the probability of each ion, and "Kind" indicating whether the ion is a B or Y ion.
+//' @examples
+//' # Example usage
+//' df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.2)
+//' df <- BYion_peak_calculator_DIY("PEPTIDE", "N15", 0.5)
 //' @export
 // [[Rcpp::export]]
-DataFrame BYion_peak_calculator_DIY(CharacterVector AAstr, CharacterVector Atom,
-									NumericVector Prob)
+DataFrame BYion_peak_calculator_DIY(String AAstr, String Atom,
+									double Prob)
 {
-	// check and convert input
-	if (AAstr.length() > 1 || Atom.length() > 1 || Prob.length() > 1)
-		Rcerr << "only one string one time" << endl;
-	string AAstr_str = as<std::string>(AAstr);
-	string Atom_str = as<string>(Atom);
-	double Prob_d = as<double>(Prob);
-	if (Prob_d < 0 || Prob_d > 1)
+	if (Prob < 0 || Prob > 1)
 		Rcout << "Wrong isotopic percentage" << endl;
 	// read default config
 	string config = get_extdata();
 	ProNovoConfig::setFilename(config);
 	// compute residue mass and prob again
-	computeResidueMassIntensityAgain(Atom_str, Prob_d);
-	// AA string format is [AAKRCI]
+	computeResidueMassIntensityAgain(Atom, Prob);
+    string AAstr_str = AAstr.get_cstring();
+    // AA string format is [AAKRCI] for example
 	AAstr_str = "[" + AAstr_str + "]";
 	vector<vector<double>> vvdYionMass, vvdYionProb, vvdBionMass, vvdBionProb;
 	ProNovoConfig::configIsotopologue.computeProductIon(AAstr_str, vvdYionMass,

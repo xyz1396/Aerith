@@ -119,8 +119,12 @@ generateCFGs <- function(cfgPath, outPath, element) {
     .Call(`_Aerith_generateCFGs`, cfgPath, outPath, element)
 }
 
-#' Simple peak calculator of natural isotopic distribution
-#' @param AAstr a CharacterVector
+#' @title Precursor Peak Calculator
+#' @description This function calculates the isotopic distribution of a given amino acid string and returns a DataFrame containing the mass and probability of each isotope.
+#' @param AAstr A string representing the amino acid sequence.
+#' @return A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
+#' @examples
+#' a <- precursor_peak_calculator("PEPTIDE")
 #' @export
 precursor_peak_calculator <- function(AAstr) {
     .Call(`_Aerith_precursor_peak_calculator`, AAstr)
@@ -128,25 +132,34 @@ precursor_peak_calculator <- function(AAstr) {
 
 #' Simple residue peak calculator of user defined isotopic distribution of one residue
 #' @param residue residue name
-#' @param Atom "C13" or "N15"
+#' @param Atom isotopes of "C13", "N15", "H2", "O18", "S34"
 #' @param Prob its SIP abundance (0.0~1.0)
+#' @return A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
+#' @examples
+#' df <- residue_peak_calculator_DIY("A", "C13", 0.2)
 #' @export
 residue_peak_calculator_DIY <- function(residue, Atom, Prob) {
     .Call(`_Aerith_residue_peak_calculator_DIY`, residue, Atom, Prob)
 }
 
-#' Simple peak calculator of user defined isotopic distribution of one peptide
-#' @param AAstr a CharacterVector
-#' @param Atom a CharacterVector C13 or N15
-#' @param Prob a NumericVector for its abundance
+#' @title Precursor Peak Calculator with User-Defined Isotopic Distribution
+#' @description This function calculates the isotopic distribution of a given amino acid string with a user-defined isotopic distribution and returns a DataFrame containing the mass and probability of each isotope.
+#' @param AAstr A string representing the amino acid sequence.
+#' @param Atom A string representing the isotope ("C13", "N15", "H2", "O18", "S34").
+#' @param Prob A double representing the abundance of the specified isotope (0.0 to 1.0).
+#' @return A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
+#' @examples
+#' # Example usage
+#' df <- precursor_peak_calculator_DIY("PEPTIDE", "C13", 0.2)
+#' df <- precursor_peak_calculator_DIY("PEPTIDE", "N15", 0.5)
 #' @export
 precursor_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
     .Call(`_Aerith_precursor_peak_calculator_DIY`, AAstr, Atom, Prob)
 }
 
-#' Simple calculator of CHONPS atom count of peptide
+#' Simple calculator of C H O N P S atom count of peptide
 #' @param AAstr a CharacterVector of peptides
-#' @return a dataframe of CHONPS atom count each row is for one peptide
+#' @return a dataframe of C H O N P S atom count each row is for one peptide
 #' @export
 #' @examples
 #' df <- calPepAtomCount(c("HKFL","ADCH"))
@@ -154,9 +167,9 @@ calPepAtomCount <- function(AAstrs) {
     .Call(`_Aerith_calPepAtomCount`, AAstrs)
 }
 
-#' Simple calculator of CHONPS atom count and mass without isotope of B Y ions
+#' Simple calculator of C H O N P S atom count and mass without isotope of B Y ions
 #' @param AAstr a CharacterVector of peptides
-#' @return a list of data.frame of CHONPS atom count and each data.frame is for one peptide
+#' @return a list of data.frame of C H O N P S atom count and each data.frame is for one peptide
 #' @export
 #' @examples
 #' peps <- calBYAtomCountAndBaseMass(c("HK~FL","AD!CH","~ILKMV"))
@@ -166,7 +179,7 @@ calBYAtomCountAndBaseMass <- function(AAstrs) {
 
 #' Simple calculator of peptide precursor mass by binomial NP
 #' @param AAstr a CharacterVector of peptides
-#' @param Atom a Character of "C13", "H2", "O18", or "N15"
+#' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 #' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 #' @return a vector of peptide precursor masses
 #' @export
@@ -178,7 +191,7 @@ calPepPrecursorMass <- function(AAstrs, Atom, Probs) {
 
 #' Simple calculator neutron mass by average delta mass of each isotope
 #' @param AAstr a CharacterVector of peptides
-#' @param Atom a Character of "C13", "H2", "O18", or "N15"
+#' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 #' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 #' @return a vector of peptide neutron masses
 #' @export
@@ -198,10 +211,16 @@ precursor_peak_calculator_DIY_averagine <- function(AAstrs, Atom, Prob) {
     .Call(`_Aerith_precursor_peak_calculator_DIY_averagine`, AAstrs, Atom, Prob)
 }
 
-#' peak calculator of B Y ione from of one peptide using user defined isotopic distribution
-#' @param AAstr a CharacterVector
-#' @param Atom a CharacterVector C13 or N15
-#' @param Prob a NumericVector for its abundance
+#' @title BY Ion Peak Calculator with User-Defined Isotopic Distribution
+#' @description This function calculates the isotopic distribution of B and Y ions for a given amino acid string with a user-defined isotopic distribution and returns a DataFrame containing the mass, probability, and type of each ion.
+#' @param AAstr A string representing the amino acid sequence.
+#' @param Atom A string representing the isotope ("C13", "N15", "H2", "O18", "S34").
+#' @param Prob A double representing the abundance of the specified isotope (0.0 to 1.0).
+#' @return A DataFrame with three columns: "Mass" containing the mass of each ion, "Prob" containing the probability of each ion, and "Kind" indicating whether the ion is a B or Y ion.
+#' @examples
+#' # Example usage
+#' df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.2)
+#' df <- BYion_peak_calculator_DIY("PEPTIDE", "N15", 0.5)
 #' @export
 BYion_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
     .Call(`_Aerith_BYion_peak_calculator_DIY`, AAstr, Atom, Prob)
@@ -512,6 +531,20 @@ rankyfify <- function(a) {
 #' @export
 denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
     .Call(`_Aerith_denoiseOneMS2ScanHasCharge`, scanList, window, step, threshold)
+}
+
+#' write all MS1 scans has charge
+#' @param header a list of FT file header
+#' @param scans a list of scans for output
+#' @param ftFile a ft1 file's output path
+#' @return void
+#' @examples
+#' header <- readFTheader("demo.ft1")
+#' ft1 <- readAllScanMS1("demo.ft1")
+#' writeAllScanMS1(header,ft1[1:10],"demo10.ft1")
+#' @export
+writeAllScanMS1 <- function(header, scansList, ftFile) {
+    .Call(`_Aerith_writeAllScanMS1`, header, scansList, ftFile)
 }
 
 #' write all MS2 scans has charge

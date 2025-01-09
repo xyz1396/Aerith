@@ -9,10 +9,16 @@ residue_peak_calculator_DIY(residue, Atom, Prob)
 \arguments{
 \item{residue}{residue name}
 
-\item{Atom}{"C13" or "N15"}
+\item{Atom}{isotopes of "C13", "N15", "H2", "O18", "S34"}
 
 \item{Prob}{its SIP abundance (0.0~1.0)}
 }
+\value{
+A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
+}
 \description{
 Simple residue peak calculator of user defined isotopic distribution of one residue
+}
+\examples{
+df <- residue_peak_calculator_DIY("A", "C13", 0.2)
 }

@@ -13,10 +13,10 @@ test_that("readSpe2Peps works", {
   #   ".*X3_ID110156_01_OA10034_10302_120823.100184.*", 3
   # )
   # expect_equal(ncol(psm), 17)
-  psm <- readSpe2PepFilesScansTopPSMsFromEachFT2Parallel("/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Good/", 5)
-  expect_equal(length(psm), 12)
-  psm <- readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel("/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Good/",
-  "/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Decoy/", 5)
-  expect_equal(length(psm), 12)
+#   psm <- readSpe2PepFilesScansTopPSMsFromEachFT2Parallel("/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Good/", 5)
+#   expect_equal(length(psm), 12)
+#   psm <- readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel("/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Good/",
+#   "/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Decoy/", 5)
+#   expect_equal(length(psm), 12)
   # writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel("/mnt/d/work/202404/unlabelEcoliAstralRegularDecoy/Good/", 5, "/mnt/d/work/202404/test.tsv")
 })

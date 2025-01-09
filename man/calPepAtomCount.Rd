@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{calPepAtomCount}
 \alias{calPepAtomCount}
-\title{Simple calculator of CHONPS atom count of peptide}
+\title{Simple calculator of C H O N P S atom count of peptide}
 \usage{
 calPepAtomCount(AAstrs)
 }
@@ -10,10 +10,10 @@ calPepAtomCount(AAstrs)
 \item{AAstr}{a CharacterVector of peptides}
 }
 \value{
-a dataframe of CHONPS atom count each row is for one peptide
+a dataframe of C H O N P S atom count each row is for one peptide
 }
 \description{
-Simple calculator of CHONPS atom count of peptide
+Simple calculator of C H O N P S atom count of peptide
 }
 \examples{
 df <- calPepAtomCount(c("HKFL","ADCH"))

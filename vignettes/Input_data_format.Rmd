@@ -1,0 +1,232 @@
+---
+title: "Input Data Format"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Input_data_format}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10
+)
+```
+
+```{r, include = FALSE, eval=FALSE}
+library(devtools)
+use_vignette("your-vignette-name")
+build_vignettes()
+```
+
+```{r setup}
+library(Aerith)
+```
+
+### Convert raw file to FT1, FT2, and mzml file
+
+[Link to download Raxport and help pages](https://github.com/xyz1396/Raxport.net)  
+[Links to download ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser/)  
+[Links of tutorial of Sipros](https://github.com/thepanlab/Sipros4)  
+[conda env of Sipros](https://anaconda.org/bioconda/sipros)  
+
+```{bash, eval=FALSE}
+mkdir rmd
+mkdir "rmd/input data format"
+cd "rmd/input data format"
+wget https://github.com/xyz1396/Raxport.net/releases/download/Raxport5.02/Raxport
+chmod +x Raxport
+wget https://github.com/compomics/ThermoRawFileParser/releases/download/v1.4.5/ThermoRawFileParser1.4.5.zip
+unzip ThermoRawFileParser1.4.5.zip -d ThermoRawFileParser
+mkdir raw ft mzml mgf
+conda create -n sipros4 -c bioconda -c conda-forge sipros
+# for using mono in this conda env
+conda activate sipros4
+# Download raw file with 1% 13C
+wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/Pan_062822_X1iso5.raw -P raw
+# Download raw file with 50% 13C  
+wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/Pan_052322_X13.raw -P raw
+wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/pct50.psm.txt
+# convert raw to FT1 and FT2 file
+./Raxport -i raw -o ft -j 8
+# convert raw to mzml file
+mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -o mzml
+mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -f 0 -o mgf
+```
+
+### Read one scan or scans from FT1 and FT2 file
+
+```{r}
+ft1 <- readOneScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1", 10430)
+ft2 <- readOneScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", 10487)
+ft1 <- getRealScanFromList(ft1)
+plot(ft1)
+ft2 <- getRealScanFromList(ft2)
+plot(ft2)
+
+ft1 <- readScansMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1", 10430, 10500)
+ft1 <- getRealScanFromList(ft1[[1]])
+plot(ft1)
+ft1 <- readScansMS1Vector(
+  "../rmd/input data format/ft/Pan_062822_X1iso5.FT1",
+  c(10444, 10469, 10485)
+)
+ft1 <- getRealScanFromList(ft1[[1]])
+plot(ft1)
+
+ft2 <- readScansMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", 10487, 10600)
+ft2 <- getRealScanFromList(ft2[[1]])
+plot(ft2)
+ft2 <- readScansMS2Vector(
+  "../rmd/input data format/ft/Pan_062822_X1iso5.FT2",
+  c(10488, 10490, 10493)
+)
+ft2 <- getRealScanFromList(ft2[[1]])
+plot(ft2)
+```
+
+### Read all scans from FT1 and FT2 file
+
+```{r eval=FALSE}
+ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
+ft2 <- getRealScan(10487, ft2)
+plot(ft2)
+
+ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
+ft1 <- getRealScan(10430, ft1)
+plot(ft1)
+```
+
+### Write small demo FT1 FT2 file
+
+```{r eval=FALSE}
+header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
+ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
+writeAllScanMS1(header,ft1[1:100],"../rmd/input data format/demo.ft1")
+```
+
+```{r eval=FALSE}
+header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
+ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
+writeAllScanMS2(header,ft2[1:100],"../rmd/input data format/demo.ft2")
+```
+
+### Read mzml file
+
+```{r eval=FALSE}
+mzml1 <- readMzmlMS1("../rmd/input data format/mzml/Pan_052322_X13.mzML")
+scan1 <- getRealScan(11188, mzml1)
+plot(scan1)
+mzml2 <- readMzmlMS2("../rmd/input data format/mzml/Pan_052322_X13.mzML")
+scan2 <- getRealScan(12658, mzml2)
+plot(scan2)
+```
+
+### Read mgf file
+
+```{bash, include = FALSE, eval=FALSE}
+#!/bin/bash
+# generate small mgf file
+
+awk '
+BEGIN {
+  chunk_count = 0
+  inside_chunk = 0
+  start_chunk = 1000
+  end_chunk = 2000
+}
+{
+  if ($0 == "BEGIN IONS") {
+    chunk_count++
+    if (chunk_count > start_chunk && chunk_count <= end_chunk) {
+      inside_chunk = 1
+    } else {
+      inside_chunk = 0
+    }
+  }
+  if (inside_chunk) {
+    print $0 >> "../rmd/input data format/mgf/demo.mgf"
+  }
+  if ($0 == "END IONS" && inside_chunk) {
+    inside_chunk = 0
+  }
+}
+' "../rmd/input data format/mgf/Pan_052322_X13.mgf"
+mv "../rmd/input data format/mgf/demo.mgf" "../rmd/input data format/"
+```
+
+```{r eval=FALSE}
+mgf <- readMgf("../rmd/input data format/mgf/Pan_052322_X13.mgf")
+scan1 <- getRealScan(3400, mgf)
+plot(scan1)
+```
+
+### Read PSM from pepXML file
+
+```{xml include = FALSE, eval=FALSE}
+essential chunk:  
+<search_summary precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic" search_engine="X! Tandem" search_engine_version="Sipros">
+<search_score name="hyperscore" value="8"/>
+<search_score name="nextscore" value="8"/>
+<search_score name="expect" value="2"/>
+```
+
+```{r}
+psm <- readPepXMLtable("../rmd/input data format/demo.pep.xml")
+psm$sequence
+```
+
+### Read PSM from TSV generated from Sipros
+
+```{r}
+psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
+```
+
+### TIC visualization
+
+```{r}
+ms1 <- readAllScanMS1("../rmd/input data format/ft/Pan_052322_X13.FT1")
+tic <- getTIC(ms1)
+plotTIC(tic)
+ms2 <- readAllScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2")
+tic <- getTIC(ms2)
+plotTIC(tic)
+```
+
+### Scan speed visualization in retention times
+
+```{r}
+# MS1 has 6434 scans
+length(ms1)
+
+# MS2 has 44259 scans
+length(ms2)
+
+# MS1 has average 7 MS2 scan
+length(ms2) / length(ms1)
+
+infoMS1 <- getRetentionTimeAndPrecursorInfo(ms1)
+plotScanFrequency(infoMS1)
+
+infoMS2 <- getRetentionTimeAndPrecursorInfo(ms2)
+plotScanFrequency(infoMS2)
+
+# 1980 MS1 scans do not have ms2 scan
+length(unique(infoMS1$ScanNumber)) - length(unique(infoMS2$PrecursorScanNumber))
+
+plotScanFrequency(infoMS1) + plotScanFrequencyMS2(infoMS2)
+```
+
+### Precursor density visualization in retention times
+
+```{r}
+plotPrecursorMzFrequency(infoMS2)
+```
+
+

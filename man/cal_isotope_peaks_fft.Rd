@@ -9,7 +9,7 @@ cal_isotope_peaks_fft(formula, N_width = 100, min_abundance = 1e-04, ...)
 \arguments{
 \item{formula}{A character string representing the chemical formula.}
 
-\item{N_width}{An integer specifying the width of the FFT. Default is 100.
+\item{N_width}{An integer specifying the width of the isotope envelope in FFT. Default is 100.
 Wider isotopic envolope will require larger N_width.}
 
 \item{min_abundance}{A numeric value specifying the minimum abundance threshold
@@ -23,9 +23,8 @@ A data frame containing the calculated isotope peaks mass and their abundances.
 }
 \description{
 This function calculates the isotope peaks for a given chemical formula using
-Fast Fourier Transform (FFT). It allows for customization of the width of the
-FFT and the minimum abundance threshold for the peaks. It approximates the delta
-mass of isotopes is one neutron mass and ignore the fine structure of isotopes.
+Fast Fourier Transform (FFT).  It approximates the delta mass of isotopes is one neutron mass
+and ignore the fine structure of isotopes.
 }
 \examples{
 # Example usage:

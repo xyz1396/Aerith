@@ -147,12 +147,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // precursor_peak_calculator
-DataFrame precursor_peak_calculator(CharacterVector AAstr);
+DataFrame precursor_peak_calculator(String AAstr);
 RcppExport SEXP _Aerith_precursor_peak_calculator(SEXP AAstrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type AAstr(AAstrSEXP);
+    Rcpp::traits::input_parameter< String >::type AAstr(AAstrSEXP);
     rcpp_result_gen = Rcpp::wrap(precursor_peak_calculator(AAstr));
     return rcpp_result_gen;
 END_RCPP
@@ -171,14 +171,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // precursor_peak_calculator_DIY
-DataFrame precursor_peak_calculator_DIY(CharacterVector AAstr, CharacterVector Atom, NumericVector Prob);
+DataFrame precursor_peak_calculator_DIY(String AAstr, String Atom, double Prob);
 RcppExport SEXP _Aerith_precursor_peak_calculator_DIY(SEXP AAstrSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type AAstr(AAstrSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type Atom(AtomSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Prob(ProbSEXP);
+    Rcpp::traits::input_parameter< String >::type AAstr(AAstrSEXP);
+    Rcpp::traits::input_parameter< String >::type Atom(AtomSEXP);
+    Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
     rcpp_result_gen = Rcpp::wrap(precursor_peak_calculator_DIY(AAstr, Atom, Prob));
     return rcpp_result_gen;
 END_RCPP
@@ -245,14 +245,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // BYion_peak_calculator_DIY
-DataFrame BYion_peak_calculator_DIY(CharacterVector AAstr, CharacterVector Atom, NumericVector Prob);
+DataFrame BYion_peak_calculator_DIY(String AAstr, String Atom, double Prob);
 RcppExport SEXP _Aerith_BYion_peak_calculator_DIY(SEXP AAstrSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< CharacterVector >::type AAstr(AAstrSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type Atom(AtomSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Prob(ProbSEXP);
+    Rcpp::traits::input_parameter< String >::type AAstr(AAstrSEXP);
+    Rcpp::traits::input_parameter< String >::type Atom(AtomSEXP);
+    Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
     rcpp_result_gen = Rcpp::wrap(BYion_peak_calculator_DIY(AAstr, Atom, Prob));
     return rcpp_result_gen;
 END_RCPP
@@ -599,6 +599,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// writeAllScanMS1
+bool writeAllScanMS1(List header, List scansList, const String& ftFile);
+RcppExport SEXP _Aerith_writeAllScanMS1(SEXP headerSEXP, SEXP scansListSEXP, SEXP ftFileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type header(headerSEXP);
+    Rcpp::traits::input_parameter< List >::type scansList(scansListSEXP);
+    Rcpp::traits::input_parameter< const String& >::type ftFile(ftFileSEXP);
+    rcpp_result_gen = Rcpp::wrap(writeAllScanMS1(header, scansList, ftFile));
+    return rcpp_result_gen;
+END_RCPP
+}
 // writeAllScanMS2
 bool writeAllScanMS2(List header, List scansList, const String& ftFile);
 RcppExport SEXP _Aerith_writeAllScanMS2(SEXP headerSEXP, SEXP scansListSEXP, SEXP ftFileSEXP) {
@@ -660,6 +673,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_scorePSMold", (DL_FUNC) &_Aerith_scorePSMold, 6},
     {"_Aerith_rankyfify", (DL_FUNC) &_Aerith_rankyfify, 1},
     {"_Aerith_denoiseOneMS2ScanHasCharge", (DL_FUNC) &_Aerith_denoiseOneMS2ScanHasCharge, 4},
+    {"_Aerith_writeAllScanMS1", (DL_FUNC) &_Aerith_writeAllScanMS1, 3},
     {"_Aerith_writeAllScanMS2", (DL_FUNC) &_Aerith_writeAllScanMS2, 3},
     {NULL, NULL, 0}
 };

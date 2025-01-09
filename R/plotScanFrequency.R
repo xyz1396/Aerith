@@ -12,7 +12,7 @@
 #' b <- getRetentionTimeAndPrecursorMass(a)
 getRetentionTimeAndPrecursorInfo <- function(ft) {
   # for MS1
-  if (is.null(ft[[1]]$precursorMz)) {
+  if (is.null(ft[[1]]$isolationWindowCenterMZ)) {
     info <- as.data.frame(t(sapply(ft, function(x) {
       return (c(
         ScanNumber = x$scanNumber,
@@ -29,7 +29,7 @@ getRetentionTimeAndPrecursorInfo <- function(ft) {
         c(
           PrecursorScanNumber = x$precursorScanNumber,
           RetentionTime = x$retentionTime,
-          PrecursorMz = x$precursorMz,
+          PrecursorMz = x$isolationWindowCenterMZ,
           PrecursorCharge = x$precursorCharge
         )
       )

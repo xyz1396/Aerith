@@ -2,49 +2,20 @@
 #' @slot spectra data.frame for ion peaks
 #' @slot charges numeric vector for precursor charge
 #' @slot AAstr characters for amino acid sequence or compound name
-#' @slot elementStr characters element of compound
-#' @slot elementMasses list of numeric vector for element isotopic mass
-#' @slot elementAbundances list of numeric vector for element isotopic abundance
-#' @slot elementNumbers numeric vector of element numbers
 #' @description
 #' This class is unified data structure for spectra plotting.
 #' The data.frame of spectra consists of columns of "Mass", "Prob"
 #' "Kind", "Charge", and "MZ".
-#' Take glucose C6H12O6 for example of compound.
-#' elementStr: C6H12O6 for example.
-#' elementMasses: list(C=c(12.000000,	13.003355), H=c(1.007825,	2.014102),
-#' O=c(15.994915, 16.999132, 17.999160)) for example.
-#' elementAbundances: list(C=c(0.9893, 0.0107), H=c(0.999885,	0.000115),
-#' O=c(0.99757, 0.00038, 0.00205)) for example.
-#' elementNumbers c(C=6,H=12,O=6) for example.
 #' @export
 #' @examples
 #' AAstr <- "KHRIP"
 #' spectra <- getPrecursorSpectra(AAstr, 1:2)
 #' class(spectra)
-#'
-#' glucose <- new("AAspectra",
-#'   AAstr = "Glucose",
-#'   elementStr = "C6H12O6",
-#'   elementMasses = list(
-#'     C = c(12.000000, 13.003355), H = c(1.007825, 2.014102),
-#'     O = c(15.994915, 16.999132, 17.999160)
-#'   ),
-#'   elementAbundances = list(
-#'     C = c(0.9893, 0.0107), H = c(0.999885, 0.000115),
-#'     O = c(0.99757, 0.00038, 0.00205)
-#'   ),
-#'   elementNumbers = c(C = 6, H = 12, O = 6)
-#' )
 setClass("AAspectra",
   slot = c(
     spectra = "data.frame",
     charges = "numeric",
-    AAstr = "character",
-    elementStr = "character",
-    elementMasses = "list",
-    elementAbundances = "list",
-    elementNumbers = "numeric"
+    AAstr = "character"
   )
 )
 
@@ -154,7 +125,7 @@ getSipBYionSpectra <-
            precursorCharges = 2) {
     spectra <- BYion_peak_calculator_DIY(AAstr, Atom, Prob)
     spectra <- getMZ(spectra, charges)
-    if (precursorCharges != 0) {
+    if (precursorCharges[1] != 0) {
       precursorSpectra <-
         getSipPrecursorSpectra(AAstr, Atom, Prob, precursorCharges)@spectra
       precursorSpectra$Kind <- "Precursor"
@@ -195,9 +166,12 @@ getRealScanFromList <- function(scan) {
     MZ = scan$peaks$mz,
     Charge = Charge
   )
+  charges <- 0
+  if (!is.null(scan$precursorCharges))
+    charges <- scan$precursorCharges
   AAsOBJ <- new("AAspectra",
     spectra = BYreal,
-    charges = scan1$precursorCharges,
+    charges = charges,
     AAstr = "Unknown"
   )
   return(AAsOBJ)

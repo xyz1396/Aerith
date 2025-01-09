@@ -2,13 +2,19 @@
 % Please edit documentation in R/RcppExports.R
 \name{precursor_peak_calculator}
 \alias{precursor_peak_calculator}
-\title{Simple peak calculator of natural isotopic distribution}
+\title{Precursor Peak Calculator}
 \usage{
 precursor_peak_calculator(AAstr)
 }
 \arguments{
-\item{AAstr}{a CharacterVector}
+\item{AAstr}{A string representing the amino acid sequence.}
+}
+\value{
+A DataFrame with two columns: "Mass" containing the mass of each isotope and "Prob" containing the probability of each isotope.
 }
 \description{
-Simple peak calculator of natural isotopic distribution
+This function calculates the isotopic distribution of a given amino acid string and returns a DataFrame containing the mass and probability of each isotope.
+}
+\examples{
+a <- precursor_peak_calculator("PEPTIDE")
 }

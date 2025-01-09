@@ -8,13 +8,19 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: TRUE
 ByteCompile: TRUE
-Suggests: testthat
-RoxygenNote: 7.3.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
     Rcpp
 Imports: 
     Rcpp,
     ggplot2,
-    ggrepel
+    ggrepel,
+    ggnewscale
 SystemRequirements: C++17
+VignetteBuilder: knitr
+Config/build/vignettes: FALSE

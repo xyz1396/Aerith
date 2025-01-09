@@ -1,0 +1,78 @@
+---
+title: "Theoretic-spectra-generation-of-SIP-labeled-compound"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Input_data_format}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10
+)
+```
+
+```{r setup}
+library(Aerith)
+library(ggplot2)
+```
+
+### Monte Carlo method
+
+This algorithm calculates the isotope numbers for Stable Isotope Probing (SIP) based on a given chemical formula. It uses a Monte Carlo simulation approach while maintaining the isotopic fine structure of each isotope.
+
+```{r}
+# natural abundance of (M-H)- of glucose
+iso1<- cal_isotope_numbers_SIP("C6H11O6")
+plotMolecularIsotopes(iso1) + 
+  ggtitle(expression(C[6]*H[11]*O[6]^"-"~1.07*"% "*{}^{13}*C))
+# adjusted abundance in SIP
+iso2<- cal_isotope_numbers_SIP("C6H11O6", num_simulations = 50000, C13 = 0.5)
+plotMolecularIsotopes(iso2) + 
+  ggtitle(expression(C[6]*H[11]*O[6]^"-"~50*"% "*{}^{13}*C))
+```
+
+```{r}
+# natural abundance of (M+Na)⁺ of glucose
+iso1<- cal_isotope_peaks_fft("C6H12O6Na")
+plotMolecularFFTisotopes(iso1) + 
+  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~1.07*"% "*{}^{13}*C))
+# adjusted abundance in SIP
+iso2<- cal_isotope_peaks_fft("C6H12O6Na", N_width = 200, min_abundance = 0.001, C13 = 0.5)
+plotMolecularFFTisotopes(iso2) + 
+  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~50*"% "*{}^{13}*C))
+```
+
+### FFT-based algorithm
+
+This algorithm calculates the isotope peaks for a given chemical formula using Fast Fourier Transform (FFT). It approximates the delta mass of isotopes is one neutron mass and ignore the fine structure of isotopes.
+
+```{r}
+# natural abundance of (M-H)- of glucose
+iso1<- cal_isotope_peaks_fft("C6H11O6")
+plotMolecularFFTisotopes(iso1) + 
+  ggtitle(expression(C[6]*H[11]*O[6]^"-"~1.07*"% "*{}^{13}*C))
+# adjusted abundance in SIP
+iso2<- cal_isotope_peaks_fft("C6H11O6", N_width = 200, min_abundance = 0.001, C13 = 0.5)
+plotMolecularFFTisotopes(iso2) + 
+  ggtitle(expression(C[6]*H[11]*O[6]^"-"~50*"% "*{}^{13}*C))
+```
+
+```{r}
+# natural abundance of (M+Na)⁺ of glucose
+iso1<- cal_isotope_peaks_fft("C6H12O6Na")
+plotMolecularFFTisotopes(iso1) + 
+  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~1.07*"% "*{}^{13}*C))
+# adjusted abundance in SIP
+iso2<- cal_isotope_peaks_fft("C6H12O6Na", N_width = 200, min_abundance = 0.001, C13 = 0.5)
+plotMolecularFFTisotopes(iso2) + 
+  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~50*"% "*{}^{13}*C))
+```
+

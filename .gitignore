@@ -45,3 +45,6 @@ vignettes/*.pdf
 
 # in house document
 rmd/
+inst/doc
+/doc/
+/Meta/

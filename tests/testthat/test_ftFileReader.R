@@ -17,7 +17,7 @@ context("readScansMS2")
 #   expect_equal(length(ft2), 588)
 # })
 
-test_that("readScansMS2 works", {
-  ft2 <- readScansMS2Vector("/mnt/d/work/202210/ecoliSIPpct1_pct100/data/pct1/Pan_062822_X1iso5.FT2", 10487:10600)
-  expect_equal(length(ft2), 100)
-})
+# test_that("readScansMS2 works", {
+#   ft2 <- readScansMS2Vector("/mnt/d/work/202210/ecoliSIPpct1_pct100/data/pct1/Pan_062822_X1iso5.FT2", 10487:10600)
+#   expect_equal(length(ft2), 100)
+# })

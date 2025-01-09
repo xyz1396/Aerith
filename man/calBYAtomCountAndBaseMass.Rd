@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{calBYAtomCountAndBaseMass}
 \alias{calBYAtomCountAndBaseMass}
-\title{Simple calculator of CHONPS atom count and mass without isotope of B Y ions}
+\title{Simple calculator of C H O N P S atom count and mass without isotope of B Y ions}
 \usage{
 calBYAtomCountAndBaseMass(AAstrs)
 }
@@ -10,10 +10,10 @@ calBYAtomCountAndBaseMass(AAstrs)
 \item{AAstr}{a CharacterVector of peptides}
 }
 \value{
-a list of data.frame of CHONPS atom count and each data.frame is for one peptide
+a list of data.frame of C H O N P S atom count and each data.frame is for one peptide
 }
 \description{
-Simple calculator of CHONPS atom count and mass without isotope of B Y ions
+Simple calculator of C H O N P S atom count and mass without isotope of B Y ions
 }
 \examples{
 peps <- calBYAtomCountAndBaseMass(c("HK~FL","AD!CH","~ILKMV"))

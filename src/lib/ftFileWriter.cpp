@@ -175,6 +175,44 @@ void ftFileWriter::writeMS2ScanHasCharge(Scan &mScan)
     }
 }
 
+void ftFileWriter::writeMS1ScanHasCharge(Scan &mScan)
+{
+    ftFileStream << std::fixed << std::setprecision(6);
+    ftFileStream << "S\t" << std::to_string(mScan.scanNumber)
+                 << std::setprecision(2) << "\t" << mScan.TIC << std::endl;
+    ftFileStream << "I\tRetentionTime\t" << mScan.retentionTime << std::endl;
+    ftFileStream << "I\tScanType\t" << scanType << std::endl;
+    ftFileStream << "I\tScanFilter\t" << scanFilter << std::endl;
+    for (size_t i = 0; i < mScan.mz.size(); i++)
+    {
+        ftFileStream << std::setprecision(6) << mScan.mz[i]
+                     << "\t" << std::setprecision(2) << mScan.intensity[i]
+                     << "\t" << std::to_string(mScan.resolution[i])
+                     << "\t" << mScan.baseLine[i]
+                     << "\t" << mScan.signalToNoise[i] << "\t" << std::to_string(mScan.charge[i])
+                     << std::endl;
+    }
+}
+
+void ftFileWriter::writeAllScanMS1(std::vector<Scan> &mScans)
+{
+    if (!isWriteable)
+        return;
+    if (hasCharge && MSlevel == 1)
+    {
+        writeHeaderHasCharge();
+        for (size_t i = 0; i < mScans.size(); i++)
+        {
+            writeMS1ScanHasCharge(mScans[i]);
+            // output buffer to FT file
+            ftFileStreamtoFile << ftFileStream.str();
+            ftFileStream.str("");
+        }
+    }
+    else
+        std::cout << "This format is not implemented!" << std::endl;
+}
+
 void ftFileWriter::writeAllScanMS2(std::vector<Scan> &mScans)
 {
     if (!isWriteable)

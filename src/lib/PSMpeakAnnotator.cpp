@@ -252,10 +252,76 @@ void PSMpeakAnnotator::calMatchedSpectraEntropy()
     matchedSpectraEntropy = entropy;
 }
 
-double PSMpeakAnnotator::scorePSM()
-{
-    return 0;
+// Compute log(binomial(n, k)) using lgamma for numerical stability.
+double PSMpeakAnnotator::logBinom(int n, int k) {
+    if (k < 0 || k > n)
+        return -INFINITY;
+    return std::lgamma(n + 1) - std::lgamma(k + 1) - std::lgamma(n - k + 1);
 }
+
+// Compute one term of the hypergeometric probability:
+// term = (n_theo choose j) * ((N - n_theo) choose (n_obs - j)) / (N choose n_obs)
+double PSMpeakAnnotator::hypergeomProbability(int n_theo, int n_obs, int j, int N) {
+    if (j > n_theo || (n_obs - j) > (N - n_theo))
+        return 0.0;
+    double logTerm = logBinom(n_theo, j)
+                   + logBinom(N - n_theo, n_obs - j)
+                   - logBinom(N, n_obs);
+    return exp(logTerm);
+}
+
+void PSMpeakAnnotator::calMVHscore()
+{
+    double maxMz = *std::max_element(realScan->mz.begin(), realScan->mz.end());
+    double minMz = *std::min_element(realScan->mz.begin(), realScan->mz.end());
+    // total number of tolerance window
+    int N = (maxMz - minMz) / ((maxMz + minMz) / 2 * tolerancePPM / 1e6 * 2);
+    int n_theo = 0, n_match = 0, n_obs = realScan->mz.size();
+    // consider top 3 peaks of isotopic envelope
+    const int topN = 3;
+    size_t ix = 0, nISO = 0;
+    int lastResiduePosition = 1;
+    while (ix <- expectedMZs.size())
+    {
+        if (residuePositions[ix] != lastResiduePosition)
+        {
+            lastResiduePosition = residuePositions[ix];
+            nISO = 0;
+        }
+        if (expectedMZs[ix] >= minMz && expectedMZs[ix] <= maxMz)
+        {
+            if (ionKinds[ix] == B || ionKinds[ix] == Y)
+                n_theo = n_theo + topN;
+            if (matchedIndices[ix] != -1 && nISO <= topN)
+            {
+                n_match ++;                   
+                nISO ++; 
+            }
+        }
+        ix ++;
+    }    
+    double pValue = 0.0;
+    for (int j = n_match; j <= n_theo; ++j) {
+        pValue += hypergeomProbability(n_theo, n_obs, j, N);
+    }
+    // Prevent taking log of zero.
+    if (pValue < 1e-300)
+        pValue = 1e-300;
+    MVHscore = -std::log10(pValue);
+}
+
+void PSMpeakAnnotator::calWDPscore()
+{
+}
+
+void PSMpeakAnnotator::calXcorrScore()
+{
+}
+
+void PSMpeakAnnotator::scorePSM()
+{
+}
+
 
 void PSMpeakAnnotator::analyzePSM(const std::string &peptide, Scan *realScan,
                                   const std::vector<int> &charges,

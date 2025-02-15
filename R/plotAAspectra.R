@@ -226,6 +226,7 @@ getRealScanWithCharge <- function(scanNumber, ft) {
 #' Draw AAspectra MS plot
 #'
 #' @param x AAspectra object
+#' @param linewidth
 #'
 #' @return a ggplot2 object
 #' @importFrom ggplot2 ggplot
@@ -244,7 +245,7 @@ getRealScanWithCharge <- function(scanNumber, ft) {
 #' @examples
 #' a <- getPrecursorSpectra("KHRIP", 2)
 #' plot(a)
-plot.AAspectra <- function(x) {
+plot.AAspectra <- function(x, linewidth = 0.1) {
   return(
     ggplot2::ggplot(
       x@spectra,
@@ -255,7 +256,7 @@ plot.AAspectra <- function(x) {
         color = Kind
       )
     ) +
-      ggplot2::geom_linerange(linewidth = 0.1) +
+      ggplot2::geom_linerange(linewidth = linewidth) +
       ggplot2::scale_x_continuous(breaks = seq(0, 2000, by = 100)) +
       ggplot2::scale_y_continuous(
         breaks = seq(-100, 100, by = 25),
@@ -339,6 +340,7 @@ plotSipBYionLabel <- function(spect) {
 #' plot real scan layer under the B Y ion peaks
 #'
 #' @param spect AAspectra object of real scan
+#' @param linewidth
 #'
 #' @return ggplot2 layer
 #' @export
@@ -351,7 +353,7 @@ plotSipBYionLabel <- function(spect) {
 #' c <- getRealScan(18, b)
 #' p <- p + plotRealScan(c)
 #' p
-plotRealScan <- function(spect) {
+plotRealScan <- function(spect, linewidth = 0.1) {
   drawDf <- spect@spectra
   drawDf$Prob <- -drawDf$Prob
   p <-
@@ -364,7 +366,7 @@ plotRealScan <- function(spect) {
       ),
       drawDf,
       inherit.aes = F,
-      linewidth = 0.1
+      linewidth = linewidth
     )
   return(p)
 }
@@ -438,16 +440,28 @@ plotPSMannotation <- function(observedSpect, pep, Atom, Prob, charges,
   )
   p <- plot(expectedSP)
   p <- p + plotSipBYionLabel(expectedSP)
-  if (all(unique(realPeaks$Kind) == c("Unmatched", "Matched"))) {
-    p <- p + ggnewscale::new_scale_color()
+  p <- p + ggplot2::guides(color = ggplot2::guide_legend(
+    override.aes = list(linewidth = 5, fill = NA)
+  ))
+  if (setequal(unique(realPeaks$Kind), c("Unmatched", "Matched"))) {
+    # p <- p + ggnewscale::new_scale_color()
     p <- p + plotRealScan(observedSP)
+    colors <- c(
+      "#1F78B4", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00",
+      "#FFFF33", "#A65628", "#F781BF", "#A6CEE3", "#66C2A5",
+      "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "#FFD92F",
+      "#E5C494", "#FF33CC", "#1B9E77", "#D95F02", "#7570B3",
+      "#E7298A", "#66A61E", "#E6AB02", "#A6761D", "#33A02C",
+      "#8DD3C7", "#FFFFB3", "#BEBADA", "#FB8072", "#80B1D3"
+    )
+    nKind <- length(unique(expectedSP@spectra$Kind))
+    replace_needed <- nKind > length(colors)
+    colors <- sample(colors, nKind, replace = replace_needed)
+    names(colors) <- unique(expectedSP@spectra$Kind)
     p <- p + ggplot2::scale_color_manual(
       name = "Kind",
-      values = c("Matched" = "red", "Unmatched" = "grey")
+      values = c(colors, "Matched" = "red", "Unmatched" = "grey")
     )
-    p <- p + ggplot2::guides(color = ggplot2::guide_legend(
-      override.aes = list(linewidth = 5, fill = NA)
-    ))
   } else {
     p <- p + plotRealScan(observedSP)
   }

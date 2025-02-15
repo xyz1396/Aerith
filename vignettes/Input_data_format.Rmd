@@ -23,6 +23,8 @@ knitr::opts_chunk$set(
 library(devtools)
 use_vignette("your-vignette-name")
 build_vignettes()
+getwd()
+rmarkdown::render("Input_data_format.Rmd", output_dir = "../doc/")
 ```
 
 ```{r setup}
@@ -53,6 +55,7 @@ wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/Pan_062822_X
 # Download raw file with 50% 13C  
 wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/Pan_052322_X13.raw -P raw
 wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/pct50.psm.txt
+wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/pct1.psm.txt
 # convert raw to FT1 and FT2 file
 ./Raxport -i raw -o ft -j 8
 # convert raw to mzml file

@@ -4,10 +4,12 @@
 \alias{plotRealScan}
 \title{plot real scan layer under the B Y ion peaks}
 \usage{
-plotRealScan(spect)
+plotRealScan(spect, linewidth = 0.1)
 }
 \arguments{
 \item{spect}{AAspectra object of real scan}
+
+\item{linewidth}{}
 }
 \value{
 ggplot2 layer

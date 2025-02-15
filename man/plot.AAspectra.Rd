@@ -4,10 +4,12 @@
 \alias{plot.AAspectra}
 \title{Draw AAspectra MS plot}
 \usage{
-plot.AAspectra(x)
+plot.AAspectra(x, linewidth = 0.1)
 }
 \arguments{
 \item{x}{AAspectra object}
+
+\item{linewidth}{}
 }
 \value{
 a ggplot2 object

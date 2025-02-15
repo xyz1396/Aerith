@@ -4,7 +4,7 @@
 \alias{plot,AAspectra-method}
 \title{Draw AAspectra MS plot}
 \usage{
-\S4method{plot}{AAspectra}(x)
+\S4method{plot}{AAspectra}(x, linewidth = 0.1)
 }
 \arguments{
 \item{AAspectra}{}

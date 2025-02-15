@@ -37,7 +37,7 @@ private:
     // unit is ppm
     double tolerancePPM = 10;
     double matchedSpectraEntropy = 0;
-    double Score = 0;
+    double Score = 0, MVHscore = 0, WDPscore = 0, XcorrScore = 0;
     vector<vector<double>> vvdYionMass, vvdYionProb, vvdBionMass, vvdBionProb;
 
     // theoretical spectra info of same length vectors
@@ -65,5 +65,10 @@ private:
                                    const int charge);
     void matchIsotopicEnvelopes(Scan *mRealScan, const int charge);
     void calMatchedSpectraEntropy();
-    double scorePSM();
+    void scorePSM();
+    double logBinom(int n, int k);
+    double hypergeomProbability(int n_theo, int n_obs, int j, int N);
+    void calMVHscore();
+    void calWDPscore();
+    void calXcorrScore();
 };

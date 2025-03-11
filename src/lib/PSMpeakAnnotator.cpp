@@ -230,7 +230,7 @@ void PSMpeakAnnotator::matchIsotopicEnvelopes(Scan *mRealScan, const int charge)
     }
 }
 
-void PSMpeakAnnotator::calMatchedSpectraEntropy()
+void PSMpeakAnnotator::calMatchedSpectraEntropyScore()
 {
     double totalIntensity = 0;
     double entropy = 0;
@@ -249,7 +249,7 @@ void PSMpeakAnnotator::calMatchedSpectraEntropy()
             entropy += -prob * std::log(prob);
         }
     }
-    matchedSpectraEntropy = entropy;
+    matchedSpectraEntropyScore = entropy;
 }
 
 // Compute log(binomial(n, k)) using lgamma for numerical stability.
@@ -281,7 +281,7 @@ void PSMpeakAnnotator::calMVHscore()
     const int topN = 3;
     size_t ix = 0, nISO = 0;
     int lastResiduePosition = 1;
-    while (ix <- expectedMZs.size())
+    while (ix < expectedMZs.size())
     {
         if (residuePositions[ix] != lastResiduePosition)
         {
@@ -314,8 +314,134 @@ void PSMpeakAnnotator::calWDPscore()
 {
 }
 
+SparseBins PSMpeakAnnotator::sparseBinSpectrum(const std::vector<double> &mz,
+    const vector<double> &intensity, double binWidth,
+    double minMz, double maxMz) {
+        SparseBins bins;
+        bins.reserve(mz.size());
+        for (size_t i = 0; i < mz.size(); ++i) {
+            double m = mz[i];
+            double inten = intensity[i];
+            if (m < minMz || m > maxMz)
+                continue;
+            int binIndex = static_cast<int>(std::floor((m - minMz) / binWidth));
+            // Update bin to hold the max intensity.
+            auto it = bins.find(binIndex);
+            if (it == bins.end())
+                bins[binIndex] = inten;
+            else
+                it->second = max(it->second, inten);
+        }
+        return bins;
+    }
+
+// Compute correlation at a given shift using sparse bins.
+double PSMpeakAnnotator::sparseCorrelationAtShift(const SparseBins &theoBins, const SparseBins &obsBins, int shift) {
+    double sum = 0.0;
+    for (const auto &p : theoBins) {
+        int binIndex = p.first;
+        int shiftIndex = binIndex + shift;
+        auto it = obsBins.find(shiftIndex);
+        if (it != obsBins.end()) {
+            sum += p.second * it->second;
+        }
+    }
+    return sum;
+}
+
+void PSMpeakAnnotator::selectTopPeaks(std::vector<double> &theo_mz,
+    std::vector<double> &theo_intensity, int topN, double intensityThreshold)
+{
+    auto processIons = [&](const std::vector<std::vector<double>> &ionMasses,
+                             const std::vector<std::vector<double>> &ionProbs)
+    {
+        for (size_t i = 0; i < ionMasses.size(); i++)
+        {
+            if (ionMasses[i].size() != ionProbs[i].size())
+            {   
+                std::cerr << "Error: ionMasses and ionProbs have different sizes." << std::endl;
+                continue;
+            }
+            double maxInten = *std::max_element(ionProbs[i].begin(), ionProbs[i].end());
+            // Make a copy of the probability vector so we can modify it.
+            std::vector<double> probCopy = ionProbs[i];
+            for (int n = 0; n < topN; n++)
+            {
+                auto maxIt = std::max_element(probCopy.begin(), probCopy.end());
+                if (maxIt == probCopy.end() || *maxIt < 0)
+                    break; // No valid peak remaining.
+                size_t index = std::distance(probCopy.begin(), maxIt);
+                double normalizedInten = ionProbs[i][index] / maxInten;
+                if (normalizedInten < intensityThreshold)
+                    break; // No peak with intensity above threshold.
+                theo_intensity.push_back(normalizedInten);
+                theo_mz.push_back(ionMasses[i][index]);
+                // Mark this peak so it won't be chosen again.
+                *maxIt = -std::numeric_limits<double>::infinity();
+            }
+        }
+    };
+    processIons(vvdBionMass, vvdBionProb);
+    processIons(vvdYionMass, vvdYionProb);
+}
+
 void PSMpeakAnnotator::calXcorrScore()
 {
+    std::vector<double> obs_mz = realScan->mz;
+    // convert mz to single charge and remove proton mass
+    for (size_t i = 0; i < obs_mz.size(); i++)
+    {
+        if (realScan->charge[i] == 0)
+            obs_mz[i] = obs_mz[i] - ProNovoConfig::getProtonMass();
+        else
+            obs_mz[i] = obs_mz[i] * realScan->charge[i] - realScan->charge[i] * ProNovoConfig::getProtonMass();
+    }
+    std::vector<double> obs_intensity = realScan->intensity;
+    double maxInten = *std::max_element(obs_intensity.begin(), obs_intensity.end());
+    for (size_t i = 0; i < obs_intensity.size(); i++)
+    {
+        obs_intensity[i] /= maxInten;
+    }
+
+    std::vector<double> theo_mz, theo_intensity;
+    int topN = 3;
+    theo_mz.reserve(vvdBionMass.size() * topN + vvdYionMass.size() * topN);
+    theo_intensity.reserve(vvdBionMass.size() * topN + vvdYionMass.size() * topN);
+    double intensityThreshold = 0.01;
+    selectTopPeaks(theo_mz, theo_intensity, topN, intensityThreshold);
+
+    auto obsRange = std::minmax_element(obs_mz.begin(), obs_mz.end());
+    double minMz = *obsRange.first;
+    double maxMz = *obsRange.second;
+    double binWidth = tolerancePPM / 1e6 * (minMz + maxMz) / 2;
+    int shiftWindow = 75;
+    // Add margins to account for shifts.
+    minMz -= shiftWindow * binWidth;
+    minMz = std::max(minMz, 0.0);
+    maxMz += shiftWindow * binWidth;
+  
+    // Create sparse bins for both the theoretical and observed spectra.
+    SparseBins theoBins = sparseBinSpectrum(theo_mz, theo_intensity, binWidth, minMz, maxMz);
+    SparseBins obsBins  = sparseBinSpectrum(obs_mz, obs_intensity, binWidth, minMz, maxMz);
+  
+    // Correlation at zero shift.
+    double cc0 = sparseCorrelationAtShift(theoBins, obsBins, 0);
+  
+    // Compute the average correlation over shifted windows (excluding zero).
+    double ccSum = 0.0;
+    int cnt = 0;
+    for (int shift = -shiftWindow; shift <= shiftWindow; ++shift) {
+        if (shift == 0)
+            continue;
+        ccSum += sparseCorrelationAtShift(theoBins, obsBins, shift);
+        cnt++;
+    }
+    double avgShift = (cnt > 0) ? ccSum / cnt : 0.0;
+  
+    // XCorr is defined as the zero-shift correlation minus the average shifted correlation.
+    XcorrScore = cc0 - avgShift;
+    if (XcorrScore < 0)
+        XcorrScore = 0;
 }
 
 void PSMpeakAnnotator::scorePSM()
@@ -325,7 +451,7 @@ void PSMpeakAnnotator::scorePSM()
 
 void PSMpeakAnnotator::analyzePSM(const std::string &peptide, Scan *realScan,
                                   const std::vector<int> &charges,
-                                  const double isoCenter, const double isoWidth)
+                                  const double isoCenter, const double isoWidth, const bool calScores)
 {
     if (isoCenter != 0 && isoWidth != 0)
         removePeaksInIsolationWindow(realScan, isoCenter, isoWidth);
@@ -335,7 +461,13 @@ void PSMpeakAnnotator::analyzePSM(const std::string &peptide, Scan *realScan,
     {
         matchIsotopicEnvelopes(realScan, charge);
     }
-    calMatchedSpectraEntropy();
+    if (calScores)
+    {
+        calMVHscore();
+        calWDPscore();
+        calXcorrScore();
+        calMatchedSpectraEntropyScore();
+    }
 }
 
 double PSMpeakAnnotator::getScore()
@@ -343,9 +475,24 @@ double PSMpeakAnnotator::getScore()
     return Score;
 }
 
-double PSMpeakAnnotator::getMatchedSpectraEntropy()
+double PSMpeakAnnotator::getWDPscore()
 {
-    return matchedSpectraEntropy;
+    return WDPscore;
+}
+
+double PSMpeakAnnotator::getMVHscore()
+{
+    return MVHscore;
+}
+
+double PSMpeakAnnotator::getXcorrScore()
+{
+    return XcorrScore;
+}
+
+double PSMpeakAnnotator::getMatchedSpectraEntropyScore()
+{
+    return matchedSpectraEntropyScore;
 }
 
 std::vector<int> PSMpeakAnnotator::getMatchedIndices()

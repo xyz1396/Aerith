@@ -36,11 +36,34 @@ plotPSMs(
 
 \item{proNames}{Character vector of protein name of PSMs}
 
-\item{path}{Output path of pdf. Defaut is "."}
+\item{path}{Output path of pdf. Default is "."}
 }
 \description{
 plot PSMs from FT2 files and PSM results
 }
 \examples{
-plotPSMs()
+\dontrun{
+psm <- psm[1:10, ]
+ftFileNames <- psm$Filename
+scanNumbers <- psm$ScanNumber
+proNames <- psm$ProteinNames
+charges <- psm$ParentCharge
+pep <- psm$OriginalPeptide
+pep <- str_sub(pep, 2, -2)
+pct <- psm$SearchName
+pct <- as.numeric(str_sub(str_split(pct, "_", simplify = T)[, 2], 1, -4)) / 100 / 1000
+realScans <- getRealScans(ft2, scanNumbers)
+plotPSMs(
+  realScans,
+  charges,
+  element,
+  pct,
+  BYcharge = 1:2,
+  ftFileNames,
+  scanNumbers,
+  pep,
+  proNames,
+  ""
+)
+}
 }

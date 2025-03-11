@@ -475,6 +475,7 @@ std::vector<std::string> enumsToStrings(std::vector<PSMpeakAnnotator::ionKind> i
 //' @param Prob its SIP abundance (0.0~1.0)
 //' @param isoCenter isolation window center, set it 0 as default if not remove peaks in isolation window
 //' @param isoWidth isolation window width, set it 0 as default if not remove peaks in isolation window
+//' @param calScores calculate WDP MVH Xcor scores or not
 //' @return a List about matched peaks information of this PSM
 //' @examples
 //' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
@@ -489,7 +490,7 @@ std::vector<std::string> enumsToStrings(std::vector<PSMpeakAnnotator::ionKind> i
 List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity,
                  const NumericVector &realCharge, const String &pepSeq, const NumericVector charges,
                  const String &Atom, double Prob,
-                 const double isoCenter = 0, const double isoWidth = 0)
+                 const double isoCenter = 0, const double isoWidth = 0, const bool calScores = false)
 {
     // read default config
     string config = get_extdata();
@@ -503,7 +504,7 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
     // set tolerance in ppm
     PSMpeakAnnotator mAnnotator(10);
     if (mScan.mz.size() > 10 && mScan.intensity.size() > 10)
-        mAnnotator.analyzePSM(pepSeq, &mScan, as<vector<int>>(charges), isoCenter, isoWidth);
+        mAnnotator.analyzePSM(pepSeq, &mScan, as<vector<int>>(charges), isoCenter, isoWidth, calScores);
     else
     {
         Rcerr << "Too less peaks or empty Scan" << endl;
@@ -522,7 +523,10 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
                                             _("charge") = mScan.charge);
     List re = List::create(Named("ExpectedBYions") = ExpectedBYions,
                            _("RealPeaks") = realPeaks,
-                           _("MatchedSpectraEntropy") = mAnnotator.getMatchedSpectraEntropy(),
+                           _("MatchedSpectraEntropyScore") = mAnnotator.getMatchedSpectraEntropyScore(),
+                           _("MVHscore") = mAnnotator.getMVHscore(),
+                           _("WDPscore") = mAnnotator.getWDPscore(),
+                           _("XcorrScore") = mAnnotator.getXcorrScore(),
                            _("Peptide") = pepSeq);
     return re;
 }

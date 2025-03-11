@@ -2,20 +2,20 @@
 % Please edit documentation in R/plotAAspectra.R
 \name{getRealScanWithCharge}
 \alias{getRealScanWithCharge}
-\title{Convert one scan in scans with real charges list of ft file to AAspectra class}
+\title{Convert one scan in scans with real charges and raw intensities from list of scans of ft file to AAspectra class}
 \usage{
 getRealScanWithCharge(scanNumber, ft)
 }
 \arguments{
-\item{scanNumber}{ScanNumber of one scan}
+\item{scanNumber}{Integer. The scan number of one scan.}
 
-\item{ft}{Scans list of ft file}
+\item{ft}{List. The list of scans from an ft file.}
 }
 \value{
-AAspectra object
+AAspectra object containing the scan data.
 }
 \description{
-Convert one scan in scans with real charges list of ft file to AAspectra class
+Convert one scan in scans with real charges and raw intensities from list of scans of ft file to AAspectra class
 }
 \examples{
 a <- readAllScanMS2("demo.FT2")

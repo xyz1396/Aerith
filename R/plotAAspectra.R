@@ -194,12 +194,12 @@ getRealScan <- function(scanNumber, ft) {
   return(getRealScanFromList(scan))
 }
 
-#' Convert one scan in scans with real charges list of ft file to AAspectra class
+#' Convert one scan in scans with real charges and raw intensities from list of scans of ft file to AAspectra class
 #'
-#' @param scanNumber ScanNumber of one scan
-#' @param ft Scans list of ft file
+#' @param scanNumber Integer. The scan number of one scan.
+#' @param ft List. The list of scans from an ft file.
 #'
-#' @return AAspectra object
+#' @return AAspectra object containing the scan data.
 #' @export
 #'
 #' @examples

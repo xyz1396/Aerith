@@ -13,7 +13,8 @@ annotatePSM(
   Atom,
   Prob,
   isoCenter = 0,
-  isoWidth = 0
+  isoWidth = 0,
+  calScores = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ annotatePSM(
 \item{isoCenter}{isolation window center, set it 0 as default if not remove peaks in isolation window}
 
 \item{isoWidth}{isolation window width, set it 0 as default if not remove peaks in isolation window}
+
+\item{calScores}{calculate WDP MVH Xcor scores or not}
 }
 \value{
 a List about matched peaks information of this PSM

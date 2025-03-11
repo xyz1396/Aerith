@@ -489,6 +489,7 @@ scorePSM <- function(realMZ, realIntensity, realCharge, parentCharge, pepSeq, At
 #' @param Prob its SIP abundance (0.0~1.0)
 #' @param isoCenter isolation window center, set it 0 as default if not remove peaks in isolation window
 #' @param isoWidth isolation window width, set it 0 as default if not remove peaks in isolation window
+#' @param calScores calculate WDP MVH Xcor scores or not
 #' @return a List about matched peaks information of this PSM
 #' @examples
 #' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
@@ -499,8 +500,8 @@ scorePSM <- function(realMZ, realIntensity, realCharge, parentCharge, pepSeq, At
 #'   0.0107, 886.65, 4.0
 #' )
 #' @export
-annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter = 0, isoWidth = 0) {
-    .Call(`_Aerith_annotatePSM`, realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter, isoWidth)
+annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter = 0, isoWidth = 0, calScores = FALSE) {
+    .Call(`_Aerith_annotatePSM`, realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter, isoWidth, calScores)
 }
 
 #' scorePSMold old function of scoreWeightSumHighMS2

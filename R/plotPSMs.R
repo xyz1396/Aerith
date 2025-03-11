@@ -1,9 +1,9 @@
-#' get real scans  from scans list of one ft file
+#' Get real scans from a scans list of one FT file with charges converted to 1 and intensities normalized by the highest peak.
 #'
-#' @param ft Scans list of one ft file
-#' @param scanNumbers Integer vector of scan number of PSMs
+#' @param ft A list of scans from one FT file.
+#' @param scanNumbers An integer vector of scan numbers of PSMs.
 #'
-#' @return List of AAspectra objects of real scans
+#' @return A list of AAspectra objects representing the real scans.
 #' @export
 #'
 #' @examples
@@ -14,7 +14,7 @@ getRealScans <- function(ft, scanNumbers) {
   return(lapply(scanNumbers, getRealScan, ft = ft))
 }
 
-#' get real scans with real charges from scans list of one ft file
+#' get real scans with real charges and raw intensities from scans list of one ft file
 #'
 #' @param ft Scans list of one ft file
 #' @param scanNumbers Integer vector of scan number of PSMs
@@ -41,12 +41,35 @@ getRealScansWithCharges <- function(ft, scanNumbers) {
 #' @param scanNumbers Integer vector of scan number of PSMs
 #' @param pepSeqs Character vector of peptide sequence of PSMs
 #' @param proNames Character vector of protein name of PSMs
-#' @param path Output path of pdf. Defaut is "."
+#' @param path Output path of pdf. Default is "."
 #'
 #' @export
 #'
 #' @examples
-#' plotPSMs()
+#' \dontrun{
+#' psm <- psm[1:10, ]
+#' ftFileNames <- psm$Filename
+#' scanNumbers <- psm$ScanNumber
+#' proNames <- psm$ProteinNames
+#' charges <- psm$ParentCharge
+#' pep <- psm$OriginalPeptide
+#' pep <- str_sub(pep, 2, -2)
+#' pct <- psm$SearchName
+#' pct <- as.numeric(str_sub(str_split(pct, "_", simplify = T)[, 2], 1, -4)) / 100 / 1000
+#' realScans <- getRealScans(ft2, scanNumbers)
+#' plotPSMs(
+#'   realScans,
+#'   charges,
+#'   element,
+#'   pct,
+#'   BYcharge = 1:2,
+#'   ftFileNames,
+#'   scanNumbers,
+#'   pep,
+#'   proNames,
+#'   ""
+#' )
+#' }
 plotPSMs <-
   function(realScans,
            charges,
@@ -65,6 +88,7 @@ plotPSMs <-
       plot(BY) + plotRealScan(realScans[[i]]) + plotSipBYionLabel(BY)
       ggsave(paste0(
         path,
+        "/",
         paste(
           ftFileNames[i],
           i,
@@ -72,7 +96,8 @@ plotPSMs <-
           scanNumbers[i],
           pepSeqs[i],
           proNames[i],
-          Probs[i]
+          Probs[i],
+          sep = "_"
         ),
         ".pdf"
       ),

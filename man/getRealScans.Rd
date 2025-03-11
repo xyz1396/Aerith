@@ -2,20 +2,20 @@
 % Please edit documentation in R/plotPSMs.R
 \name{getRealScans}
 \alias{getRealScans}
-\title{get real scans  from scans list of one ft file}
+\title{Get real scans from a scans list of one FT file with charges converted to 1 and intensities normalized by the highest peak.}
 \usage{
 getRealScans(ft, scanNumbers)
 }
 \arguments{
-\item{ft}{Scans list of one ft file}
+\item{ft}{A list of scans from one FT file.}
 
-\item{scanNumbers}{Integer vector of scan number of PSMs}
+\item{scanNumbers}{An integer vector of scan numbers of PSMs.}
 }
 \value{
-List of AAspectra objects of real scans
+A list of AAspectra objects representing the real scans.
 }
 \description{
-get real scans  from scans list of one ft file
+Get real scans from a scans list of one FT file with charges converted to 1 and intensities normalized by the highest peak.
 }
 \examples{
 scanNumbers <- 3:7

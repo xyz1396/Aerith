@@ -16,6 +16,8 @@ a ggplot2 obj
 plot the distribution of SIP percent of proteins
 }
 \examples{
+\dontrun{
 p <- plotProSipPct("demo.pro.cluster.txt")
 p
+}
 }

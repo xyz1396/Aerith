@@ -1,0 +1,48 @@
+---
+title: "Visualization-of-SIP-proteomic-result"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Visualization-of-SIP-proteomic-result}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10
+)
+```
+
+```{r, include = FALSE, eval=FALSE}
+library(devtools)
+use_vignette("your-vignette-name")
+build_vignettes()
+getwd()
+rmarkdown::render("Visualization-of-SIP-proteomic-result.Rmd", output_dir = "../doc/")
+```
+
+```{r setup}
+library(Aerith)
+```
+
+### Summarize SIP percent for PSMs
+
+```{r}
+s <- summaryPSMsipPCT("../rmd/input data format/pct1.psm.txt", SIPthreshold = 0.5, chargeThreshold = 3)
+knitr::kable(s)
+s <- summaryPSMsipPCT("../rmd/input data format/pct50.psm.txt", SIPthreshold = 10, chargeThreshold = 3)
+knitr::kable(s)
+```
+
+### Plot the distribution of SIP percent for PSMs
+
+```{r}
+plotPSMsipPCT("../rmd/input data format/pct1.psm.txt")
+plotPSMsipPCT("../rmd/input data format/pct50.psm.txt")
+```

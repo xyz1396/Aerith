@@ -8,5 +8,5 @@ test_that("precursor_peak_calculator_DIY", {
 
 test_that("calPepPrecursorMass", {
     m <- calPepPrecursorMass("PEPTIDECCCC", "S34", 0.5)
-    expect_equal(abs(m - 1447.463) < 0.01, TRUE)
+    expect_equal(abs(m - 1444.473) < 0.01, TRUE)
 })

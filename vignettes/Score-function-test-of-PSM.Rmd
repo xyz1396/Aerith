@@ -1,0 +1,170 @@
+---
+title: "Score-function-test-of-PSM"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Score-function-test-of-PSM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 10
+)
+```
+
+```{r, include = FALSE, eval=FALSE}
+library(devtools)
+build_vignettes()
+rmarkdown::render("Score-function-test-of-PSM.Rmd", output_dir = "../doc/")
+```
+
+```{r setup}
+library(Aerith)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(tidyr)
+```
+
+### Unlabeled PSM at 1.07% ^13^C 
+
+```{r}
+psm <- readPSMtsv("../rmd/input data format/pct1.psm.txt")
+psm <- arrange(psm, desc(Score))
+psm1 <- psm[8, ]
+pep2 <- psm1$OriginalPeptide
+pep <- str_sub(pep2, 2, -2)
+scan1 <- readOneScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", psm1$ScanNumber)
+scan1 <- getRealScanFromList(scan1)
+```
+
+```{r}
+isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
+anno <- annotatePSM(
+  scan1@spectra$MZ, scan1@spectra$Prob,
+  scan1@spectra$Charge,
+  pep, 1:2, "C13",
+  0.0107, isoCenter, 5.0
+)
+WDPscores <- sapply((0:100) / 100, simplify = T, function(prob) {
+  return(scorePSM(scan1@spectra$MZ,
+    realIntensity = scan1@spectra$Prob,
+    realCharge = scan1@spectra$Charge, parentCharge = scan1@charges[1],
+    pepSeq = pep2, Atom = "C13", Prob = prob
+  ))
+})
+scores <- sapply((0:100) / 100, simplify = T, function(prob) {
+  anno <- annotatePSM(
+    scan1@spectra$MZ, scan1@spectra$Prob,
+    scan1@spectra$Charge,
+    pep, 1:2, "C13",
+    prob, isoCenter, 4.0, T
+  )
+  return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
+})
+scores <- t(scores)
+scores <- cbind(WDPscores, scores)
+```
+
+```{r}
+scores_df <- as.data.frame(scores)
+scores_df$abundance <- 0:100
+
+# Reshape the data to long format for faceting
+scores_long <- scores_df %>% 
+  pivot_longer(cols = c(WDPscores, XcorrScore, MVHscore), 
+               names_to = "score_type", 
+               values_to = "score_value")
+
+# Create a publication-quality plot
+ggplot(scores_long, aes(x = abundance, y = score_value)) +
+  geom_line() +                            # Line plot to show trends
+  facet_wrap(~ score_type, scales = "free_y") +  # Separate panels for each score with free y-scales
+  labs(x = expression(paste(~ {}^{13}, "C %")),
+       y = "Score",
+       title = expression(paste("Scores Across", ~ {}^{13}, "C %"))) + 
+  theme_minimal() +                        # Minimal theme as a base
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Centered, bold title
+    axis.title = element_text(size = 14),       # Larger axis titles
+    axis.text = element_text(size = 12),        # Readable axis text
+    strip.text = element_text(size = 12, face = "bold"),  # Bold facet labels
+    panel.grid.minor = element_blank(),         # Remove minor grid lines
+    panel.background = element_rect(fill = "white", colour = "black")  # White background, black border
+  )
+```
+
+### Labeled PSM at 50% ^13^C 
+
+#### Annotate B and Y ion fragments
+
+```{r}
+psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
+psm <- arrange(psm, desc(Score))
+# use the same peptide as 1% 13C chunk
+psm1 <- psm[4, ]
+pep2 <- psm1$OriginalPeptide
+pep <- str_sub(pep2, 2, -2)
+pct <- psm1$SearchName
+pct <- as.numeric(str_sub(pct,5,-4))/1000/100
+scan1 <- readOneScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2", psm1$ScanNumber)
+scan1 <- getRealScanFromList(scan1)
+```
+
+```{r}
+isoCenter <- psm1$MeasuredParentMass/psm1$ParentCharge + 1.007276
+WDPscores <- sapply((0:100) / 100, simplify = T, function(prob) {
+  return(scorePSM(scan1@spectra$MZ,
+    realIntensity = scan1@spectra$Prob,
+    realCharge = scan1@spectra$Charge, parentCharge = scan1@charges[1],
+    pepSeq = pep2, Atom = "C13", Prob = prob
+  ))
+})
+scores <- sapply((0:100) / 100, simplify = T, function(prob) {
+  anno <- annotatePSM(
+    scan1@spectra$MZ, scan1@spectra$Prob,
+    scan1@spectra$Charge,
+    pep, 1:2, "C13",
+    prob, isoCenter, 4.0, T
+  )
+  return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
+})
+scores <- t(scores)
+scores <- cbind(WDPscores, scores)
+```
+
+```{r}
+scores_df <- as.data.frame(scores)
+scores_df$abundance <- 0:100
+
+# Reshape the data to long format for faceting
+scores_long <- scores_df %>% 
+  pivot_longer(cols = c(WDPscores, XcorrScore, MVHscore), 
+               names_to = "score_type", 
+               values_to = "score_value")
+
+# Create a publication-quality plot
+ggplot(scores_long, aes(x = abundance, y = score_value)) +
+  geom_line() +                            # Line plot to show trends
+  facet_wrap(~ score_type, scales = "free_y") +  # Separate panels for each score with free y-scales
+  labs(x = expression(paste(~ {}^{13}, "C %")),
+       y = "Score",
+       title = expression(paste("Scores Across", ~ {}^{13}, "C %"))) + 
+  theme_minimal() +                        # Minimal theme as a base
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Centered, bold title
+    axis.title = element_text(size = 14),       # Larger axis titles
+    axis.text = element_text(size = 12),        # Readable axis text
+    strip.text = element_text(size = 12, face = "bold"),  # Bold facet labels
+    panel.grid.minor = element_blank(),         # Remove minor grid lines
+    panel.background = element_rect(fill = "white", colour = "black")  # White background, black border
+  )
+```
+

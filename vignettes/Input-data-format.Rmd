@@ -1,12 +1,12 @@
 ---
-title: "Input Data Format"
+title: "Input-Data-Format"
 output:
   rmarkdown::html_document:
     toc: true
     toc_float: true
     theme: united
 vignette: >
-  %\VignetteIndexEntry{Input_data_format}
+  %\VignetteIndexEntry{Input-data-format}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,7 +24,7 @@ library(devtools)
 use_vignette("your-vignette-name")
 build_vignettes()
 getwd()
-rmarkdown::render("Input_data_format.Rmd", output_dir = "../doc/")
+rmarkdown::render("Input-data-format.Rmd", output_dir = "../doc/")
 ```
 
 ```{r setup}

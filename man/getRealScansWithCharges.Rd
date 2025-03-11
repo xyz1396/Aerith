@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotPSMs.R
 \name{getRealScansWithCharges}
 \alias{getRealScansWithCharges}
-\title{get real scans with real charges from scans list of one ft file}
+\title{get real scans with real charges and raw intensities from scans list of one ft file}
 \usage{
 getRealScansWithCharges(ft, scanNumbers)
 }
@@ -15,7 +15,7 @@ getRealScansWithCharges(ft, scanNumbers)
 List of AAspectra objects of real scans
 }
 \description{
-get real scans with real charges from scans list of one ft file
+get real scans with real charges and raw intensities from scans list of one ft file
 }
 \examples{
 scanNumbers <- 3:7

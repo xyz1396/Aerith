@@ -152,9 +152,15 @@ void PSMpeakAnnotator::
     double mzTolerance = highestPeakMZ * tolerancePPM / 1e6;
     bool foundIsotopicPeak = false;
 
+    double pct = -1.0;
     if (highestObservedPeakIX != std::numeric_limits<size_t>::max())
     {
         mMatchedIndices[highestExpectedPeakIX] = (int)highestObservedPeakIX;
+        matchedIonIsotopicEnvelopes[{BYkind, residuePosition}].push_back(
+            {ionMZs[highestExpectedPeakIX], mScan->mz[highestObservedPeakIX],
+             ionIntensities[highestExpectedPeakIX], mScan->intensity[highestObservedPeakIX],
+             charge, mScan->charge[highestObservedPeakIX], BYkind,
+             residuePosition, highestObservedPeakIX});
         // Go left and right side
         for (int direction : {-1, 1})
         {
@@ -183,23 +189,28 @@ void PSMpeakAnnotator::
                     currentMZ = mScan->mz[currentIX];
                 }
                 if (foundIsotopicPeak)
+                {
                     mMatchedIndices[iso] = foundIX;
+                    matchedIonIsotopicEnvelopes[{BYkind, residuePosition}].push_back(
+                        {ionMZs[iso], mScan->mz[foundIX],
+                        ionIntensities[iso], mScan->intensity[foundIX],
+                        charge, mScan->charge[foundIX], BYkind,
+                        residuePosition, foundIX});
+                }
                 else
                     break;
             }
         }
-    }
-
-    double pct = 0;
-    if (BYkind == B)
-    {
-        pct = calSIPabundancesOfBYion(mAveragine.BionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
-                                      mAveragine.BionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
-    }
-    else
-    {
-        pct = calSIPabundancesOfBYion(mAveragine.YionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
-                                      mAveragine.YionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
+        if (BYkind == B)
+        {
+            pct = calSIPabundancesOfBYion(mAveragine.BionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
+                                        mAveragine.BionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
+        }
+        else
+        {
+            pct = calSIPabundancesOfBYion(mAveragine.YionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
+                                        mAveragine.YionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
+        }
     }
     std::vector<double> pcts(mMatchedIndices.size(), -1);
     for (size_t i = 0; i < mMatchedIndices.size(); i++)
@@ -234,12 +245,16 @@ void PSMpeakAnnotator::calMatchedSpectraEntropyScore()
 {
     double totalIntensity = 0;
     double entropy = 0;
-    for (size_t i = 0; i < matchedIndices.size(); i++)
+    // for (size_t i = 0; i < matchedIndices.size(); i++)
+    // {
+    //     if (matchedIndices[i] != -1)
+    //     {
+    //         totalIntensity += realScan->intensity[matchedIndices[i]];
+    //     }
+    // }
+    for (size_t i = 0; i < realScan->intensity.size(); i++)
     {
-        if (matchedIndices[i] != -1)
-        {
-            totalIntensity += realScan->intensity[matchedIndices[i]];
-        }
+        totalIntensity += realScan->intensity[i];
     }
     for (size_t i = 0; i < matchedIndices.size(); i++)
     {
@@ -312,6 +327,67 @@ void PSMpeakAnnotator::calMVHscore()
 
 void PSMpeakAnnotator::calWDPscore()
 {
+    WDPscore = 0.0;
+    
+    // Iterate through all matched ion isotopic envelopes
+    for (const auto& entry : matchedIonIsotopicEnvelopes) {
+        const auto& ionType = entry.first.first;
+        const auto& residuePos = entry.first.second;
+        const auto& matches = entry.second;
+        
+        if (matches.empty()) {
+            continue;
+        }
+        
+        // Calculate average mass error for h_k
+        double sumMassError = 0.0;
+        for (const auto& match : matches) {
+            sumMassError += std::abs(match.observedMZ - match.expectedMZ);
+        }
+        double avgMassError = sumMassError / matches.size();
+        
+        // Calculate h_k (mass accuracy score) using pnorm approximation
+        // Using error function to approximate normal CDF
+        double massAccuracyThreshold = tolerancePPM * 1e-6 * matches[0].expectedMZ;
+        double h_k = 2.0 * (1.0 - 0.5 * (1.0 + std::erf(avgMassError / (massAccuracyThreshold / 2.0) / std::sqrt(2.0))));
+        
+        // Calculate s_k (isotopic envelope score)
+        double s_k = 1.0;
+        for (size_t i = 1; i < matches.size(); i++) {  // Start from 1 as the first peak is the highest intensity peak
+            // Get expected and observed relative intensities
+            double expectedRelIntensity = matches[i].expectedIntensity / matches[0].expectedIntensity;
+            double observedRelIntensity = matches[i].observedIntensity / matches[0].observedIntensity;
+            
+            // Calculate e_i using error function
+            double e_i = 0.5 - 0.5 * std::erf(std::abs(expectedRelIntensity - observedRelIntensity) / 
+                                      std::sqrt(expectedRelIntensity * expectedRelIntensity + observedRelIntensity * observedRelIntensity));
+            s_k += e_i;
+        }
+        
+        // Determine c_k (charge state penalty)
+        double c_k = 1.0;
+        if (matches[0].expectedCharge != matches[0].observedCharge) {
+            c_k = 0.5;
+        }
+        
+        // Determine g_k (complementary fragment penalty)
+        double g_k = 1.0; // Default: no complementary fragment
+        ionKind complementaryKind = (ionType == B) ? Y : B;
+        
+        int peptideLength = vvdBionMass.size();
+        // Calculate complementary position based on peptide length
+        // For B ions, the complementary Y ion is at position (peptideLength - position)
+        int complementaryPosition = peptideLength - residuePos;
+        
+        auto complementKey = std::make_pair(complementaryKind, complementaryPosition);
+        if (matchedIonIsotopicEnvelopes.find(complementKey) != matchedIonIsotopicEnvelopes.end() && 
+            !matchedIonIsotopicEnvelopes.at(complementKey).empty()) {
+            g_k = 2.0; // Complementary fragment found
+        }
+        
+        // Add the score contribution of this ion
+        WDPscore += s_k * c_k * h_k * g_k;
+    }
 }
 
 SparseBins PSMpeakAnnotator::sparseBinSpectrum(const std::vector<double> &mz,

@@ -17,6 +17,18 @@ public:
         Y,
         YisotopicPeak
     };
+    struct ionMatch
+    {
+        double expectedMZ;
+        double observedMZ;
+        double expectedIntensity;
+        double observedIntensity;
+        int expectedCharge;
+        int observedCharge;
+        ionKind kind;
+        int residuePosition;
+        size_t matchedIndex;
+    };
     PSMpeakAnnotator(const double tolerancePPM);
     ~PSMpeakAnnotator();
     void analyzePSM(const std::string &peptide, Scan *realScan,
@@ -54,6 +66,9 @@ private:
     std::vector<int> residuePositions, matchedIndices;
     // SIP abundance from BY ion isotopic envelope by binomial distribution estimation
     std::vector<double> SIPabundances;
+    // matched B/Y ion isotopic peaks of envolope for scoring
+    // key: ion kind and residue position, value: matched indices, first ion is the highest intensity ion
+    std::map<std::pair<ionKind, int>, std::vector<ionMatch>> matchedIonIsotopicEnvelopes;
 
     void generateTheoreticalSpectra(const std::string &peptide);
     void removePeaksInIsolationWindow(Scan *mScan, const double isoCenter, const double isoWidth);

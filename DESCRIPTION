@@ -11,7 +11,9 @@ ByteCompile: TRUE
 Suggests: 
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    mzR,
+    MSnbase
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
@@ -20,7 +22,8 @@ Imports:
     Rcpp,
     ggplot2,
     ggrepel,
-    ggnewscale
+    ggnewscale,
+    dplyr
 SystemRequirements: C++17
 VignetteBuilder: knitr
 Config/build/vignettes: FALSE

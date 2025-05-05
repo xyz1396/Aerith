@@ -10,6 +10,9 @@
 #' library(mzR)
 #' a <- readMzmlMS1("demo.mzML")
 readMzmlMS1 <- function(ms) {
+  if (!requireNamespace("mzR", quietly = TRUE)) {
+    stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
+  }
   ms <- mzR::openMSfile(ms)
   meta <- mzR::header(ms)
   meta <- meta[meta$msLevel == 1, ]
@@ -52,6 +55,9 @@ readMzmlMS1 <- function(ms) {
 #' library(mzR)
 #' a <- readMzmlMS1("demo.mzML")
 readMzmlMS2 <- function(ms) {
+  if (!requireNamespace("mzR", quietly = TRUE)) {
+    stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
+  }
   ms <- mzR::openMSfile(ms)
   meta <- mzR::header(ms)
   meta <- meta[meta$msLevel == 2, ]
@@ -109,6 +115,9 @@ readMzmlMS2 <- function(ms) {
 #' library(MSnbase)
 #' a <- readMgf("demo.mgf")
 readMgf <- function(mgf) {
+  if (!requireNamespace("MSnbase", quietly = TRUE)) {
+    stop("The 'MSnbase' package is required but not installed. Please install it using Bioconductor.")
+}
   spectra <- MSnbase::readMgfData(mgf)
   scanNumbers <- MSnbase::fData(spectra)$SCANS
   scans <- lapply(seq_along(spectra), function(i) {
@@ -160,6 +169,9 @@ readPSMtsv <- function(tsv) {
 #' library(mzR)
 #' a <- readPepXMLtable("demo.pepXML")
 readPepXMLtable <- function(pepXML) {
+  if (!requireNamespace("mzR", quietly = TRUE)) {
+    stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
+  }
   pepXML <- mzR::openIDfile(pepXML)
   psm <- mzR::psms(pepXML)
   scores <- mzR::score(pepXML)

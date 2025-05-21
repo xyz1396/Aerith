@@ -4,10 +4,12 @@
 \alias{plotTIC}
 \title{Plot TIC of MS1 or MS2}
 \usage{
-plotTIC(tic)
+plotTIC(tic, breaks = seq(0, 200, by = 10))
 }
 \arguments{
 \item{tic}{A data.frame of TIC and retention time}
+
+\item{breaks}{A vector of breaks for x axis}
 }
 \value{
 a ggplot2 object
@@ -16,7 +18,8 @@ a ggplot2 object
 Plot TIC of MS1 or MS2
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
 b <- getTIC(a)
-plotTIC(b)
+plotTIC(b, seq(9, 10, by = 0.2))
 }

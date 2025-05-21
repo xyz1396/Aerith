@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<msms_pipeline_analysis>
+  <analysis_summary/>
+  <msms_run_summary base_name="demo" raw_data_type="mzML" raw_data="mzML">
+    <sample_enzyme name="stricttrypsin">
+      <specificity cut="KR" no_cut="" sense="C"/>
+    </sample_enzyme>
+    <search_summary precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic" search_engine="X! Tandem" search_engine_version="Sipros">
+      <search_database local_path="/scratch/yixiong/benchmark/mousefecal/necropsy/2024-08-09-decoys-contam-clean.fasta.fas" type="AA"/>
+    </search_summary>
+    <spectrum_query start_scan="531" assumed_charge="2" spectrum="PanC_20241024_02_DDA_NDC1.00531.00531.2" spectrumNativeID="controllerType=0 controllerNumber=1 scan=531" end_scan="531" index="1" precursor_neutral_mass="833.44257" retention_time_sec="379.6314">
+      <search_result>
+        <search_hit peptide="KGAVATCK" massdiff="-3.662109375E-4" calc_neutral_pep_mass="833.44293" peptide_next_aa="V" num_missed_cleavages="1" num_tol_term="2" protein_descr="Bacterial Ig-like domain (group 2)" num_tot_proteins="4" hit_rank="1" tot_num_ions="22" num_matched_ions="9" protein="MGBC115096_01980" peptide_prev_aa="K" is_rejected="0">
+          <alternative_protein protein_descr="Bacterial Ig-like domain (group 2)" protein="MGBC128936_01434" peptide_prev_aa="K" peptide_next_aa="V" num_tol_term="2"/>
+          <alternative_protein protein_descr="Bacterial Ig-like domain (group 2)" protein="MGBC132046_01637" peptide_prev_aa="K" peptide_next_aa="V" num_tol_term="2"/>
+          <alternative_protein protein_descr="unannotated protein" protein="MGBC118143_01865" peptide_prev_aa="K" peptide_next_aa="V" num_tol_term="2"/>
+          <analysis_result analysis="peptideprophet">
+            <peptideprophet_result probability="0.982362" all_ntt_prob="(0.982362,0.982362,0.982362)">
+            </peptideprophet_result>
+          </analysis_result>
+          <search_score name="hyperscore" value="8"/>
+          <search_score name="nextscore" value="8"/>
+          <search_score name="expect" value="2"/>
+        </search_hit>
+      </search_result>
+    </spectrum_query>
+<spectrum_query start_scan="13043" assumed_charge="2" spectrum="PanC_20241024_02_DDA_NDC1.13043.13043.2" spectrumNativeID="controllerType=0 controllerNumber=1 scan=13043" end_scan="13043" index="11642" precursor_neutral_mass="1114.5294" retention_time_sec="1849.854">
+<search_result>
+<search_hit peptide="GYGFITGTDGK" massdiff="0.0" calc_neutral_pep_mass="1114.5294" peptide_next_aa="D" num_missed_cleavages="0" num_tol_term="2" protein_descr="unannotated protein" num_tot_proteins="2" tot_num_ions="20" hit_rank="1" num_matched_ions="10" protein="MGBC134670_02107" peptide_prev_aa="K" is_rejected="0">
+<alternative_protein protein_descr="unannotated protein" protein="MGBC165238_00126" peptide_prev_aa="K" peptide_next_aa="D" num_tol_term="2"/>
+<search_score name="hyperscore" value="18.254"/>
+<search_score name="nextscore" value="13.679"/>
+<search_score name="expect" value="9.089e-03"/>
+</search_hit>
+</search_result>
+</spectrum_query>
+<spectrum_query start_scan="13044" assumed_charge="4" spectrum="PanC_20241024_02_DDA_NDC1.13044.13044.4" spectrumNativeID="controllerType=0 controllerNumber=1 scan=13044" end_scan="13044" index="11643" precursor_neutral_mass="1639.8118" retention_time_sec="1849.932">
+<search_result>
+<search_hit peptide="ISISVDMLGSDDFIK" massdiff="0.994384765625" calc_neutral_pep_mass="1638.8174" peptide_next_aa="G" num_missed_cleavages="0" num_tol_term="2" protein_descr="hypothetical protein" num_tot_proteins="1" tot_num_ions="28" hit_rank="1" num_matched_ions="7" protein="MGBC162268_01739" peptide_prev_aa="K" is_rejected="0">
+<search_score name="hyperscore" value="15.315"/>
+<search_score name="nextscore" value="13.508"/>
+<search_score name="expect" value="4.141e+00"/>
+</search_hit>
+</search_result>
+</spectrum_query>
+  </msms_run_summary>
+</msms_pipeline_analysis>

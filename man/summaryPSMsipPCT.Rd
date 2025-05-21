@@ -22,8 +22,8 @@ including the total count, average, median, Median Absolute Deviation (MAD), sta
 estimated FDR, the number of labeled PSMs, and the median SIP percent for the labeled PSMs.
 }
 \examples{
-\dontrun{
-  summaryStats <- summaryPSMsipPCT("path/to/psm_file.txt")
-  print(summaryStats)
-}
+demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+summaryStats <- summaryPSMsipPCT(demo_file)
+print(summaryStats)
+
 }

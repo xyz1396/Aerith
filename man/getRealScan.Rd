@@ -18,7 +18,8 @@ AAspectra object
 Convert one scan with charges=1 normalized by highest peak in scans list of ft file to AAspectra class
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
-b <- getRealScan(18, a)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
+b <- getRealScan(1388, a)
 plot(b)
 }

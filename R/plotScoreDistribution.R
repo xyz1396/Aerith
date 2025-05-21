@@ -1,6 +1,6 @@
 #' plot the score of PSMs at different charge and mass error
 #'
-#' @param sipFile	a .sip file's path
+#' @param sipFile a .sip file's path
 #'
 #' @importFrom stringr str_detect
 #'
@@ -8,6 +8,7 @@
 #' @export
 #'
 #' @examples
+#' sipFile <- system.file("extdata", "demo.sip", package = "Aerith")
 #' plotScoreDistribution(sipFile)
 plotScoreDistribution <- function(sipFile) {
   psm <- readSip(sipFile)

@@ -9,16 +9,16 @@
 #' @param chargeThreshold Numeric value representing the parent charge threshold (default is 3).
 #'
 #' @return A data frame containing summary statistics of the SIP percent values.
-#' 
+#'
 #' @import stringr
 #'
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'   summaryStats <- summaryPSMsipPCT("path/to/psm_file.txt")
-#'   print(summaryStats)
-#' }
+#' demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+#' summaryStats <- summaryPSMsipPCT(demo_file)
+#' print(summaryStats)
+#'
 summaryPSMsipPCT <- function(psmPath, SIPthreshold = 5, chargeThreshold = 3) {
     tempDf <- read.table(psmPath,
         sep = "\t",
@@ -65,10 +65,9 @@ summaryPSMsipPCT <- function(psmPath, SIPthreshold = 5, chargeThreshold = 3) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'   p <- plotPSMsipPCT("path/to/psm_file.txt")
-#'   print(p)
-#' }
+#' demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+#' p <- plotPSMsipPCT(demo_file)
+#' p
 plotPSMsipPCT <- function(psmPath) {
     tempDf <- read.table(psmPath,
         sep = "\t",
@@ -104,9 +103,9 @@ plotPSMsipPCT <- function(psmPath) {
     ) +
     ggplot2::annotate("text",
             x = medianPCT,
-            y = -Inf, 
+            y = -Inf,
             label = paste("Median:", round(medianPCT, 1)),
-            vjust = -1.5,    
+            vjust = -1.5,
             hjust = -0.3,
             color = "red",
             size = 5
@@ -139,10 +138,9 @@ plotPSMsipPCT <- function(psmPath) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' p <- plotProSipPct("demo.pro.cluster.txt")
+#' demo_file <- system.file("extdata", "demo.pro.cluster.txt", package = "Aerith")
+#' p <- plotProSipPct(demo_file)
 #' p
-#' }
 plotProSipPct <- function(proPath) {
     proPct <-
         read.table(proPath,
@@ -150,7 +148,9 @@ plotProSipPct <- function(proPath) {
             quote = "",
             header = T
         )
-    FDR <- readLines(proPath, 44)[44]
+    proPct$AverageEnrichmentLevel <- proPct$AverageEnrichmentLevel / 1000
+    FDR <- readLines(proPath, 100)
+    FDR <- FDR[grepl("Protein_FDR = ", FDR)]
     FDR <- as.numeric(stringr::str_extract(FDR, "[0-9]\\.[0-9]+"))
     output <- paste0("FDR: ", round(FDR, 3), "\n")
     output <-
@@ -173,7 +173,7 @@ plotProSipPct <- function(proPath) {
         )
     output <-
         paste0(output, "Pct SD: ", round(sd(proPct$AverageEnrichmentLevel), 3), "%")
-    cat(output)
+    message(output)
     x <- data.frame(Abundance = proPct$AverageEnrichmentLevel)
     p <-
         ggplot2::ggplot(

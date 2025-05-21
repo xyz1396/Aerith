@@ -18,7 +18,8 @@ AAspectra object containing the scan data.
 Convert one scan in scans with real charges and raw intensities from list of scans of ft file to AAspectra class
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
-b <- getRealScanWithCharge(18, a)
-plot(b)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
+b <- getRealScanWithCharge(1388, a)
+head(b@spectra)
 }

@@ -16,7 +16,8 @@ AAspectra object
 Convert one scan in list format to AAspectra class
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
 b <- getRealScanFromList(a[[1]])
 plot(b)
 }

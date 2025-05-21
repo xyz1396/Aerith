@@ -16,6 +16,6 @@ A data frame containing the data from the PSM TSV file.
 This function reads a Peptide-Spectrum Match (PSM) file in TSV (Tab-Separated Values) format.
 }
 \examples{
-psm <- readPSMtsv("demo.psm.txt")
-
+demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+a <- readPSMtsv(demo_file)
 }

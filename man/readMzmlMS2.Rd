@@ -18,5 +18,6 @@ Read MS2 spectra from .mzML file
 \examples{
 # mzR can be installed from bioconductor
 library(mzR)
-a <- readMzmlMS1("demo.mzML")
+demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
+a <- readMzmlMS2(demo_file)
 }

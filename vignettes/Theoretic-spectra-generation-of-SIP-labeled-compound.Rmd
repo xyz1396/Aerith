@@ -76,3 +76,8 @@ plotMolecularFFTisotopes(iso2) +
   ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~50*"% "*{}^{13}*C))
 ```
 
+
+
+```{r session-info, include=FALSE}
+sessionInfo()
+```

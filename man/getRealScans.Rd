@@ -18,7 +18,8 @@ A list of AAspectra objects representing the real scans.
 Get real scans from a scans list of one FT file with charges converted to 1 and intensities normalized by the highest peak.
 }
 \examples{
-scanNumbers <- 3:7
-ft2 <- readAllScanMS2("demo.FT2")
+scanNumbers <- c("2596","8182")
+demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+ft2 <- readAllScanMS2(demo_file)
 realScans <- getRealScans(ft2, scanNumbers)
 }

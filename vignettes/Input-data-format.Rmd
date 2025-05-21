@@ -29,6 +29,7 @@ rmarkdown::render("Input-data-format.Rmd", output_dir = "../doc/")
 
 ```{r setup}
 library(Aerith)
+library(dplyr)
 ```
 
 ### Convert raw file to FT1, FT2, and mzml file
@@ -111,13 +112,27 @@ plot(ft1)
 ```{r eval=FALSE}
 header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
 ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
-writeAllScanMS1(header,ft1[1:100],"../rmd/input data format/demo.ft1")
+a <- getRetentionTimeAndPrecursorInfo(ft1)
+a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
+writeAllScanMS1(header, ft1[as.character(a$ScanNumber)], "../rmd/input data format/demo.ft1")
+b <- readAllScanMS1("../rmd/input data format/demo.ft1")
 ```
 
 ```{r eval=FALSE}
 header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
 ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
-writeAllScanMS2(header,ft2[1:100],"../rmd/input data format/demo.ft2")
+a <- getRetentionTimeAndPrecursorInfo(ft2)
+a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
+writeAllScanMS2(header, ft2[as.character(a$ScanNumber)], "../rmd/input data format/demo.ft2")
+b <- readAllScanMS1("../rmd/input data format/demo.ft2")
+```
+
+```{r eval=FALSE, include=FALSE}
+header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT2")
+ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2")
+writeAllScanMS2(header, ft2[c("4068","2596","8182")],
+                "../rmd/input data format/X13_4068_2596_8182.ft2")
+a <- readAllScanMS2("../rmd/input data format/X13_4068_2596_8182.ft2")
 ```
 
 ### Read mzml file
@@ -131,6 +146,29 @@ scan2 <- getRealScan(12658, mzml2)
 plot(scan2)
 ```
 
+```{r include=FALSE, eval=FALSE}
+ms_data <- mzR::openMSfile("../rmd/input data format/mzml/Pan_052322_X13.mzML")
+header <- mzR::header(ms_data)
+scan_indices <- header$seqNum
+start_ix <- 10005
+selected_indices <- (start_ix + 1):(start_ix + 100)
+peaks_list <- mzR::peaks(ms_data, selected_indices)
+selected_header <- header[selected_indices, ]
+selected_header$seqNum <- selected_header$seqNum - start_ix
+selected_header$acquisitionNum <- selected_header$acquisitionNum - start_ix
+selected_header$precursorScanNum <- selected_header$precursorScanNum - start_ix
+# first 5 ms2 scans' precursor is 9995, convert it to 10005
+selected_header$precursorScanNum[2:6] <- 1
+mzR::writeMSData(
+  peaks_list,
+  file = "../rmd/input data format/demo.mzML",
+  header = selected_header
+)
+mzR::close(ms_data)
+mzml1 <- readMzmlMS1("../rmd/input data format/demo.mzML")
+mzml2 <- readMzmlMS2("../rmd/input data format/demo.mzML")
+```
+
 ### Read mgf file
 
 ```{bash, include = FALSE, eval=FALSE}
@@ -142,7 +180,7 @@ BEGIN {
   chunk_count = 0
   inside_chunk = 0
   start_chunk = 1000
-  end_chunk = 2000
+  end_chunk = 1100
 }
 {
   if ($0 == "BEGIN IONS") {
@@ -173,7 +211,7 @@ plot(scan1)
 ### Read PSM from pepXML file
 
 ```{xml include = FALSE, eval=FALSE}
-essential chunk:  
+<!-- essential chunk: --> 
 <search_summary precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic" search_engine="X! Tandem" search_engine_version="Sipros">
 <search_score name="hyperscore" value="8"/>
 <search_score name="nextscore" value="8"/>
@@ -187,8 +225,51 @@ psm$sequence
 
 ### Read PSM from TSV generated from Sipros
 
-```{r}
+```{r psm.txt}
 psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
+```
+
+```{r eval=FALSE, include=FALSE}
+set.seed(9527)
+psm2 <- psm[sample(nrow(psm), 2000), ]
+write.table(psm2, "../rmd/input data format/demo.psm.txt",
+  sep = "\t", row.names = FALSE, quote = FALSE
+)
+
+# top 3 in demo in X13
+psm2 <- psm2[psm2$Filename=="Pan_052322_X13.FT2",]
+psm2 <- arrange(psm2, desc(Score))
+# 4068 2596 8182
+psm2$"ScanNumber"[1:3]
+```
+
+```{r pro.cluster.txt, eval=FALSE, include=FALSE}
+header <- readLines("../rmd/input data format/pct50.pro.cluster.txt", n = 100)
+header <- header[grepl("^#", header)]
+pro <- readPSMtsv("../rmd/input data format/pct50.pro.cluster.txt")
+set.seed(9527)
+pro <- pro[sample(nrow(pro), 2000), ]
+colnames(pro)[1] <- ""
+writeLines(header, "../rmd/input data format/demo.pro.cluster.txt")
+write.table(pro, "../rmd/input data format/demo.pro.cluster.txt",
+  sep = "\t", row.names = FALSE, quote = FALSE, append = T
+)
+# test
+pro <- readPSMtsv("../rmd/input data format/demo.pro.cluster.txt")
+```
+
+```{r .sip, eval=FALSE, include=FALSE}
+header <- readLines("/prebiotics/ubuntuShare/EcoliSIP/goodResults/pct50/Pan_052322_X13/Pan_052322_X13.C13_50000Pct.sip", n = 200)
+header <- header[grepl("^#", header)]
+sip <- readPSMtsv("/prebiotics/ubuntuShare/EcoliSIP/goodResults/pct50/Pan_052322_X13/Pan_052322_X13.C13_50000Pct.sip")
+set.seed(9527)
+sip <- sip[sample(nrow(sip), 2000), ]
+writeLines(header, "../rmd/input data format/demo.sip")
+write.table(sip, "../rmd/input data format/demo.sip",
+  sep = "\t", row.names = FALSE, quote = FALSE, append = T
+)
+# test
+sip <- readPSMtsv("../rmd/input data format/demo.sip")
 ```
 
 ### TIC visualization
@@ -233,3 +314,7 @@ plotPrecursorMzFrequency(infoMS2)
 ```
 
 
+
+```{r session-info, include=FALSE}
+sessionInfo()
+```

@@ -19,5 +19,7 @@ Draw AAspectra MS plot
 }
 \examples{
 a <- getPrecursorSpectra("KHRIP", 2)
-plot(a)
+plot(a) +
+  scale_x_continuous(breaks = seq(324, 329, by = 0.5)) +
+  geom_linerange(linewidth = 0.2)
 }

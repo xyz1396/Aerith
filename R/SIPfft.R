@@ -81,7 +81,13 @@ cal_isotope_peaks_fft <- function(formula, N_width = 100, min_abundance = 0.0001
                 shared_env$isotopic_abundances[other_isotope] <- shared_env$isotopic_abundances[other_isotope] / sum(shared_env$isotopic_abundances[other_isotopes]) * remaining_abundance
             }
         } else {
-            warning(paste("Unsupported isotope:", param, "will be ignored."))
+            warning(
+            sprintf(
+                "Unsupported isotope: %s will be ignored.",
+                toString(param)
+            ),
+            call. = FALSE
+        )
         }
     }
 

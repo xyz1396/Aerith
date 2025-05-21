@@ -16,5 +16,6 @@ a ggplot2 obj
 plot the score of PSMs at different charge and mass error
 }
 \examples{
+sipFile <- system.file("extdata", "demo.sip", package = "Aerith")
 plotScoreDistribution(sipFile)
 }

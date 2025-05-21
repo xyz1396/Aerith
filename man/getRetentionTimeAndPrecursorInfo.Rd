@@ -16,8 +16,10 @@ A data.frame of retention time and precursor mass
 get retention time and precursor mass from scans list of ft file
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
-b <- getRetentionTimeAndPrecursorMass(a)
-a <- readAllScanMS1("demo.FT1")
-b <- getRetentionTimeAndPrecursorMass(a)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
+b <- getRetentionTimeAndPrecursorInfo(a)
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+a <- readAllScanMS1(demo_file)
+b <- getRetentionTimeAndPrecursorInfo(a)
 }

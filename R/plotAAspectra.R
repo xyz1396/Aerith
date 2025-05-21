@@ -12,11 +12,11 @@
 #' spectra <- getPrecursorSpectra(AAstr, 1:2)
 #' class(spectra)
 setClass("AAspectra",
-  slot = c(
-    spectra = "data.frame",
-    charges = "numeric",
-    AAstr = "character"
-  )
+    slots = c(
+        spectra = "data.frame",
+        charges = "numeric",
+        AAstr = "character"
+    )
 )
 
 #' add MZ to spectra data.frame
@@ -30,7 +30,7 @@ setClass("AAspectra",
 #' @examples
 #' spectra <- precursor_peak_calculator("KHRIP")
 #' spectra <- getMZ(spectra, 1:2)
-getMZ <- function(spectra, charges = 1:2) {
+getMZ <- function(spectra, charges = c(1, 2)) {
   nMass <- nrow(spectra)
   # duplicate spectra for MZ calculation
   spectra <- spectra[rep(1:nMass, length(charges)), ]
@@ -114,9 +114,11 @@ getSipPrecursorSpectra <-
 #'
 #' @examples
 #' # add precursor
-#' getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 2)
+#' a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 2)
+#' tail(a@spectra)
 #' # not add precursor
-#' getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 0)
+#' a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 0)
+#' tail(a@spectra)
 getSipBYionSpectra <-
   function(AAstr,
            Atom = "C13",
@@ -149,7 +151,8 @@ getSipBYionSpectra <-
 #' @export
 #'
 #' @examples
-#' a <- readAllScanMS2("demo.FT2")
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' a <- readAllScanMS2(demo_file)
 #' b <- getRealScanFromList(a[[1]])
 #' plot(b)
 getRealScanFromList <- function(scan) {
@@ -186,11 +189,17 @@ getRealScanFromList <- function(scan) {
 #' @export
 #'
 #' @examples
-#' a <- readAllScanMS2("demo.FT2")
-#' b <- getRealScan(18, a)
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' a <- readAllScanMS2(demo_file)
+#' b <- getRealScan(1388, a)
 #' plot(b)
 getRealScan <- function(scanNumber, ft) {
-  scan <- ft[[paste0("", scanNumber)]]
+  scanNumber <- paste0("", scanNumber)
+    if (!scanNumber %in% names(ft)) {
+        stop(paste0("Scan ", scanNumber, " not found in Scan ",
+            paste0(head(names(ft)), collapse = " "), "..."))
+    }
+  scan <- ft[[scanNumber]]
   return(getRealScanFromList(scan))
 }
 
@@ -203,9 +212,10 @@ getRealScan <- function(scanNumber, ft) {
 #' @export
 #'
 #' @examples
-#' a <- readAllScanMS2("demo.FT2")
-#' b <- getRealScanWithCharge(18, a)
-#' plot(b)
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' a <- readAllScanMS2(demo_file)
+#' b <- getRealScanWithCharge(1388, a)
+#' head(b@spectra)
 getRealScanWithCharge <- function(scanNumber, ft) {
   scan <- ft[[paste0("", scanNumber)]]
   BYreal <- data.frame(
@@ -244,7 +254,9 @@ getRealScanWithCharge <- function(scanNumber, ft) {
 #'
 #' @examples
 #' a <- getPrecursorSpectra("KHRIP", 2)
-#' plot(a)
+#' plot(a) +
+#'   scale_x_continuous(breaks = seq(324, 329, by = 0.5)) +
+#'   geom_linerange(linewidth = 0.2)
 plot.AAspectra <- function(x, linewidth = 0.1) {
   return(
     ggplot2::ggplot(
@@ -329,7 +341,7 @@ plotSipBYionLabel <- function(spect) {
       label = Label
     ),
     data = drawDf,
-    inherit.aes = F,
+    inherit.aes = FALSE,
     box.padding = 0.5,
     max.overlaps = Inf,
     parse = TRUE
@@ -346,11 +358,12 @@ plotSipBYionLabel <- function(spect) {
 #' @export
 #'
 #' @examples
-#' a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2)
+#' a <- getSipBYionSpectra("HSQVFSTAEDNQSAVTIHVLQGER", "C13", 0.01, 1:2)
 #' p <- plot(a)
 #' p <- p + plotSipBYionLabel(a)
-#' b <- readAllScanMS2("demo.FT2")
-#' c <- getRealScan(18, b)
+#' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+#' b <- readAllScanMS2(demo_file)
+#' c <- getRealScan(107728, b)
 #' p <- p + plotRealScan(c)
 #' p
 plotRealScan <- function(spect, linewidth = 0.1) {
@@ -385,13 +398,14 @@ plotRealScan <- function(spect, linewidth = 0.1) {
 #' @export
 #'
 #' @examples
-#' a <- readAllScanMS2("107728.ft2.FT2")
-#' a <- getRealScan(a, "107728")
+#' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+#' a <- readAllScanMS2(demo_file)
+#' a <- getRealScan("107728", a)
 #' p <- plotPSMannotation(
 #'   observedSpect = a,
 #'   pep = "HSQVFSTAEDNQSAVTIHVLQGER", Atom = "C13", Prob = 0.01,
 #'   charges = c(2), isoCenter = 886.65, isoWidth = 4.0,
-#'   ifRemoveNotFoundIon = FALSE
+#'   ifRemoveNotFoundIon = TRUE
 #' )
 #' p
 plotPSMannotation <- function(observedSpect, pep, Atom, Prob, charges,

@@ -5,6 +5,4 @@
 #' Filtration of high quality PSM. Accurate isotopic abundance calculation of peptide and metabolites. 
 #' Visualisation of SIP proteomics results.
 #' @useDynLib Aerith, .registration = TRUE
-invisible(NULL)
-
-
+NULL

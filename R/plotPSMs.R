@@ -81,7 +81,7 @@ plotPSMs <-
            charges,
            Atom = "C13",
            Probs,
-           BYcharge = 1:2,
+           BYcharge = c(1, 2),
            ftFileNames,
            scanNumbers,
            pepSeqs,

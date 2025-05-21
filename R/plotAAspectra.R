@@ -33,7 +33,7 @@ setClass("AAspectra",
 getMZ <- function(spectra, charges = c(1, 2)) {
   nMass <- nrow(spectra)
   # duplicate spectra for MZ calculation
-  spectra <- spectra[rep(1:nMass, length(charges)), ]
+  spectra <- spectra[rep(seq_len(nMass), length(charges)), ]
   rownames(spectra) <- NULL
   spectra$Charge <- rep(charges, each = nMass)
   spectra$MZ <- spectra$Mass / spectra$Charge
@@ -57,7 +57,7 @@ getMZ <- function(spectra, charges = c(1, 2)) {
 #'
 #' @examples
 #' getPrecursorSpectra("KHRIP", 1:2)
-getPrecursorSpectra <- function(AAstr, charges = 1:2) {
+getPrecursorSpectra <- function(AAstr, charges = c(1, 2)) {
   spectra <- precursor_peak_calculator(AAstr)
   spectra <- getMZ(spectra, charges)
   # for plot
@@ -87,7 +87,7 @@ getSipPrecursorSpectra <-
   function(AAstr,
            Atom = "C13",
            Prob = 0.0107,
-           charges = 1:2) {
+           charges = c(1, 2)) {
     spectra <- precursor_peak_calculator_DIY(AAstr, Atom, Prob)
     spectra <- getMZ(spectra, charges)
     # for plot
@@ -378,7 +378,7 @@ plotRealScan <- function(spect, linewidth = 0.1) {
         color = Kind,
       ),
       drawDf,
-      inherit.aes = F,
+      inherit.aes = FALSE,
       linewidth = linewidth
     )
   return(p)

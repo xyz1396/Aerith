@@ -23,18 +23,18 @@ summaryPSMsipPCT <- function(psmPath, SIPthreshold = 5, chargeThreshold = 3) {
     tempDf <- read.table(psmPath,
         sep = "\t",
         quote = "",
-        header = T
+        header = TRUE
     )
     itemNames <- tempDf[["ProteinNames"]]
     notDecoy <- stringr::str_detect(itemNames, "Rev_",
-        negate = T
+        negate = TRUE
     )
     notCon <- stringr::str_detect(itemNames, "Con_",
-        negate = T
+        negate = TRUE
     )
     pct <- tempDf[["SearchName"]][notDecoy & notCon]
     fdr <- (1 - sum(notDecoy) / nrow(tempDf)) * 100
-    pct <- stringr::str_split(pct, "_", simplify = T)[, 2]
+    pct <- stringr::str_split(pct, "_", simplify = TRUE)[, 2]
     pct <- stringr::str_sub(pct, 1, -4)
     pct <- as.numeric(pct)
     pct <- pct / 1000
@@ -72,17 +72,17 @@ plotPSMsipPCT <- function(psmPath) {
     tempDf <- read.table(psmPath,
         sep = "\t",
         quote = "",
-        header = T
+        header = TRUE
     )
     itemNames <- tempDf[["ProteinNames"]]
     notDecoy <- stringr::str_detect(itemNames, "Rev_",
-        negate = T
+        negate = TRUE
     )
     notCon <- stringr::str_detect(itemNames, "Con_",
-        negate = T
+        negate = TRUE
     )
     pct <- tempDf[["SearchName"]][notDecoy & notCon]
-    pct <- stringr::str_split(pct, "_", simplify = T)[, 2]
+    pct <- stringr::str_split(pct, "_", simplify = TRUE)[, 2]
     pct <- stringr::str_sub(pct, 1, -4)
     pct <- as.numeric(pct)
     pct <- pct / 1000
@@ -146,7 +146,7 @@ plotProSipPct <- function(proPath) {
         read.table(proPath,
             sep = "\t",
             quote = "",
-            header = T
+            header = TRUE
         )
     proPct$AverageEnrichmentLevel <- proPct$AverageEnrichmentLevel / 1000
     FDR <- readLines(proPath, 100)
@@ -155,7 +155,7 @@ plotProSipPct <- function(proPath) {
     output <- paste0("FDR: ", round(FDR, 3), "\n")
     output <-
         paste0(output, "Proteins: ", sum(stringr::str_detect(proPct$ProteinID, "Rev_",
-            negate = T
+            negate = TRUE
         )), "\n")
     output <-
         paste0(

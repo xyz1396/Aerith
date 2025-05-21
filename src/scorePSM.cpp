@@ -380,6 +380,7 @@ double scoreIntensity(const bool observed, const double realIntensity, const dou
 //' scoreIntensityByCrossEntropy
 //' @param expectedIntensity expected intensityreal
 //' @param observedIntensity observed intensity in MS2 scan
+//' @return numeric, a score of this intensity match
 //' @export
 // [[Rcpp::export]]
 double scoreIntensityByCE(const NumericVector &expectedIntensity, const NumericVector &observedIntensity)

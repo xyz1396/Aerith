@@ -4,7 +4,7 @@
 \alias{getPrecursorSpectra}
 \title{Get AAspectra object of precursor from AA sequence with natural SIP abundance}
 \usage{
-getPrecursorSpectra(AAstr, charges = 1:2)
+getPrecursorSpectra(AAstr, charges = c(1, 2))
 }
 \arguments{
 \item{AAstr}{Amino acid string}

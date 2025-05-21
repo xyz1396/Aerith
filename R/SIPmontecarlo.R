@@ -104,7 +104,13 @@ parse_chemical_formula <- function(formula) {
 
     unsupported_elements <- setdiff(names(element_counts), supported_elements)
     if (length(unsupported_elements) > 0) {
-        warning(paste("Unsupported elements in chemical formula:", unsupported_elements, "will be ignored."))
+        warning(
+            sprintf(
+                "Unsupported elements in chemical formula: %s will be ignored.",
+                toString(unsupported_elements)
+            ),
+            call. = FALSE
+        )
     }
     names(element_array) <- supported_elements
     return(element_array)
@@ -212,7 +218,13 @@ cal_isotope_numbers_SIP <- function(formula, num_simulations = 10000, ...) {
                 shared_env$isotopic_abundances[other_isotope] <- shared_env$isotopic_abundances[other_isotope] / sum(shared_env$isotopic_abundances[other_isotopes]) * remaining_abundance
             }
         } else {
-            warning(paste("Unsupported isotope:", param, "will be ignored."))
+            warning(
+            sprintf(
+                "Unsupported isotope: %s will be ignored.",
+                toString(param)
+            ),
+            call. = FALSE
+        )
         }
     }
 
@@ -289,16 +301,16 @@ plotMolecularIsotopes <- function(isotope_numbers, charge = 1, minProb = 0.0001,
     spectra$MZ <- jitter_preserve_rank(spectra$MZ, amount = jitterAmount)
     spectra$Prob <- spectra$Prob
     spectra$Kind <- paste0(spectra$Charge)
-    spectra$Formula <- sapply(spectra$Isotopes, isotopes_to_formula)
+    spectra$Formula <- vapply(spectra$Isotopes, isotopes_to_formula, character(1))
     labelDf <- dplyr::arrange(spectra, desc(Prob))
-    labelDf <- labelDf[1:min(labelN, nrow(labelDf)),]
+    labelDf <- labelDf[seq_len(min(labelN, nrow(labelDf))), ]
     p <- ggplot2::ggplot(spectra)
     p <- p + ggplot2::aes(x = MZ, ymax = Prob, ymin = yshift)
     p <- p + ggplot2::geom_linerange(linewidth = 0.5)
     p <- p + ggplot2::scale_x_continuous(breaks = seq(min(spectra$MZ) - 1, max(spectra$MZ) + 1, by = 1))
     p <- p + ggplot2::scale_y_continuous(breaks = seq(0, 100, by = 10))
     p <- p + ggrepel::geom_text_repel(ggplot2::aes(x = MZ, y = Prob, label = Formula),
-        data = labelDf, inherit.aes = F, parse = TRUE, color = "black",
+        data = labelDf, inherit.aes = FALSE, parse = TRUE, color = "black",
         segment.colour="#d26c67", size = 3, box.padding = 1, max.overlaps = Inf
     )
     p<- p + ggplot2::theme(

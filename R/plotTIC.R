@@ -8,7 +8,8 @@
 #' @export
 #'
 #' @examples
-#' a <- readAllScanMS2("demo.FT2")
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' a <- readAllScanMS2(demo_file)
 #' b <- getTIC(a)
 getTIC <- function(ft) {
   tic <- as.data.frame(t(sapply(ft, function(x) {
@@ -25,16 +26,18 @@ getTIC <- function(ft) {
 #' Plot TIC of MS1 or MS2
 #'
 #' @param tic A data.frame of TIC and retention time
+#' @param breaks A vector of breaks for x axis
 #'
 #' @return a ggplot2 object
 #' @importFrom ggplot2 scale_y_log10
 #' @export
 #'
 #' @examples
-#' a <- readAllScanMS2("demo.FT2")
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' a <- readAllScanMS2(demo_file)
 #' b <- getTIC(a)
-#' plotTIC(b)
-plotTIC <- function(tic) {
+#' plotTIC(b, seq(9, 10, by = 0.2))
+plotTIC <- function(tic, breaks = seq(0, 200, by = 10)) {
   return(
     ggplot2::ggplot(
       tic,
@@ -43,7 +46,7 @@ plotTIC <- function(tic) {
                    ymin = 0)
     ) +
       ggplot2::geom_linerange(size = 0.2) +
-      ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10)) +
+      ggplot2::scale_x_continuous(breaks = breaks) +
       ggplot2::scale_y_continuous(
         breaks = seq(0, 100, by = 25)
       ) +

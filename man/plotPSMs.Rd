@@ -14,7 +14,7 @@ plotPSMs(
   scanNumbers,
   pepSeqs,
   proNames,
-  path = ""
+  path = "."
 )
 }
 \arguments{
@@ -42,8 +42,13 @@ plotPSMs(
 plot PSMs from FT2 files and PSM results
 }
 \examples{
-\dontrun{
-psm <- psm[1:10, ]
+element <- "C13"
+demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+psm <- readPSMtsv(demo_file)
+psm <- psm[psm$Filename=="Pan_052322_X13.FT2", ]
+psm <- psm[psm$ScanNumber \%in\% c("4068","2596","8182"), ]
+demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+ft2 <- readAllScanMS2(demo_file)
 ftFileNames <- psm$Filename
 scanNumbers <- psm$ScanNumber
 proNames <- psm$ProteinNames
@@ -63,7 +68,6 @@ plotPSMs(
   scanNumbers,
   pep,
   proNames,
-  ""
 )
-}
+
 }

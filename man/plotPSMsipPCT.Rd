@@ -17,8 +17,7 @@ This function reads a PSM file, processes the SIP percent values,
 and generates a histogram with a dashed vertical line indicating the median.
 }
 \examples{
-\dontrun{
-  p <- plotPSMsipPCT("path/to/psm_file.txt")
-  print(p)
-}
+demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+p <- plotPSMsipPCT(demo_file)
+p
 }

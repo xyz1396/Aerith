@@ -4,10 +4,14 @@
 \alias{plotScanFrequency}
 \title{Plot scan frequency}
 \usage{
-plotScanFrequency(info)
+plotScanFrequency(info, binwidth = 1, breaks = seq(0, 200, by = 10))
 }
 \arguments{
 \item{info}{A data.frame of retention time and precursor mass}
+
+\item{binwidth}{A numeric value of bin width. Default is 1}
+
+\item{breaks}{A numeric vector of breaks for x axis. Default is seq(0, 200, by = 10)}
 }
 \value{
 A ggplot of scan frequency per minute
@@ -16,10 +20,12 @@ A ggplot of scan frequency per minute
 Plot scan frequency
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
-b <- getRetentionTimeAndPrecursorMass(a)
-plotScanFrequency(b)
-a <- readAllScanMS1("demo.FT1")
-b <- getRetentionTimeAndPrecursorMass(a)
-plotScanFrequency(b)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
+b <- getRetentionTimeAndPrecursorInfo(a)
+plotScanFrequency(b, binwidth = 0.1, breaks = seq(9, 10, by = 0.2))
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+a <- readAllScanMS1(demo_file)
+b <- getRetentionTimeAndPrecursorInfo(a)
+plotScanFrequency(b, binwidth = 0.1, breaks = seq(9, 10, by = 0.2))
 }

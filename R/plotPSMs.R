@@ -7,8 +7,9 @@
 #' @export
 #'
 #' @examples
-#' scanNumbers <- 3:7
-#' ft2 <- readAllScanMS2("demo.FT2")
+#' scanNumbers <- c("2596","8182")
+#' demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+#' ft2 <- readAllScanMS2(demo_file)
 #' realScans <- getRealScans(ft2, scanNumbers)
 getRealScans <- function(ft, scanNumbers) {
   return(lapply(scanNumbers, getRealScan, ft = ft))
@@ -23,8 +24,9 @@ getRealScans <- function(ft, scanNumbers) {
 #' @export
 #'
 #' @examples
-#' scanNumbers <- 3:7
-#' ft2 <- readAllScanMS2("demo.FT2")
+#' scanNumbers <- c("2596","8182")
+#' demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+#' ft2 <- readAllScanMS2(demo_file)
 #' realScans <- getRealScansWithCharges(ft2, scanNumbers)
 getRealScansWithCharges <- function(ft, scanNumbers) {
   return(lapply(scanNumbers, getRealScanWithCharge, ft = ft))
@@ -46,8 +48,13 @@ getRealScansWithCharges <- function(ft, scanNumbers) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' psm <- psm[1:10, ]
+#' element <- "C13"
+#' demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+#' psm <- readPSMtsv(demo_file)
+#' psm <- psm[psm$Filename=="Pan_052322_X13.FT2", ]
+#' psm <- psm[psm$ScanNumber %in% c("4068","2596","8182"), ]
+#' demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+#' ft2 <- readAllScanMS2(demo_file)
 #' ftFileNames <- psm$Filename
 #' scanNumbers <- psm$ScanNumber
 #' proNames <- psm$ProteinNames
@@ -67,9 +74,8 @@ getRealScansWithCharges <- function(ft, scanNumbers) {
 #'   scanNumbers,
 #'   pep,
 #'   proNames,
-#'   ""
 #' )
-#' }
+#'
 plotPSMs <-
   function(realScans,
            charges,
@@ -80,9 +86,8 @@ plotPSMs <-
            scanNumbers,
            pepSeqs,
            proNames,
-           path = "") {
-    ix <- 1:length(realScans)
-    for (i in ix) {
+           path = ".") {
+    for (i in seq_along(realScans)) {
       BY <-
         getSipBYionSpectra(pepSeqs[i], Atom, Probs[i], BYcharge, charges[i])
       plot(BY) + plotRealScan(realScans[[i]]) + plotSipBYionLabel(BY)

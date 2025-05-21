@@ -4,10 +4,12 @@
 \alias{plotScanFrequencyMS2}
 \title{Plot scan frequency layer of MS2}
 \usage{
-plotScanFrequencyMS2(info)
+plotScanFrequencyMS2(info, binwidth = 1)
 }
 \arguments{
 \item{info}{A data.frame of retention time and precursor mass}
+
+\item{binwidth}{A numeric value of bin width. Default is 1}
 }
 \value{
 A ggplot layer of scan frequency of MS2
@@ -16,9 +18,11 @@ A ggplot layer of scan frequency of MS2
 Plot scan frequency layer of MS2
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
-a <- getRetentionTimeAndPrecursorMass(a)
-b <- readAllScanMS1("demo.FT1")
-b <- getRetentionTimeAndPrecursorMass(b)
-plotScanFrequency(a) + plotScanFrequencyMS2(b)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
+a <- getRetentionTimeAndPrecursorInfo(a)
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+b <- readAllScanMS1(demo_file)
+b <- getRetentionTimeAndPrecursorInfo(b)
+plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) + plotScanFrequencyMS2(b, binwidth = 0.1)
 }

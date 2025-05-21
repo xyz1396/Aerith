@@ -18,11 +18,12 @@ ggplot2 layer
 plot real scan layer under the B Y ion peaks
 }
 \examples{
-a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2)
+a <- getSipBYionSpectra("HSQVFSTAEDNQSAVTIHVLQGER", "C13", 0.01, 1:2)
 p <- plot(a)
 p <- p + plotSipBYionLabel(a)
-b <- readAllScanMS2("demo.FT2")
-c <- getRealScan(18, b)
+demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+b <- readAllScanMS2(demo_file)
+c <- getRealScan(107728, b)
 p <- p + plotRealScan(c)
 p
 }

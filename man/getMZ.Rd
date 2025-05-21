@@ -4,7 +4,7 @@
 \alias{getMZ}
 \title{add MZ to spectra data.frame}
 \usage{
-getMZ(spectra, charges = 1:2)
+getMZ(spectra, charges = c(1, 2))
 }
 \arguments{
 \item{spectra}{a dataframe of spectra}

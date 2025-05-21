@@ -18,5 +18,6 @@ Read PSM table from .pepXML file
 \examples{
 # mzR can be installed from bioconductor
 library(mzR)
-a <- readPepXMLtable("demo.pepXML")
+demo_file <- system.file("extdata", "demo.pepXML", package = "Aerith")
+a <- readPepXMLtable(demo_file)
 }

@@ -13,9 +13,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 10
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10
 )
 ```
 
@@ -34,9 +34,11 @@ library(Aerith)
 ### Summarize SIP percent for PSMs
 
 ```{r}
-s <- summaryPSMsipPCT("../rmd/input data format/pct1.psm.txt", SIPthreshold = 0.5, chargeThreshold = 3)
+s <- summaryPSMsipPCT("../rmd/input data format/pct1.psm.txt", 
+    SIPthreshold = 0.5, chargeThreshold = 3)
 knitr::kable(s)
-s <- summaryPSMsipPCT("../rmd/input data format/pct50.psm.txt", SIPthreshold = 10, chargeThreshold = 3)
+s <- summaryPSMsipPCT("../rmd/input data format/pct50.psm.txt", 
+    SIPthreshold = 10, chargeThreshold = 3)
 knitr::kable(s)
 ```
 
@@ -45,4 +47,10 @@ knitr::kable(s)
 ```{r}
 plotPSMsipPCT("../rmd/input data format/pct1.psm.txt")
 plotPSMsipPCT("../rmd/input data format/pct50.psm.txt")
+```
+
+
+
+```{r session-info, include=FALSE}
+sessionInfo()
 ```

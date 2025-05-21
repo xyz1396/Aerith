@@ -153,3 +153,9 @@ plot(a) + plotSipBYionLabel(a)
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 2:3)
 plot(a) + plotSipBYionLabel(a)
 ```
+
+
+
+```{r session-info, include=FALSE}
+sessionInfo()
+```

@@ -18,5 +18,6 @@ Read spectra from .mgf file
 \examples{
 # MSnbase can be installed from bioconductor
 library(MSnbase)
-a <- readMgf("demo.mgf")
+demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
+a <- readMgf(demo_file)
 }

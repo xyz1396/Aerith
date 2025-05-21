@@ -53,19 +53,19 @@ anno <- annotatePSM(
   pep, 1:2, "C13",
   0.0107, isoCenter, 5.0
 )
-WDPscores <- sapply((0:100) / 100, simplify = T, function(prob) {
+WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   return(scorePSM(scan1@spectra$MZ,
     realIntensity = scan1@spectra$Prob,
     realCharge = scan1@spectra$Charge, parentCharge = scan1@charges[1],
     pepSeq = pep2, Atom = "C13", Prob = prob
   ))
 })
-scores <- sapply((0:100) / 100, simplify = T, function(prob) {
+scores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   anno <- annotatePSM(
     scan1@spectra$MZ, scan1@spectra$Prob,
     scan1@spectra$Charge,
     pep, 1:2, "C13",
-    prob, isoCenter, 4.0, T
+    prob, isoCenter, 4.0, TRUE
   )
   return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
 })
@@ -120,19 +120,19 @@ scan1 <- getRealScanFromList(scan1)
 
 ```{r}
 isoCenter <- psm1$MeasuredParentMass/psm1$ParentCharge + 1.007276
-WDPscores <- sapply((0:100) / 100, simplify = T, function(prob) {
+WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   return(scorePSM(scan1@spectra$MZ,
     realIntensity = scan1@spectra$Prob,
     realCharge = scan1@spectra$Charge, parentCharge = scan1@charges[1],
     pepSeq = pep2, Atom = "C13", Prob = prob
   ))
 })
-scores <- sapply((0:100) / 100, simplify = T, function(prob) {
+scores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   anno <- annotatePSM(
     scan1@spectra$MZ, scan1@spectra$Prob,
     scan1@spectra$Charge,
     pep, 1:2, "C13",
-    prob, isoCenter, 4.0, T
+    prob, isoCenter, 4.0, TRUE
   )
   return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
 })
@@ -166,5 +166,11 @@ ggplot(scores_long, aes(x = abundance, y = score_value)) +
     panel.grid.minor = element_blank(),         # Remove minor grid lines
     panel.background = element_rect(fill = "white", colour = "black")  # White background, black border
   )
+```
+
+
+
+```{r session-info, include=FALSE}
+sessionInfo()
 ```
 

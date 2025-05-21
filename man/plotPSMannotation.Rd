@@ -39,13 +39,14 @@ ggplot2 layer
 plot PSM annotation
 }
 \examples{
-a <- readAllScanMS2("107728.ft2.FT2")
-a <- getRealScan(a, "107728")
+demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
+a <- getRealScan("107728", a)
 p <- plotPSMannotation(
   observedSpect = a,
   pep = "HSQVFSTAEDNQSAVTIHVLQGER", Atom = "C13", Prob = 0.01,
   charges = c(2), isoCenter = 886.65, isoWidth = 4.0,
-  ifRemoveNotFoundIon = FALSE
+  ifRemoveNotFoundIon = TRUE
 )
 p
 }

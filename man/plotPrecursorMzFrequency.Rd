@@ -4,10 +4,18 @@
 \alias{plotPrecursorMzFrequency}
 \title{Plot precursor MZ frequency per 5 per minute of MS2}
 \usage{
-plotPrecursorMzFrequency(info)
+plotPrecursorMzFrequency(
+  info,
+  timeBinWidth = 1,
+  x_breaks = seq(0, 200, by = 10)
+)
 }
 \arguments{
 \item{info}{A data.frame of retention time and precursor mass}
+
+\item{timeBinWidth}{A numeric value of retention time bin width. Default is 1}
+
+\item{x_breaks}{A numeric vector of breaks for x axis. Default is seq(0, 200, by = 10)}
 }
 \value{
 A ggplot layer of scan frequency of MS2
@@ -16,7 +24,8 @@ A ggplot layer of scan frequency of MS2
 Plot precursor MZ frequency per 5 per minute of MS2
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
-a <- getRetentionTimeAndPrecursorMass(a)
-plotPrecursorMzFrequency(a)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
+a <- getRetentionTimeAndPrecursorInfo(a)
+plotPrecursorMzFrequency(a, timeBinWidth = 0.1, x_breaks = seq(8, 11, by = 0.2))
 }

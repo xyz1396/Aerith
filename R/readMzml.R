@@ -8,7 +8,8 @@
 #' @examples
 #' # mzR can be installed from bioconductor
 #' library(mzR)
-#' a <- readMzmlMS1("demo.mzML")
+#' demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
+#' a <- readMzmlMS1(demo_file)
 readMzmlMS1 <- function(ms) {
   if (!requireNamespace("mzR", quietly = TRUE)) {
     stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
@@ -53,7 +54,8 @@ readMzmlMS1 <- function(ms) {
 #' @examples
 #' # mzR can be installed from bioconductor
 #' library(mzR)
-#' a <- readMzmlMS1("demo.mzML")
+#' demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
+#' a <- readMzmlMS2(demo_file)
 readMzmlMS2 <- function(ms) {
   if (!requireNamespace("mzR", quietly = TRUE)) {
     stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
@@ -113,7 +115,8 @@ readMzmlMS2 <- function(ms) {
 #' @examples
 #' # MSnbase can be installed from bioconductor
 #' library(MSnbase)
-#' a <- readMgf("demo.mgf")
+#' demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
+#' a <- readMgf(demo_file)
 readMgf <- function(mgf) {
   if (!requireNamespace("MSnbase", quietly = TRUE)) {
     stop("The 'MSnbase' package is required but not installed. Please install it using Bioconductor.")
@@ -145,8 +148,8 @@ readMgf <- function(mgf) {
 #' @return A data frame containing the data from the PSM TSV file.
 #'
 #' @examples
-#' psm <- readPSMtsv("demo.psm.txt")
-#'
+#' demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+#' a <- readPSMtsv(demo_file)
 #' @export
 readPSMtsv <- function(tsv) {
     tb <- read.table(tsv,
@@ -167,7 +170,8 @@ readPSMtsv <- function(tsv) {
 #' @examples
 #' # mzR can be installed from bioconductor
 #' library(mzR)
-#' a <- readPepXMLtable("demo.pepXML")
+#' demo_file <- system.file("extdata", "demo.pepXML", package = "Aerith")
+#' a <- readPepXMLtable(demo_file)
 readPepXMLtable <- function(pepXML) {
   if (!requireNamespace("mzR", quietly = TRUE)) {
     stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")

@@ -16,6 +16,7 @@ A data.frame of TIC, relative TIC and retention time
 TIC: total ion chromatogram.
 }
 \examples{
-a <- readAllScanMS2("demo.FT2")
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+a <- readAllScanMS2(demo_file)
 b <- getTIC(a)
 }

@@ -11,6 +11,9 @@ scoreIntensityByCE(expectedIntensity, observedIntensity)
 
 \item{observedIntensity}{observed intensity in MS2 scan}
 }
+\value{
+numeric, a score of this intensity match
+}
 \description{
 scoreIntensityByCrossEntropy
 }

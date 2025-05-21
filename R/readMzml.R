@@ -38,7 +38,7 @@ readMzmlMS1 <- function(ms) {
       retentionTimes,
       TICs,
       peakss,
-      SIMPLIFY = F
+      SIMPLIFY = FALSE
     )
   names(scans) <- as.character(scanNumbers)
   return(scans)
@@ -99,7 +99,7 @@ readMzmlMS2 <- function(ms) {
       TICs,
       precursorCharges,
       peakss,
-      SIMPLIFY = F
+      SIMPLIFY = FALSE
     )
   names(scans) <- as.character(scanNumbers)
   return(scans)
@@ -155,7 +155,7 @@ readPSMtsv <- function(tsv) {
     tb <- read.table(tsv,
       sep = "\t",
       quote = "",
-      header = T
+      header = TRUE
     )
     return(tb)
 }

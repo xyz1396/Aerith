@@ -5,7 +5,7 @@
 \title{Get AAspectra object  of precursor from AA sequence
 with labeled SIP abundance}
 \usage{
-getSipPrecursorSpectra(AAstr, Atom = "C13", Prob = 0.0107, charges = 1:2)
+getSipPrecursorSpectra(AAstr, Atom = "C13", Prob = 0.0107, charges = c(1, 2))
 }
 \arguments{
 \item{AAstr}{Amino acide string}

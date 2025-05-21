@@ -12,12 +12,12 @@
 #' a <- readAllScanMS2(demo_file)
 #' b <- getTIC(a)
 getTIC <- function(ft) {
-  tic <- as.data.frame(t(sapply(ft, function(x) {
+  tic <- as.data.frame(t(vapply(ft, function(x) {
     return (c(
       RetentionTime = x$retentionTime,
       TIC = x$TIC
     ))
-  })))
+  }, c(RetentionTime = 0, TIC = 0))))
   maxTIC <- max(tic$TIC)
   tic$RelativeTic <- tic$TIC / maxTIC * 100
   return(tic)

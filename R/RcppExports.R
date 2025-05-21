@@ -455,6 +455,7 @@ scoreIntensity <- function(observed, realIntensity, expectedIntensity, Atom, Pro
 #' scoreIntensityByCrossEntropy
 #' @param expectedIntensity expected intensityreal
 #' @param observedIntensity observed intensity in MS2 scan
+#' @return numeric, a score of this intensity match
 #' @export
 scoreIntensityByCE <- function(expectedIntensity, observedIntensity) {
     .Call(`_Aerith_scoreIntensityByCE`, expectedIntensity, observedIntensity)

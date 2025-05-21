@@ -94,13 +94,13 @@ parse_chemical_formula <- function(formula) {
     }
 
     # Create an array of element counts in the order of isotopic_mass list
-    element_array <- sapply(supported_elements, function(element) {
+    element_array <- vapply(supported_elements, function(element) {
         if (element %in% names(element_counts)) {
             return(element_counts[[element]])
         } else {
             return(0)
         }
-    })
+    }, numeric(1))
 
     unsupported_elements <- setdiff(names(element_counts), supported_elements)
     if (length(unsupported_elements) > 0) {
@@ -118,9 +118,9 @@ parse_chemical_formula <- function(formula) {
 
 cal_monoisotopic_mass <- function(formula) {
     element_array <- parse_chemical_formula(formula)
-    monoisotopic_elements <- sapply(supported_isotopes, function(isotopes) {
+    monoisotopic_elements <- vapply(supported_isotopes, function(isotopes) {
         return(isotopes[1])
-    })
+    }, character(1))
     monoisotopic_element_masses <- isotopic_masses[monoisotopic_elements]
     mass <- sum(element_array * monoisotopic_element_masses)
     return(mass)
@@ -151,7 +151,7 @@ summary_isotopic_df <- function(isotopic_df) {
 
     unique_isotopic_df <- dplyr::arrange(unique_isotopic_df, desc(Count))
     # Compute mass of each row by number of isotopes
-    isotopes <- colnames(unique_isotopic_df)[1:(ncol(unique_isotopic_df) - 3)]
+    isotopes <- colnames(unique_isotopic_df)[seq_len(ncol(unique_isotopic_df) - 3)]
     unique_isotopic_df$Mass <- c(as.matrix(unique_isotopic_df[, isotopes]) %*%
         as.matrix(isotopic_masses[isotopes], ncol = 1))
     return(unique_isotopic_df)

@@ -22,7 +22,8 @@ Imports:
     ggplot2,
     ggrepel,
     ggnewscale,
-    dplyr
+    dplyr,
+    stringr
 SystemRequirements: C++17
 VignetteBuilder: knitr
 Config/build/vignettes: FALSE

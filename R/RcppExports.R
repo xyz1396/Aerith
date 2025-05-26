@@ -8,7 +8,18 @@
 #' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
 #' @return the PSMs in a dataframe in a list
 #' @examples
-#' psm <- extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, 3)
+#' tmp <- tempdir()
+#' target_dir <- file.path(tmp, "target")
+#' dir.create(target_dir, showWarnings = FALSE)
+#' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+#' ft_dir <- file.path(tmp, "ft")
+#' dir.create(ft_dir, showWarnings = FALSE)
+#' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+#' file_content <- readRDS(ft_file)
+#' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+#' list.files(tmp, full.names = TRUE, recursive = TRUE)
+#' psm <- extractPSMfeatures(target_dir, 5, ft_dir, 3)
 #' @export
 extractPSMfeatures <- function(Spe2PepFilePath, topN, ftFilepath, ThreadNumber = 3L) {
     .Call(`_Aerith_extractPSMfeatures`, Spe2PepFilePath, topN, ftFilepath, ThreadNumber)
@@ -22,7 +33,22 @@ extractPSMfeatures <- function(Spe2PepFilePath, topN, ftFilepath, ThreadNumber =
 #' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
 #' @return the PSMs in a dataframe in a list
 #' @examples
-#' psm <- extractPSMfeaturesTargetAndDecoy("targetPath", "decoyPath", topN, "ftFilepath", 3)
+#' tmp <- tempdir()
+#' target_dir <- file.path(tmp, "target")
+#' dir.create(target_dir, showWarnings = FALSE)
+#' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+#' decoy_dir <- file.path(tmp, "decoy")
+#' dir.create(decoy_dir, showWarnings = FALSE)
+#' decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+#' ft_dir <- file.path(tmp, "ft")
+#' dir.create(ft_dir, showWarnings = FALSE)
+#' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+#' file_content <- readRDS(ft_file)
+#' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+#' list.files(tmp, full.names = TRUE, recursive = TRUE)
+#' psm <- extractPSMfeaturesTargetAndDecoy(target_dir, decoy_dir, 3, ft_dir, 3)
 #' @export
 extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFilepath, ThreadNumber = 3L) {
     .Call(`_Aerith_extractPSMfeaturesTargetAndDecoy`, targetPath, decoyPath, topN, ftFilepath, ThreadNumber)
@@ -38,7 +64,23 @@ extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFile
 #' @param doProteinInference out put protein inference format or only PSM format
 #' @param fileName output path of the percolator tsv file
 #' @examples
-#' extractPSMfeaturesTargetAndDecoytoPercolatorPin("targetPath", "decoyPath", topN, "ftFilepath", 3, "a.pin")
+#' tmp <- tempdir()
+#' target_dir <- file.path(tmp, "target")
+#' dir.create(target_dir, showWarnings = FALSE)
+#' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+#' decoy_dir <- file.path(tmp, "decoy")
+#' dir.create(decoy_dir, showWarnings = FALSE)
+#' decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+#' ft_dir <- file.path(tmp, "ft")
+#' dir.create(ft_dir, showWarnings = FALSE)
+#' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+#' file_content <- readRDS(ft_file)
+#' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+#' pin_path <- file.path(tmp, "a.pin")
+#' extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
+#' list.files(tmp, full.names = TRUE, recursive = TRUE)
 #' @export
 extractPSMfeaturesTargetAndDecoytoPercolatorPin <- function(targetPath, decoyPath, topN, ftFilepath, ThreadNumber = 3L, doProteinInference = FALSE, fileName = "a.pin") {
     invisible(.Call(`_Aerith_extractPSMfeaturesTargetAndDecoytoPercolatorPin`, targetPath, decoyPath, topN, ftFilepath, ThreadNumber, doProteinInference, fileName))
@@ -85,12 +127,22 @@ getFilterThresholdTopPSMs <- function(workingPath, OverallThreshold, topN) {
 #' @param workingPath a full path with .Spe2Pep files in it
 #' @param OverallThreshold FDR thredhold of peptides
 #' @param topN store top N PSMs of each scan of one .FT file
+#' @param decoyPrefix the prefix of decoy sequence
 #' @return a dataframe about filter threshold and FDR results
 #' @examples
-#' getFilterThresholdTopPSMsSpe2Pep("testDir", 0.01, 3)
+#' tmp <- tempdir()
+#' sip_dir <- file.path(tmp, "sip")
+#' dir.create(sip_dir)
+#' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+#' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+#' list.files(sip_dir, full.names = TRUE)
+#' a <- getFilterThresholdTopPSMsSpe2Pep(sip_dir, 1, 3, "Decoy_")
+#' a$threshold
 #' @export
-getFilterThresholdTopPSMsSpe2Pep <- function(workingPath, OverallThreshold, topN) {
-    .Call(`_Aerith_getFilterThresholdTopPSMsSpe2Pep`, workingPath, OverallThreshold, topN)
+getFilterThresholdTopPSMsSpe2Pep <- function(workingPath, OverallThreshold, topN, decoyPrefix) {
+    .Call(`_Aerith_getFilterThresholdTopPSMsSpe2Pep`, workingPath, OverallThreshold, topN, decoyPrefix)
 }
 
 #' generateOneCFG
@@ -252,7 +304,8 @@ readOneScanMS1 <- function(ftFile, scanNumber) {
 #' @param ftFile a ft1 file's full path
 #' @return a list of ft file header
 #' @examples
-#' header <- readFTheader("demo.ft1")
+#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' header <- readFTheader(demo_file)
 #' @export
 readFTheader <- function(ftFile) {
     .Call(`_Aerith_readFTheader`, ftFile)
@@ -264,7 +317,8 @@ readFTheader <- function(ftFile) {
 #' @param endScanNumber read scans ending at this scanNumber
 #' @return a list of MS1 scans with names of scan number
 #' @examples
-#' ft1 <- readScansMS1("demo.ft1", 1, 10)
+#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' ft1 <- readScansMS1(demo_file, 1398, 1503)
 #' @export
 readScansMS1 <- function(ftFile, startScanNumber, endScanNumber) {
     .Call(`_Aerith_readScansMS1`, ftFile, startScanNumber, endScanNumber)
@@ -276,7 +330,8 @@ readScansMS1 <- function(ftFile, startScanNumber, endScanNumber) {
 #' @param endScanNumber read scans ending at this scanNumber
 #' @return a list of MS1 scans with names of scan number
 #' @examples
-#' ft1 <- readAllScanMS1("demo.ft1")
+#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' ft1 <- readScansMS1Vector(demo_file, c(1398, 1503, 1508))
 #' @export
 readScansMS1Vector <- function(ftFile, scanNumbersVector) {
     .Call(`_Aerith_readScansMS1Vector`, ftFile, scanNumbersVector)
@@ -286,7 +341,8 @@ readScansMS1Vector <- function(ftFile, scanNumbersVector) {
 #' @param ftFile a ft1 file's full path
 #' @return a list of MS1 scans with names of scan number
 #' @examples
-#' ft1 <- readAllScanMS1("demo.ft1")
+#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' ft1 <- readAllScanMS1(demo_file)
 #' @export
 readAllScanMS1 <- function(ftFile) {
     .Call(`_Aerith_readAllScanMS1`, ftFile)
@@ -298,7 +354,8 @@ readAllScanMS1 <- function(ftFile) {
 #' @param endScanNumber read scans ending at this scanNumber
 #' @return a list of MS2 scans with names of scan number
 #' @examples
-#' ft2 <- readScansMS2("demo.ft2", 1, 10)
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' ft2 <- readScansMS2("demo.ft2", 1350, 1355)
 #' @export
 readScansMS2 <- function(ftFile, startScanNumber, endScanNumber) {
     .Call(`_Aerith_readScansMS2`, ftFile, startScanNumber, endScanNumber)
@@ -309,7 +366,8 @@ readScansMS2 <- function(ftFile, startScanNumber, endScanNumber) {
 #' @param scanNumbersVector read scans starting of these scanNumbers
 #' @return a list of MS2 scans with names of scan number
 #' @examples
-#' ft2 <- readScansMS2("demo.ft2", c(9, 8, 7))
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' ft2 <- readScansMS2Vector(demo_file, c(1350, 1355, 1359))
 #' @export
 readScansMS2Vector <- function(ftFile, scanNumbersVector) {
     .Call(`_Aerith_readScansMS2Vector`, ftFile, scanNumbersVector)
@@ -319,7 +377,8 @@ readScansMS2Vector <- function(ftFile, scanNumbersVector) {
 #' @param ftFile a ft2 file's full path
 #' @return a list of MS2 scans with names of scan number
 #' @examples
-#' ft2 <- readAllScanMS2("demo.ft2")
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' ft2 <- readAllScanMS2(demo_file)
 #' @export
 readAllScanMS2 <- function(ftFile) {
     .Call(`_Aerith_readAllScanMS2`, ftFile)
@@ -363,7 +422,8 @@ readFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN) {
 #' @param Spe2PepFile a .Spe2PepFile file's full path
 #' @return the PSMs in a dataframe in a list
 #' @examples
-#' psm <- readSpe2Pep("test.Spe2Pep.txt")
+#' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' psm <- readSpe2Pep(target_file)
 #' psm <- psm$PSM
 #' @export
 readSpe2Pep <- function(Spe2PepFile) {
@@ -374,7 +434,15 @@ readSpe2Pep <- function(Spe2PepFile) {
 #' @param workingPath a full path with .Spe2Pep.txt files in it
 #' @return the PSMs dataframes in lists
 #' @examples
-#' psm <- readSpe2Peps("testDir")
+#' tmp <- tempdir()
+#' sip_dir <- file.path(tmp, "sip")
+#' dir.create(sip_dir)
+#' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+#' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+#' list.files(sip_dir, full.names = TRUE)
+#' psm <- readSpe2Peps(sip_dir)
 #' psm <- psm[[1]]$PSM
 #' @export
 readSpe2Peps <- function(workingPath) {
@@ -386,7 +454,15 @@ readSpe2Peps <- function(workingPath) {
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @return the PSMs in a dataframe in a list
 #' @examples
-#' psm <- readSpe2PepFilesScansTopPSMs("testDir")
+#' tmp <- tempdir()
+#' sip_dir <- file.path(tmp, "sip")
+#' dir.create(sip_dir)
+#' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+#' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+#' list.files(sip_dir, full.names = TRUE)
+#' psm <- readSpe2PepFilesScansTopPSMs(sip_dir, 3)
 #' @export
 readSpe2PepFilesScansTopPSMs <- function(workingPath, topN = 5L) {
     .Call(`_Aerith_readSpe2PepFilesScansTopPSMs`, workingPath, topN)
@@ -398,7 +474,15 @@ readSpe2PepFilesScansTopPSMs <- function(workingPath, topN = 5L) {
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @return a dataframe of top N PSMs
 #' @examples
-#' top3 <-  readSpe2PepFilesScansTopPSMsFromOneFT2("testDir", ".*demo1.*", 3)
+#' tmp <- tempdir()
+#' sip_dir <- file.path(tmp, "sip")
+#' dir.create(sip_dir)
+#' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+#' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+#' list.files(sip_dir, full.names = TRUE)
+#' top3 <-  readSpe2PepFilesScansTopPSMsFromOneFT2(sip_dir, ".*X13.*", 3)
 #' @export
 readSpe2PepFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN = 5L) {
     .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromOneFT2`, workingPath, pattern, topN)
@@ -409,7 +493,15 @@ readSpe2PepFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN = 
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @return a dataframe of top N PSMs
 #' @examples
-#' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3)
+#' tmp <- tempdir()
+#' sip_dir <- file.path(tmp, "sip")
+#' dir.create(sip_dir)
+#' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+#' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+#' list.files(sip_dir, full.names = TRUE)
+#' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3)
 #' @export
 readSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN = 5L) {
     .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2Parallel`, workingPath, topN)
@@ -421,7 +513,18 @@ readSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN = 
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @return a dataframe of top N PSMs
 #' @examples
-#' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParalle("targetDir","decoyDir", 3)
+#' tmp <- tempdir()
+#' target_dir <- file.path(tmp, "target")
+#' dir.create(target_dir, showWarnings = FALSE)
+#' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+#' decoy_dir <- file.path(tmp, "decoy")
+#' dir.create(decoy_dir, showWarnings = FALSE)
+#' decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+#' list.files(target_dir, full.names = TRUE)
+#' list.files(decoy_dir, full.names = TRUE)
+#' top3 <- readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(target_dir, decoy_dir, 3)
 #' @export
 readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel <- function(targetPath, decoyPath, topN = 5L) {
     .Call(`_Aerith_readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel`, targetPath, decoyPath, topN)
@@ -434,7 +537,15 @@ readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel <- function(target
 #' @param fileName the output path
 #' @return nothing but write a tsv of top N PSMs
 #' @examples
-#' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3, "test.tsv")
+#' tmp <- tempdir()
+#' sip_dir <- file.path(tmp, "sip")
+#' dir.create(sip_dir)
+#' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+#' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+#' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+#' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3, file.path(sip_dir, "top3.tsv"))
+#' list.files(sip_dir, full.names = TRUE)
 #' @export
 writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN = 5L, fileName = "a.tsv") {
     invisible(.Call(`_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel`, workingPath, topN, fileName))
@@ -471,7 +582,8 @@ scoreIntensityByCE <- function(expectedIntensity, observedIntensity) {
 #' @param Prob its SIP abundance (0.0~1.0)
 #' @return a score of this PSM
 #' @examples
-#' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+#' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+#' scan1 <- readOneScanMS2(ftFile = demo_file, 107728)
 #' score <- scorePSM(scan1$peaks$mz,
 #'         scan1$peaks$intensity, scan1$peaks$charge, 2,
 #'         "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107)
@@ -490,10 +602,11 @@ scorePSM <- function(realMZ, realIntensity, realCharge, parentCharge, pepSeq, At
 #' @param Prob its SIP abundance (0.0~1.0)
 #' @param isoCenter isolation window center, set it 0 as default if not remove peaks in isolation window
 #' @param isoWidth isolation window width, set it 0 as default if not remove peaks in isolation window
-#' @param calScores calculate WDP MVH Xcor scores or not
+#' @param calScores, FALSE as default, calculate WDP MVH Xcor scores or not
 #' @return a List about matched peaks information of this PSM
 #' @examples
-#' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+#' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+#' scan1 <- readOneScanMS2(ftFile = demo_file, 107728)
 #' anno <- annotatePSM(
 #'   scan1$peaks$mz, scan1$peaks$intensity,
 #'   scan1$peaks$charge,
@@ -528,8 +641,11 @@ rankyfify <- function(a) {
 #' @param threshold a float of top N threshold for denoise
 #' @return a denoised MS2 scan has charge
 #' @examples
-#' ft2 <- readAllScanMS2("demo.ft2")
-#' ms2 <- denoiseOneMS2ScanHasCharge(ft2[1], 100, 10, 25)
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' ft2 <- readAllScanMS2(demo_file)
+#' plot(getRealScanFromList(ft2[["1346"]]))
+#' ms2 <- denoiseOneMS2ScanHasCharge(ft2[["1346"]], 100, 10, 5)
+#' plot(getRealScanFromList(ms2))
 #' @export
 denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
     .Call(`_Aerith_denoiseOneMS2ScanHasCharge`, scanList, window, step, threshold)
@@ -541,9 +657,12 @@ denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
 #' @param ftFile a ft1 file's output path
 #' @return void
 #' @examples
-#' header <- readFTheader("demo.ft1")
-#' ft1 <- readAllScanMS1("demo.ft1")
-#' writeAllScanMS1(header,ft1[1:10],"demo10.ft1")
+#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' header <- readFTheader(demo_file)
+#' ft1 <- readAllScanMS1(demo_file)
+#' tmp <- tempdir()
+#' writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.ft1"))
+#' list.files(tmp, pattern = "demo10.ft1", full.names = TRUE)
 #' @export
 writeAllScanMS1 <- function(header, scansList, ftFile) {
     .Call(`_Aerith_writeAllScanMS1`, header, scansList, ftFile)
@@ -555,9 +674,12 @@ writeAllScanMS1 <- function(header, scansList, ftFile) {
 #' @param ftFile a ft2 file's output path
 #' @return void
 #' @examples
-#' header <- readFTheader("demo.ft2")
-#' ft2 <- readAllScanMS2("demo.ft2")
-#' writeAllScanMS2(header,ft2[1:10],"demo10.ft2")
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' header <- readFTheader(demo_file)
+#' ft2 <- readAllScanMS2(demo_file)
+#' tmp <- tempdir()
+#' writeAllScanMS2(header,ft2[1:10],file.path(tmp, "demo10.ft2"))
+#' list.files(tmp, pattern = "demo10.ft2", full.names = TRUE)
 #' @export
 writeAllScanMS2 <- function(header, scansList, ftFile) {
     .Call(`_Aerith_writeAllScanMS2`, header, scansList, ftFile)

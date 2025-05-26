@@ -20,5 +20,6 @@ a list of MS1 scans with names of scan number
 read MS1 scans with scanNumber as index in a vector
 }
 \examples{
-ft1 <- readAllScanMS1("demo.ft1")
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+ft1 <- readScansMS1Vector(demo_file, c(1398, 1503, 1508))
 }

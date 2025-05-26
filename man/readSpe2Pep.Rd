@@ -16,6 +16,7 @@ the PSMs in a dataframe in a list
 readSpe2Pep
 }
 \examples{
-psm <- readSpe2Pep("test.Spe2Pep.txt")
+target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+psm <- readSpe2Pep(target_file)
 psm <- psm$PSM
 }

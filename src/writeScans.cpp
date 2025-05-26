@@ -18,8 +18,11 @@ NumericVector rankyfify(NumericVector a)
 //' @param threshold a float of top N threshold for denoise
 //' @return a denoised MS2 scan has charge
 //' @examples
-//' ft2 <- readAllScanMS2("demo.ft2")
-//' ms2 <- denoiseOneMS2ScanHasCharge(ft2[1], 100, 10, 25)
+//' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+//' ft2 <- readAllScanMS2(demo_file)
+//' plot(getRealScanFromList(ft2[["1346"]]))
+//' ms2 <- denoiseOneMS2ScanHasCharge(ft2[["1346"]], 100, 10, 5)
+//' plot(getRealScanFromList(ms2))
 //' @export
 // [[Rcpp::export]]
 List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float threshold)
@@ -52,9 +55,12 @@ List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float t
 //' @param ftFile a ft1 file's output path
 //' @return void
 //' @examples
-//' header <- readFTheader("demo.ft1")
-//' ft1 <- readAllScanMS1("demo.ft1")
-//' writeAllScanMS1(header,ft1[1:10],"demo10.ft1")
+//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' header <- readFTheader(demo_file)
+//' ft1 <- readAllScanMS1(demo_file)
+//' tmp <- tempdir()
+//' writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.ft1"))
+//' list.files(tmp, pattern = "demo10.ft1", full.names = TRUE)
 //' @export
 // [[Rcpp::export]]
 bool writeAllScanMS1(List header, List scansList, const String &ftFile)
@@ -97,9 +103,12 @@ bool writeAllScanMS1(List header, List scansList, const String &ftFile)
 //' @param ftFile a ft2 file's output path
 //' @return void
 //' @examples
-//' header <- readFTheader("demo.ft2")
-//' ft2 <- readAllScanMS2("demo.ft2")
-//' writeAllScanMS2(header,ft2[1:10],"demo10.ft2")
+//' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+//' header <- readFTheader(demo_file)
+//' ft2 <- readAllScanMS2(demo_file)
+//' tmp <- tempdir()
+//' writeAllScanMS2(header,ft2[1:10],file.path(tmp, "demo10.ft2"))
+//' list.files(tmp, pattern = "demo10.ft2", full.names = TRUE)
 //' @export
 // [[Rcpp::export]]
 bool writeAllScanMS2(List header, List scansList, const String &ftFile)

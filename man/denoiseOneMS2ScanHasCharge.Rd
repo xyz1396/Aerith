@@ -22,6 +22,9 @@ a denoised MS2 scan has charge
 denoise one MS2 scan has charge
 }
 \examples{
-ft2 <- readAllScanMS2("demo.ft2")
-ms2 <- denoiseOneMS2ScanHasCharge(ft2[1], 100, 10, 25)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+ft2 <- readAllScanMS2(demo_file)
+plot(getRealScanFromList(ft2[["1346"]]))
+ms2 <- denoiseOneMS2ScanHasCharge(ft2[["1346"]], 100, 10, 5)
+plot(getRealScanFromList(ms2))
 }

@@ -7,7 +7,8 @@ using namespace Rcpp;
 //' @param ftFile a ft1 file's full path
 //' @return a list of ft file header
 //' @examples
-//' header <- readFTheader("demo.ft1")
+//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' header <- readFTheader(demo_file)
 //' @export
 // [[Rcpp::export]]
 List readFTheader(String ftFile)
@@ -28,7 +29,8 @@ List readFTheader(String ftFile)
 //' @param endScanNumber read scans ending at this scanNumber
 //' @return a list of MS1 scans with names of scan number
 //' @examples
-//' ft1 <- readScansMS1("demo.ft1", 1, 10)
+//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' ft1 <- readScansMS1(demo_file, 1398, 1503)
 //' @export
 // [[Rcpp::export]]
 List readScansMS1(const String ftFile, const size_t startScanNumber, const size_t endScanNumber)
@@ -68,7 +70,8 @@ List readScansMS1(const String ftFile, const size_t startScanNumber, const size_
 //' @param endScanNumber read scans ending at this scanNumber
 //' @return a list of MS1 scans with names of scan number
 //' @examples
-//' ft1 <- readAllScanMS1("demo.ft1")
+//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' ft1 <- readScansMS1Vector(demo_file, c(1398, 1503, 1508))
 //' @export
 // [[Rcpp::export]]
 List readScansMS1Vector(const String ftFile, const NumericVector scanNumbersVector)
@@ -107,7 +110,8 @@ List readScansMS1Vector(const String ftFile, const NumericVector scanNumbersVect
 //' @param ftFile a ft1 file's full path
 //' @return a list of MS1 scans with names of scan number
 //' @examples
-//' ft1 <- readAllScanMS1("demo.ft1")
+//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' ft1 <- readAllScanMS1(demo_file)
 //' @export
 // [[Rcpp::export]]
 List readAllScanMS1(const String ftFile)
@@ -148,7 +152,8 @@ List readAllScanMS1(const String ftFile)
 //' @param endScanNumber read scans ending at this scanNumber
 //' @return a list of MS2 scans with names of scan number
 //' @examples
-//' ft2 <- readScansMS2("demo.ft2", 1, 10)
+//' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+//' ft2 <- readScansMS2("demo.ft2", 1350, 1355)
 //' @export
 // [[Rcpp::export]]
 List readScansMS2(const String ftFile, const size_t startScanNumber, const size_t endScanNumber)
@@ -192,7 +197,8 @@ List readScansMS2(const String ftFile, const size_t startScanNumber, const size_
 //' @param scanNumbersVector read scans starting of these scanNumbers
 //' @return a list of MS2 scans with names of scan number
 //' @examples
-//' ft2 <- readScansMS2("demo.ft2", c(9, 8, 7))
+//' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+//' ft2 <- readScansMS2Vector(demo_file, c(1350, 1355, 1359))
 //' @export
 // [[Rcpp::export]]
 List readScansMS2Vector(const String ftFile, const NumericVector scanNumbersVector)
@@ -236,7 +242,8 @@ List readScansMS2Vector(const String ftFile, const NumericVector scanNumbersVect
 //' @param ftFile a ft2 file's full path
 //' @return a list of MS2 scans with names of scan number
 //' @examples
-//' ft2 <- readAllScanMS2("demo.ft2")
+//' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+//' ft2 <- readAllScanMS2(demo_file)
 //' @export
 // [[Rcpp::export]]
 List readAllScanMS2(const String ftFile)

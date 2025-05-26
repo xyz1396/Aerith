@@ -399,7 +399,8 @@ double scoreIntensityByCE(const NumericVector &expectedIntensity, const NumericV
 //' @param Prob its SIP abundance (0.0~1.0)
 //' @return a score of this PSM
 //' @examples
-//' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+//' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+//' scan1 <- readOneScanMS2(ftFile = demo_file, 107728)
 //' score <- scorePSM(scan1$peaks$mz,
 //'         scan1$peaks$intensity, scan1$peaks$charge, 2,
 //'         "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107)
@@ -476,10 +477,11 @@ std::vector<std::string> enumsToStrings(std::vector<PSMpeakAnnotator::ionKind> i
 //' @param Prob its SIP abundance (0.0~1.0)
 //' @param isoCenter isolation window center, set it 0 as default if not remove peaks in isolation window
 //' @param isoWidth isolation window width, set it 0 as default if not remove peaks in isolation window
-//' @param calScores calculate WDP MVH Xcor scores or not
+//' @param calScores, FALSE as default, calculate WDP MVH Xcor scores or not
 //' @return a List about matched peaks information of this PSM
 //' @examples
-//' scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+//' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+//' scan1 <- readOneScanMS2(ftFile = demo_file, 107728)
 //' anno <- annotatePSM(
 //'   scan1$peaks$mz, scan1$peaks$intensity,
 //'   scan1$peaks$charge,

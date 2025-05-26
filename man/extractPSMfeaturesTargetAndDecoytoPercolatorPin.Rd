@@ -35,5 +35,21 @@ extractPSMfeaturesTargetAndDecoytoPercolatorPin extract featueres of top PSMs fr
 to pecorlator pin format
 }
 \examples{
-extractPSMfeaturesTargetAndDecoytoPercolatorPin("targetPath", "decoyPath", topN, "ftFilepath", 3, "a.pin")
+tmp <- tempdir()
+target_dir <- file.path(tmp, "target")
+dir.create(target_dir, showWarnings = FALSE)
+target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+decoy_dir <- file.path(tmp, "decoy")
+dir.create(decoy_dir, showWarnings = FALSE)
+decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+ft_dir <- file.path(tmp, "ft")
+dir.create(ft_dir, showWarnings = FALSE)
+ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+file_content <- readRDS(ft_file)
+writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+pin_path <- file.path(tmp, "a.pin")
+extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
+list.files(tmp, full.names = TRUE, recursive = TRUE)
 }

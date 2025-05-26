@@ -20,7 +20,10 @@ void
 write all MS2 scans has charge
 }
 \examples{
-header <- readFTheader("demo.ft2")
-ft2 <- readAllScanMS2("demo.ft2")
-writeAllScanMS2(header,ft2[1:10],"demo10.ft2")
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+header <- readFTheader(demo_file)
+ft2 <- readAllScanMS2(demo_file)
+tmp <- tempdir()
+writeAllScanMS2(header,ft2[1:10],file.path(tmp, "demo10.ft2"))
+list.files(tmp, pattern = "demo10.ft2", full.names = TRUE)
 }

@@ -7,7 +7,8 @@ using namespace Rcpp;
 //' @param Spe2PepFile a .Spe2PepFile file's full path
 //' @return the PSMs in a dataframe in a list
 //' @examples
-//' psm <- readSpe2Pep("test.Spe2Pep.txt")
+//' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' psm <- readSpe2Pep(target_file)
 //' psm <- psm$PSM
 //' @export
 // [[Rcpp::export]]
@@ -41,7 +42,15 @@ List readSpe2Pep(String Spe2PepFile)
 //' @param workingPath a full path with .Spe2Pep.txt files in it
 //' @return the PSMs dataframes in lists
 //' @examples
-//' psm <- readSpe2Peps("testDir")
+//' tmp <- tempdir()
+//' sip_dir <- file.path(tmp, "sip")
+//' dir.create(sip_dir)
+//' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+//' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+//' list.files(sip_dir, full.names = TRUE)
+//' psm <- readSpe2Peps(sip_dir)
 //' psm <- psm[[1]]$PSM
 //' @export
 // [[Rcpp::export]]
@@ -84,7 +93,15 @@ List readSpe2Peps(String workingPath)
 //' @param topN store top N PSMs of each scan of one .FT2 file
 //' @return the PSMs in a dataframe in a list
 //' @examples
-//' psm <- readSpe2PepFilesScansTopPSMs("testDir")
+//' tmp <- tempdir()
+//' sip_dir <- file.path(tmp, "sip")
+//' dir.create(sip_dir)
+//' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+//' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+//' list.files(sip_dir, full.names = TRUE)
+//' psm <- readSpe2PepFilesScansTopPSMs(sip_dir, 3)
 //' @export
 // [[Rcpp::export]]
 DataFrame readSpe2PepFilesScansTopPSMs(String workingPath, size_t topN = 5)
@@ -119,7 +136,15 @@ DataFrame readSpe2PepFilesScansTopPSMs(String workingPath, size_t topN = 5)
 //' @param topN store top N PSMs of each scan of one .FT2 file
 //' @return a dataframe of top N PSMs
 //' @examples
-//' top3 <-  readSpe2PepFilesScansTopPSMsFromOneFT2("testDir", ".*demo1.*", 3)
+//' tmp <- tempdir()
+//' sip_dir <- file.path(tmp, "sip")
+//' dir.create(sip_dir)
+//' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+//' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+//' list.files(sip_dir, full.names = TRUE)
+//' top3 <-  readSpe2PepFilesScansTopPSMsFromOneFT2(sip_dir, ".*X13.*", 3)
 //' @export
 // [[Rcpp::export]]
 DataFrame readSpe2PepFilesScansTopPSMsFromOneFT2(String workingPath, String pattern, size_t topN = 5)
@@ -166,7 +191,15 @@ DataFrame readSpe2PepFilesScansTopPSMsFromOneFT2(String workingPath, String patt
 //' @param topN store top N PSMs of each scan of one .FT2 file
 //' @return a dataframe of top N PSMs
 //' @examples
-//' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3)
+//' tmp <- tempdir()
+//' sip_dir <- file.path(tmp, "sip")
+//' dir.create(sip_dir)
+//' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+//' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+//' list.files(sip_dir, full.names = TRUE)
+//' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3)
 //' @export
 // [[Rcpp::export]]
 List readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN = 5)
@@ -206,7 +239,18 @@ List readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t 
 //' @param topN store top N PSMs of each scan of one .FT2 file
 //' @return a dataframe of top N PSMs
 //' @examples
-//' top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParalle("targetDir","decoyDir", 3)
+//' tmp <- tempdir()
+//' target_dir <- file.path(tmp, "target")
+//' dir.create(target_dir, showWarnings = FALSE)
+//' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+//' decoy_dir <- file.path(tmp, "decoy")
+//' dir.create(decoy_dir, showWarnings = FALSE)
+//' decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+//' list.files(target_dir, full.names = TRUE)
+//' list.files(decoy_dir, full.names = TRUE)
+//' top3 <- readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(target_dir, decoy_dir, 3)
 //' @export
 // [[Rcpp::export]]
 List readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(String targetPath, String decoyPath, size_t topN = 5)
@@ -248,7 +292,15 @@ List readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(String target
 //' @param fileName the output path
 //' @return nothing but write a tsv of top N PSMs
 //' @examples
-//' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3, "test.tsv")
+//' tmp <- tempdir()
+//' sip_dir <- file.path(tmp, "sip")
+//' dir.create(sip_dir)
+//' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+//' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+//' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3, file.path(sip_dir, "top3.tsv"))
+//' list.files(sip_dir, full.names = TRUE)
 //' @export
 // [[Rcpp::export]]
 void writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN = 5, String fileName = "a.tsv")

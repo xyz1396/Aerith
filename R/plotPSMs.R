@@ -95,22 +95,24 @@ plotPSMs <-
       BY <-
         getSipBYionSpectra(pepSeqs[i], Atom, Probs[i], BYcharge, charges[i])
       plot(BY) + plotRealScan(realScans[[i]]) + plotSipBYionLabel(BY)
-      ggsave(paste0(
+      safe_proName <- gsub("[\\/:*?\"<>|{}]", "_", proNames[i])
+      safe_pepSeq <- gsub("[\\/:*?\"<>|{}]", "_", pepSeqs[i])
+      path2 <- file.path(
         path,
-        "/",
         paste(
           ftFileNames[i],
           i,
           charges[i],
           scanNumbers[i],
-          pepSeqs[i],
-          proNames[i],
+          safe_pepSeq,
+          safe_proName,
           Probs[i],
+          ".pdf",
           sep = "_"
-        ),
-        ".pdf"
-      ),
-      width = 25,
-      height = 7)
+        ))
+      path2 <- normalizePath(path2, mustWork = FALSE)
+      ggplot2::ggsave(filename = path2,
+        width = 25,
+        height = 7)
     }
   }

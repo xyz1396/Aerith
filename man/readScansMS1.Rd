@@ -20,5 +20,6 @@ a list of MS1 scans with names of scan number
 read MS1 scans with scanNumber as index in a range
 }
 \examples{
-ft1 <- readScansMS1("demo.ft1", 1, 10)
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+ft1 <- readScansMS1(demo_file, 1398, 1503)
 }

@@ -100,12 +100,23 @@ List getFilterThresholdTopPSMs(CharacterVector workingPath, NumericVector Overal
 //' @param workingPath a full path with .Spe2Pep files in it
 //' @param OverallThreshold FDR thredhold of peptides
 //' @param topN store top N PSMs of each scan of one .FT file
+//' @param decoyPrefix the prefix of decoy sequence
 //' @return a dataframe about filter threshold and FDR results
 //' @examples
-//' getFilterThresholdTopPSMsSpe2Pep("testDir", 0.01, 3)
+//' tmp <- tempdir()
+//' sip_dir <- file.path(tmp, "sip")
+//' dir.create(sip_dir)
+//' demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+//' demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+//' list.files(sip_dir, full.names = TRUE)
+//' a <- getFilterThresholdTopPSMsSpe2Pep(sip_dir, 1, 3, "Decoy_")
+//' a$threshold
 //' @export
 // [[Rcpp::export]]
-List getFilterThresholdTopPSMsSpe2Pep(String workingPath, float OverallThreshold, size_t topN)
+List getFilterThresholdTopPSMsSpe2Pep(String workingPath, float OverallThreshold,
+     size_t topN, String decoyPrefix)
 {
     Spe2PepFileReader reader;
     reader.readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(workingPath, topN);
@@ -134,7 +145,7 @@ List getFilterThresholdTopPSMsSpe2Pep(String workingPath, float OverallThreshold
     {
         reader.sipPSMs[i].scores = reader.sipPSMs[i].MVHscores;
     }
-    peptidesFiltrator filtrator(reader.sipPSMs, OverallThreshold, "Rev2_");
+    peptidesFiltrator filtrator(reader.sipPSMs, OverallThreshold, decoyPrefix);
 
     filtrator.filterPeptideMap();
     std::vector<int> decoyCount{filtrator.decoyCountCharge2, filtrator.decoyCountCharge3,

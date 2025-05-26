@@ -18,5 +18,13 @@ a dataframe of top N PSMs
 readSpe2PepFilesScansTopPSMsFromEachFT2Parallel read each scan's top PSMs from multiple .Spe2PepFile.txt files of each .FT2 file
 }
 \examples{
-top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3)
+tmp <- tempdir()
+sip_dir <- file.path(tmp, "sip")
+dir.create(sip_dir)
+demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+list.files(sip_dir, full.names = TRUE)
+top3 <-  readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3)
 }

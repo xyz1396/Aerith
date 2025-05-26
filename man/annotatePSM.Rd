@@ -36,7 +36,7 @@ annotatePSM(
 
 \item{isoWidth}{isolation window width, set it 0 as default if not remove peaks in isolation window}
 
-\item{calScores}{calculate WDP MVH Xcor scores or not}
+\item{calScores, }{FALSE as default, calculate WDP MVH Xcor scores or not}
 }
 \value{
 a List about matched peaks information of this PSM
@@ -45,7 +45,8 @@ a List about matched peaks information of this PSM
 annotatePSM
 }
 \examples{
-scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+scan1 <- readOneScanMS2(ftFile = demo_file, 107728)
 anno <- annotatePSM(
   scan1$peaks$mz, scan1$peaks$intensity,
   scan1$peaks$charge,

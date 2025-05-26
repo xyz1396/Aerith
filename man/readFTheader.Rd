@@ -16,5 +16,6 @@ a list of ft file header
 read FT file header
 }
 \examples{
-header <- readFTheader("demo.ft1")
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+header <- readFTheader(demo_file)
 }

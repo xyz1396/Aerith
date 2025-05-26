@@ -28,7 +28,8 @@ a score of this PSM
 scorePSM
 }
 \examples{
-scan1 <- readOneScanMS2(ftFile = "107728.ft2", 107728)
+demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+scan1 <- readOneScanMS2(ftFile = demo_file, 107728)
 score <- scorePSM(scan1$peaks$mz,
         scan1$peaks$intensity, scan1$peaks$charge, 2,
         "[HSQVFSTAEDNQSAVTIHVLQGER]", "C13", 0.0107)

@@ -4,7 +4,12 @@
 \alias{getFilterThresholdTopPSMsSpe2Pep}
 \title{getFilterThresholdTopPSMsSpe2Pep get filter threshold of top PSMs of each scan from multiple .sip file}
 \usage{
-getFilterThresholdTopPSMsSpe2Pep(workingPath, OverallThreshold, topN)
+getFilterThresholdTopPSMsSpe2Pep(
+  workingPath,
+  OverallThreshold,
+  topN,
+  decoyPrefix
+)
 }
 \arguments{
 \item{workingPath}{a full path with .Spe2Pep files in it}
@@ -12,6 +17,8 @@ getFilterThresholdTopPSMsSpe2Pep(workingPath, OverallThreshold, topN)
 \item{OverallThreshold}{FDR thredhold of peptides}
 
 \item{topN}{store top N PSMs of each scan of one .FT file}
+
+\item{decoyPrefix}{the prefix of decoy sequence}
 }
 \value{
 a dataframe about filter threshold and FDR results
@@ -20,5 +27,14 @@ a dataframe about filter threshold and FDR results
 getFilterThresholdTopPSMsSpe2Pep get filter threshold of top PSMs of each scan from multiple .sip file
 }
 \examples{
-getFilterThresholdTopPSMsSpe2Pep("testDir", 0.01, 3)
+tmp <- tempdir()
+sip_dir <- file.path(tmp, "sip")
+dir.create(sip_dir)
+demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+list.files(sip_dir, full.names = TRUE)
+a <- getFilterThresholdTopPSMsSpe2Pep(sip_dir, 1, 3, "Decoy_")
+a$threshold
 }

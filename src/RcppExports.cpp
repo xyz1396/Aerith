@@ -105,15 +105,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // getFilterThresholdTopPSMsSpe2Pep
-List getFilterThresholdTopPSMsSpe2Pep(String workingPath, float OverallThreshold, size_t topN);
-RcppExport SEXP _Aerith_getFilterThresholdTopPSMsSpe2Pep(SEXP workingPathSEXP, SEXP OverallThresholdSEXP, SEXP topNSEXP) {
+List getFilterThresholdTopPSMsSpe2Pep(String workingPath, float OverallThreshold, size_t topN, String decoyPrefix);
+RcppExport SEXP _Aerith_getFilterThresholdTopPSMsSpe2Pep(SEXP workingPathSEXP, SEXP OverallThresholdSEXP, SEXP topNSEXP, SEXP decoyPrefixSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< String >::type workingPath(workingPathSEXP);
     Rcpp::traits::input_parameter< float >::type OverallThreshold(OverallThresholdSEXP);
     Rcpp::traits::input_parameter< size_t >::type topN(topNSEXP);
-    rcpp_result_gen = Rcpp::wrap(getFilterThresholdTopPSMsSpe2Pep(workingPath, OverallThreshold, topN));
+    Rcpp::traits::input_parameter< String >::type decoyPrefix(decoyPrefixSEXP);
+    rcpp_result_gen = Rcpp::wrap(getFilterThresholdTopPSMsSpe2Pep(workingPath, OverallThreshold, topN, decoyPrefix));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -635,7 +636,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_getUnfilteredPeptides", (DL_FUNC) &_Aerith_getUnfilteredPeptides, 1},
     {"_Aerith_getFilterThreshold", (DL_FUNC) &_Aerith_getFilterThreshold, 2},
     {"_Aerith_getFilterThresholdTopPSMs", (DL_FUNC) &_Aerith_getFilterThresholdTopPSMs, 3},
-    {"_Aerith_getFilterThresholdTopPSMsSpe2Pep", (DL_FUNC) &_Aerith_getFilterThresholdTopPSMsSpe2Pep, 3},
+    {"_Aerith_getFilterThresholdTopPSMsSpe2Pep", (DL_FUNC) &_Aerith_getFilterThresholdTopPSMsSpe2Pep, 4},
     {"_Aerith_generateOneCFG", (DL_FUNC) &_Aerith_generateOneCFG, 6},
     {"_Aerith_generateCFGs", (DL_FUNC) &_Aerith_generateCFGs, 3},
     {"_Aerith_precursor_peak_calculator", (DL_FUNC) &_Aerith_precursor_peak_calculator, 1},

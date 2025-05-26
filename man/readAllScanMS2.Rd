@@ -16,5 +16,6 @@ a list of MS2 scans with names of scan number
 read MS2 scans with scanNumber as index
 }
 \examples{
-ft2 <- readAllScanMS2("demo.ft2")
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+ft2 <- readAllScanMS2(demo_file)
 }

@@ -58,7 +58,18 @@ private:
 //' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
 //' @return the PSMs in a dataframe in a list
 //' @examples
-//' psm <- extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, 3)
+//' tmp <- tempdir()
+//' target_dir <- file.path(tmp, "target")
+//' dir.create(target_dir, showWarnings = FALSE)
+//' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+//' ft_dir <- file.path(tmp, "ft")
+//' dir.create(ft_dir, showWarnings = FALSE)
+//' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+//' file_content <- readRDS(ft_file)
+//' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+//' list.files(tmp, full.names = TRUE, recursive = TRUE)
+//' psm <- extractPSMfeatures(target_dir, 5, ft_dir, 3)
 //' @export
 // [[Rcpp::export]]
 
@@ -95,9 +106,12 @@ List extractPSMfeatures(String Spe2PepFilePath, int topN,
                 isotopicIntensityStr += std::to_string(sipPSMs[i].isotopicPeakss[j][k].intensity) + ",";
             }
             // remove last ","
-            isotopicMZstr.pop_back();
-            isotopicChargeStr.pop_back();
-            isotopicIntensityStr.pop_back();
+            if (!isotopicMZstr.empty()) 
+            {
+                isotopicMZstr.pop_back();
+                isotopicChargeStr.pop_back();
+                isotopicIntensityStr.pop_back();
+            }
             isotopicMZs.push_back(isotopicMZstr);
             isotopicCharges.push_back(isotopicChargeStr);
             isotopicIntensities.push_back(isotopicIntensityStr);
@@ -149,7 +163,22 @@ List extractPSMfeatures(String Spe2PepFilePath, int topN,
 //' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
 //' @return the PSMs in a dataframe in a list
 //' @examples
-//' psm <- extractPSMfeaturesTargetAndDecoy("targetPath", "decoyPath", topN, "ftFilepath", 3)
+//' tmp <- tempdir()
+//' target_dir <- file.path(tmp, "target")
+//' dir.create(target_dir, showWarnings = FALSE)
+//' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+//' decoy_dir <- file.path(tmp, "decoy")
+//' dir.create(decoy_dir, showWarnings = FALSE)
+//' decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+//' ft_dir <- file.path(tmp, "ft")
+//' dir.create(ft_dir, showWarnings = FALSE)
+//' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+//' file_content <- readRDS(ft_file)
+//' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+//' list.files(tmp, full.names = TRUE, recursive = TRUE)
+//' psm <- extractPSMfeaturesTargetAndDecoy(target_dir, decoy_dir, 3, ft_dir, 3)
 //' @export
 // [[Rcpp::export]]
 
@@ -245,7 +274,23 @@ List extractPSMfeaturesTargetAndDecoy(String targetPath, String decoyPath, int t
 //' @param doProteinInference out put protein inference format or only PSM format
 //' @param fileName output path of the percolator tsv file
 //' @examples
-//' extractPSMfeaturesTargetAndDecoytoPercolatorPin("targetPath", "decoyPath", topN, "ftFilepath", 3, "a.pin")
+//' tmp <- tempdir()
+//' target_dir <- file.path(tmp, "target")
+//' dir.create(target_dir, showWarnings = FALSE)
+//' target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+//' file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+//' decoy_dir <- file.path(tmp, "decoy")
+//' dir.create(decoy_dir, showWarnings = FALSE)
+//' decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+//' file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+//' ft_dir <- file.path(tmp, "ft")
+//' dir.create(ft_dir, showWarnings = FALSE)
+//' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+//' file_content <- readRDS(ft_file)
+//' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+//' pin_path <- file.path(tmp, "a.pin")
+//' extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
+//' list.files(tmp, full.names = TRUE, recursive = TRUE)
 //' @export
 // [[Rcpp::export]]
 

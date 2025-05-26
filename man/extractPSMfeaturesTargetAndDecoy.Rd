@@ -30,5 +30,20 @@ the PSMs in a dataframe in a list
 extractPSMfeaturesTargetAndDecoy extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
 }
 \examples{
-psm <- extractPSMfeaturesTargetAndDecoy("targetPath", "decoyPath", topN, "ftFilepath", 3)
+tmp <- tempdir()
+target_dir <- file.path(tmp, "target")
+dir.create(target_dir, showWarnings = FALSE)
+target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+decoy_dir <- file.path(tmp, "decoy")
+dir.create(decoy_dir, showWarnings = FALSE)
+decoy_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+file.copy(decoy_file, file.path(decoy_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+ft_dir <- file.path(tmp, "ft")
+dir.create(ft_dir, showWarnings = FALSE)
+ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+file_content <- readRDS(ft_file)
+writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+list.files(tmp, full.names = TRUE, recursive = TRUE)
+psm <- extractPSMfeaturesTargetAndDecoy(target_dir, decoy_dir, 3, ft_dir, 3)
 }

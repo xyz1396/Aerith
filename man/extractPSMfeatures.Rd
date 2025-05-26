@@ -22,5 +22,16 @@ the PSMs in a dataframe in a list
 extractPSMfeatures extract featueres of top PSMs from multiple .Spe2Pep.txt files
 }
 \examples{
-psm <- extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, 3)
+tmp <- tempdir()
+target_dir <- file.path(tmp, "target")
+dir.create(target_dir, showWarnings = FALSE)
+target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+file.copy(target_file, file.path(target_dir, "Pan_052322_X13.SIP_C13_050_000Pct.Spe2Pep.txt"))
+ft_dir <- file.path(tmp, "ft")
+dir.create(ft_dir, showWarnings = FALSE)
+ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
+file_content <- readRDS(ft_file)
+writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
+list.files(tmp, full.names = TRUE, recursive = TRUE)
+psm <- extractPSMfeatures(target_dir, 5, ft_dir, 3)
 }

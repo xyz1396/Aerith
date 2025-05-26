@@ -26,5 +26,13 @@ writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel read each scan's top PSMs from 
 files of each .FT2 file and write them to one tsv file
 }
 \examples{
-writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel("testDir", 3, "test.tsv")
+tmp <- tempdir()
+sip_dir <- file.path(tmp, "sip")
+dir.create(sip_dir)
+demo_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000target.Spe2Pep.txt"))
+demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith")
+file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
+writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3, file.path(sip_dir, "top3.tsv"))
+list.files(sip_dir, full.names = TRUE)
 }

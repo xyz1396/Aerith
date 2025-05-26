@@ -18,5 +18,6 @@ a list of MS2 scans with names of scan number
 read MS2 scans with scanNumber as index in a vector
 }
 \examples{
-ft2 <- readScansMS2("demo.ft2", c(9, 8, 7))
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+ft2 <- readScansMS2Vector(demo_file, c(1350, 1355, 1359))
 }

@@ -20,7 +20,10 @@ void
 write all MS1 scans has charge
 }
 \examples{
-header <- readFTheader("demo.ft1")
-ft1 <- readAllScanMS1("demo.ft1")
-writeAllScanMS1(header,ft1[1:10],"demo10.ft1")
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+header <- readFTheader(demo_file)
+ft1 <- readAllScanMS1(demo_file)
+tmp <- tempdir()
+writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.ft1"))
+list.files(tmp, pattern = "demo10.ft1", full.names = TRUE)
 }

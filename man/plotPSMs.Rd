@@ -54,10 +54,12 @@ scanNumbers <- psm$ScanNumber
 proNames <- psm$ProteinNames
 charges <- psm$ParentCharge
 pep <- psm$OriginalPeptide
-pep <- str_sub(pep, 2, -2)
+pep <- stringr::str_sub(pep, 2, -2)
 pct <- psm$SearchName
-pct <- as.numeric(str_sub(str_split(pct, "_", simplify = T)[, 2], 1, -4)) / 100 / 1000
+pct <- as.numeric(stringr::str_sub(
+ stringr::str_split(pct, "_", simplify = T)[, 2], 1, -4)) / 100 / 1000
 realScans <- getRealScans(ft2, scanNumbers)
+tmp <- tempdir()
 plotPSMs(
   realScans,
   charges,
@@ -68,6 +70,8 @@ plotPSMs(
   scanNumbers,
   pep,
   proNames,
+  path = tmp
 )
+list.files(tmp, pattern = ".pdf", full.names = T)
 
 }

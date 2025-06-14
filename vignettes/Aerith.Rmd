@@ -1,0 +1,36 @@
+---
+title: "Aerith"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Input-data-format}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Abstract
+
+Aerith is an R package for the simulation and visualization of isotopic envelopes in stable isotope 
+probing (SIP) mass spectrometry data. It enables users to model and compare simulated and experimental 
+isotopic patterns of peptides and metabolites with customizable chemical formulas and atom% enrichment. 
+Aerith employs efficient algorithms—including sequential convolution for peptide fragments, 
+Monte Carlo simulation for fine isotopic structures, and FFT-based methods for metabolites—to accurately 
+generate isotopic distributions. Implemented in C++ for high performance, Aerith supports robust scoring 
+functions for peptide-spectrum match evaluation and provides interactive visualization tools. Case studies 
+in vignettes demonstrate its application to compounds such as glucose, penicillin, and microbial peptides, highlighting 
+its utility for precise annotation and manual validation in proteomic and metabolomic SIP analyses.
+
+# Introduction
+
+Aerith is an R package designed for the simulation and analysis of theoretical isotopic peaks, 
+fine structures, and spectral envelopes for user-defined chemical formulas or peptide sequences 
+in metabolomics and proteomics. Unlike existing tools, Aerith supports flexible specification of
+isotopic abundances for stable isotope probing (SIP) experiments, allowing users to model compounds
+with any degree of isotopic enrichment. The package enables visualization and manual validation of 
+both unlabeled and SIP-labeled peptide-spectrum matches (PSMs), facilitating interpretation of
+complex mass spectrometry data. Aerith addresses limitations of previous software by providing
+a unified framework for simulating isotopic distributions in both metabolomic and proteomic SIP 
+workflows, supporting user-defined molecular structures and isotopic labeling patterns.

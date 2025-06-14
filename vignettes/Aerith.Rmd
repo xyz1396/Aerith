@@ -33,4 +33,8 @@ with any degree of isotopic enrichment. The package enables visualization and ma
 both unlabeled and SIP-labeled peptide-spectrum matches (PSMs), facilitating interpretation of
 complex mass spectrometry data. Aerith addresses limitations of previous software by providing
 a unified framework for simulating isotopic distributions in both metabolomic and proteomic SIP 
-workflows, supporting user-defined molecular structures and isotopic labeling patterns.
+workflows, supporting user-defined molecular structures and isotopic labeling patterns. 
+Aerith accepts spectral data files in multiple formats, including Raxport-processed FT2, mzML, 
+and MGF files, as well as pepXML and PIN files (Percolator outputs), and TSV files from the Sipros 
+search engine for peptide amino acid sequences or PSM input. Integration with the mzR package from 
+Bioconductor allows direct parsing of mzML and MGF files, while MSnbase enables parsing of pepXML files.

@@ -431,7 +431,7 @@ plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) + plotScanFr
 plotPrecursorMzFrequency(infoMS2)
 ```
 
-````{r}
+```{r}
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 a <- readAllScanMS2(demo_file)
 a <- getRetentionTimeAndPrecursorInfo(a)

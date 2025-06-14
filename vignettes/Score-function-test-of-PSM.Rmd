@@ -36,6 +36,14 @@ library(tidyr)
 ### Unlabeled PSM at 1.07% ^13^C 
 
 ```{r}
+demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+scan2 <- readOneScanMS2(ftFile = demo_file, 107728)
+scan1 <- getRealScanFromList(scan2)
+pep <- "HSQVFSTAEDNQSAVTIHVLQGER"
+pep2 <- "[HSQVFSTAEDNQSAVTIHVLQGER]"
+```
+
+```{r eval=FALSE}
 psm <- readPSMtsv("../rmd/input data format/pct1.psm.txt")
 psm <- arrange(psm, desc(Score))
 psm1 <- psm[8, ]
@@ -46,7 +54,8 @@ scan1 <- getRealScanFromList(scan1)
 ```
 
 ```{r}
-isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
+# isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
+isoCenter <- scan2$isolationWindowCenterMZ
 anno <- annotatePSM(
   scan1@spectra$MZ, scan1@spectra$Prob,
   scan1@spectra$Charge,
@@ -106,6 +115,16 @@ ggplot(scores_long, aes(x = abundance, y = score_value)) +
 #### Annotate B and Y ion fragments
 
 ```{r}
+demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+ft2 <- readAllScanMS2(demo_file)
+scan2 <- ft2[["2596"]]
+scan1 <- getRealScanFromList(scan2)
+pep <- "HYAHVDCPGHADYVK"
+pep2 <- "[HYAHVDCPGHADYVK]"
+pct <- 0.52
+```
+
+```{r eval=FALSE}
 psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
 psm <- arrange(psm, desc(Score))
 # use the same peptide as 1% 13C chunk
@@ -119,7 +138,8 @@ scan1 <- getRealScanFromList(scan1)
 ```
 
 ```{r}
-isoCenter <- psm1$MeasuredParentMass/psm1$ParentCharge + 1.007276
+# isoCenter <- psm1$MeasuredParentMass/psm1$ParentCharge + 1.007276
+isoCenter <- scan2$isolationWindowCenterMZ
 WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   return(scorePSM(scan1@spectra$MZ,
     realIntensity = scan1@spectra$Prob,

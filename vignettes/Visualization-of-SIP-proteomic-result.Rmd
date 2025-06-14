@@ -34,6 +34,12 @@ library(Aerith)
 ### Summarize SIP percent for PSMs
 
 ```{r}
+demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+summaryStats <- summaryPSMsipPCT(demo_file)
+print(summaryStats)
+```
+
+```{r eval=FALSE}
 s <- summaryPSMsipPCT("../rmd/input data format/pct1.psm.txt", 
     SIPthreshold = 0.5, chargeThreshold = 3)
 knitr::kable(s)
@@ -45,6 +51,12 @@ knitr::kable(s)
 ### Plot the distribution of SIP percent for PSMs
 
 ```{r}
+demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+p <- plotPSMsipPCT(demo_file)
+p
+```
+
+```{r eval=FALSE}
 plotPSMsipPCT("../rmd/input data format/pct1.psm.txt")
 plotPSMsipPCT("../rmd/input data format/pct50.psm.txt")
 ```

@@ -1,5 +1,5 @@
 ---
-title: "Input-Data-Format"
+title: "Generate-input-data"
 output:
   rmarkdown::html_document:
     toc: true
@@ -66,7 +66,7 @@ mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -f 0 -o mgf
 
 ### Read one scan or scans from FT1 and FT2 file
 
-```{r eval=FALSE}
+```{r}
 ft1 <- readOneScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1", 10430)
 ft2 <- readOneScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", 10487)
 ft1 <- getRealScanFromList(ft1)
@@ -93,17 +93,6 @@ ft2 <- readScansMS2Vector(
 )
 ft2 <- getRealScanFromList(ft2[[1]])
 plot(ft2)
-```
-
-```{r}
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- getRealScanFromList(a[[1]])
-plot(b)
-demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- getRealScanFromList(a[[1]])
-plot(b)
 ```
 
 ### Read all scans from FT1 and FT2 file
@@ -229,14 +218,14 @@ plot(scan1)
 <search_score name="expect" value="2"/>
 ```
 
-```{r, eval=FALSE}
+```{r}
 psm <- readPepXMLtable("../rmd/input data format/demo.pep.xml")
 psm$sequence
 ```
 
 ### Read PSM from TSV generated from Sipros
 
-```{r psm.txt, eval=FALSE}
+```{r psm.txt}
 psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
 ```
 
@@ -371,7 +360,7 @@ file_content<- readRDS("../rmd/input data format/demo_target_decoy.FT1.rds")
 
 ### TIC visualization
 
-```{r, eval=FALSE}
+```{r}
 ms1 <- readAllScanMS1("../rmd/input data format/ft/Pan_052322_X13.FT1")
 tic <- getTIC(ms1)
 plotTIC(tic)
@@ -380,20 +369,9 @@ tic <- getTIC(ms2)
 plotTIC(tic)
 ```
 
-```{r}
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- getTIC(a)
-plotTIC(b, seq(9, 10, by = 0.2))
-demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- getTIC(a)
-plotTIC(b, seq(9, 10, by = 0.2))
-```
-
 ### Scan speed visualization in retention times
 
-```{r, eval=FALSE}
+```{r}
 # MS1 has 6434 scans
 length(ms1)
 
@@ -415,28 +393,13 @@ length(unique(infoMS1$ScanNumber)) - length(unique(infoMS2$PrecursorScanNumber))
 plotScanFrequency(infoMS1) + plotScanFrequencyMS2(infoMS2)
 ```
 
-```{r}
-demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-a <- getRetentionTimeAndPrecursorInfo(a)
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
-b <- readAllScanMS1(demo_file)
-b <- getRetentionTimeAndPrecursorInfo(b)
-plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) + plotScanFrequencyMS2(b, binwidth = 0.1)
-```
-
 ### Precursor density visualization in retention times
 
-```{r, eval=FALSE}
+```{r}
 plotPrecursorMzFrequency(infoMS2)
 ```
 
-````{r}
-demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-a <- getRetentionTimeAndPrecursorInfo(a)
-plotPrecursorMzFrequency(a, timeBinWidth = 0.1, x_breaks = seq(8, 11, by = 0.2))
-```
+
 
 ```{r session-info, include=FALSE}
 sessionInfo()

@@ -153,7 +153,7 @@ List readAllScanMS1(const String ftFile)
 //' @return a list of MS2 scans with names of scan number
 //' @examples
 //' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-//' ft2 <- readScansMS2("demo.ft2", 1350, 1355)
+//' ft2 <- readScansMS2(demo_file, 1350, 1355)
 //' @export
 // [[Rcpp::export]]
 List readScansMS2(const String ftFile, const size_t startScanNumber, const size_t endScanNumber)

@@ -189,3 +189,88 @@ plotProSipPct <- function(proPath) {
         theme(text = element_text(size = 15))
     p
 }
+
+#' Plot decoy-filtered PSMs' PCT and intensity summary by each input file
+#'
+#' This function reads all filtered PSM files in from output directory of Sipros 5, combines them, filters for labeled PSMs,
+#' extracts file names, computes log2 intensities, and generates a hexbin plot faceted by each input file.
+#'
+#' @param psms_dir Directory containing filtered PSM files (default: "psms/").
+#' @param output_file Output PDF file name for the plot.
+#' @import data.table
+#' @import stringr
+#' @import ggplot2
+#' @importFrom scales log_breaks
+#' @export
+plotFilteredPCTIntensitySummary <- function(psms_dir = "psms/", output_file = "decoy_filtered_PCT_and_intensity_summary_by_file.pdf",
+    width = 16, height = 12) {
+  file_list <- list.files(psms_dir, pattern = "(filtered_psms.tsv)$", full.names = TRUE, recursive = TRUE)
+  # Exclude files in the top-level psms_dir (keep only those in subfolders)
+  file_list <- file_list[dirname(file_list) != normalizePath(psms_dir)]
+  if (length(file_list) == 0) stop("No filtered_psms.tsv files found in subfolders of the specified directory.")
+  psm <- data.table::rbindlist(lapply(file_list, data.table::fread))
+  psm <- psm[psm$Label == 1, ]
+  psm$fileName <- stringr::str_split(psm$PSMId, "\\.", simplify = TRUE)[, 1]
+#   psm$fileName <- stringr::str_split(psm$fileName, "_", simplify = TRUE)[, 5]
+  psm$log2_intensity <- psm$log10_precursorIntensities * log(10, base = 2)
+  p <- ggplot2::ggplot(psm, ggplot2::aes(x = log2_intensity, y = MS1IsotopicAbundances)) +
+    ggplot2::geom_hex(bins = 50) +
+    ggplot2::facet_wrap(~fileName) +
+    ggplot2::scale_fill_viridis_c(
+      option = "plasma",
+      trans = "log10",
+      breaks = scales::log_breaks()
+    ) +
+    ggplot2::labs(
+      x = expression(paste("log"[2], "(Precursor intensity)")),
+    # y = expression(paste(~ {}^{13}, "C %")),
+      y = "SIP %",
+      fill = expression(paste("log"[10], "(Count)"))
+    ) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      text = ggplot2::element_text(size = 20)
+    )
+  ggplot2::ggsave(output_file, plot = p, width = 16, height = 12)
+  return(p)
+}
+
+#' Plot SIP-filtered PCT and intensity summary by each input file
+#'
+#' This function reads a SIP filtered PSM file, processes the data, and generates a hexbin plot
+#' of log2 precursor intensity vs. MS1 isotopic abundances, faceted by each input file.
+#'
+#' @param psm_file Path to the filtered PSM file (e.g., "SIP_filtered_psms.tsv").
+#' @param output_file Output PDF file name for the plot.
+#' @param width Width of the output PDF (default: 16).
+#' @param height Height of the output PDF (default: 12).
+#' @import data.table
+#' @import stringr
+#' @import ggplot2
+#' @importFrom scales log_breaks
+#' @export
+plotSIPfilteredPCTIntensityBySample <- function(psm_file = "SIP_filtered_psms.tsv",
+                                             output_file = "SIP_filtered_PCT_and_intensity_summary_by_sample.pdf",
+                                             width = 16, height = 12) {
+  psm <- data.table::fread(psm_file)
+  psm$log2_intensity <- psm$log10_precursorIntensities * log(10, base = 2)
+  p <- ggplot2::ggplot(psm, ggplot2::aes(x = log2_intensity, y = MS1IsotopicAbundances)) +
+    ggplot2::geom_hex(bins = 50) +
+    ggplot2::facet_wrap(~SampleName) +
+    ggplot2::scale_fill_viridis_c(
+      option = "plasma",
+      trans = "log10",
+      breaks = scales::log_breaks()
+    ) +
+    ggplot2::labs(
+      x = expression(paste("log"[2], "(Precursor intensity)")),
+      y = expression(paste(~ {}^{13}, "C %")),
+      fill = expression(paste("log"[10], "(Count)"))
+    ) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      text = ggplot2::element_text(size = 20)
+    )
+  ggplot2::ggsave(output_file, plot = p, width = width, height = height)
+  return(p)
+}

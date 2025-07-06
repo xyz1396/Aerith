@@ -21,5 +21,5 @@ read MS2 scans with scanNumber as index in a range
 }
 \examples{
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-ft2 <- readScansMS2("demo.ft2", 1350, 1355)
+ft2 <- readScansMS2(demo_file, 1350, 1355)
 }

@@ -24,7 +24,9 @@ Imports:
     ggnewscale,
     dplyr,
     tidyr,
-    stringr
+    stringr,
+    data.table,
+    scales
 SystemRequirements: C++17
 VignetteBuilder: knitr
 Config/build/vignettes: FALSE

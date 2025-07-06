@@ -57,7 +57,7 @@ pep <- psm$OriginalPeptide
 pep <- stringr::str_sub(pep, 2, -2)
 pct <- psm$SearchName
 pct <- as.numeric(stringr::str_sub(
- stringr::str_split(pct, "_", simplify = T)[, 2], 1, -4)) / 100 / 1000
+ stringr::str_split(pct, "_", simplify = TRUE)[, 2], 1, -4)) / 100 / 1000
 realScans <- getRealScans(ft2, scanNumbers)
 tmp <- tempdir()
 plotPSMs(
@@ -72,6 +72,6 @@ plotPSMs(
   proNames,
   path = tmp
 )
-list.files(tmp, pattern = ".pdf", full.names = T)
+list.files(tmp, pattern = ".pdf", full.names = TRUE)
 
 }

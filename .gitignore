@@ -19,6 +19,7 @@
 
 # RStudio files
 .Rproj.user/
+Aerith.Rproj
 
 # produced vignettes
 vignettes/*.html

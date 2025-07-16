@@ -7,11 +7,11 @@
 calPepNeutronMass(AAstrs, Atom, Probs)
 }
 \arguments{
+\item{AAstrs}{a CharacterVector of peptides}
+
 \item{Atom}{a Character of "C13", "H2", "O18", "N15", or "S34"}
 
 \item{Probs}{a NumericVector with the same length of AAstr for SIP abundances}
-
-\item{AAstr}{a CharacterVector of peptides}
 }
 \value{
 a vector of peptide neutron masses

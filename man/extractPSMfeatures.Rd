@@ -16,7 +16,7 @@ extractPSMfeatures(Spe2PepFilePath, topN, ftFilepath, ThreadNumber = 3L)
 \item{ThreadNumber}{read ThreadNumber of FT file at the same time, it will increase ram usage}
 }
 \value{
-the PSMs in a dataframe in a list
+A named list of data frames, each containing the extracted PSM features from the corresponding .Spe2Pep.txt file.
 }
 \description{
 extractPSMfeatures extract featueres of top PSMs from multiple .Spe2Pep.txt files

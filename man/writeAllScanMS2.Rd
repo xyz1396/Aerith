@@ -9,9 +9,9 @@ writeAllScanMS2(header, scansList, ftFile)
 \arguments{
 \item{header}{a list of FT file header}
 
-\item{ftFile}{a ft2 file's output path}
+\item{scansList}{a list of scans for output}
 
-\item{scans}{a list of scans for output}
+\item{ftFile}{a ft2 file's output path}
 }
 \value{
 void

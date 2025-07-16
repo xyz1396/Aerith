@@ -159,7 +159,7 @@ DataFrame readSpe2PepFilesScansTopPSMsFromOneFT2(String workingPath, String patt
     }
     if (matchedNames.size() == 0)
     {
-        std::cout << "No .Spe2PepFile file was matched!" << std::endl;
+        Rcout << "No .Spe2PepFile file was matched!" << std::endl;
         return DataFrame();
     }
     reader.sipFileNames = matchedNames;

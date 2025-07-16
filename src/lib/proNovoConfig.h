@@ -12,7 +12,17 @@
 #include <stdio.h>
 #include "isotopologue.h"
 #include <limits>
+#ifdef _OPENMP
 #include "omp.h"
+#else
+#include <ctime>
+// Dummy function for omp_get_wtime() if OpenMP is not available.
+// Returns the approximate processor time in seconds.
+inline double omp_get_wtime()
+{
+	return (double)clock() / CLOCKS_PER_SEC;
+}
+#endif
 
 using namespace std;
 

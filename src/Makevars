@@ -4,8 +4,8 @@ PKG_CPPFLAGS = -I.
 
 CXX_STD = CXX17
 # PKG_CXXFLAGS += -O3 -fopenmp
-PKG_CXXFLAGS += -fopenmp
-PKG_LIBS += -fopenmp 
+PKG_CXXFLAGS += $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS += $(SHLIB_OPENMP_CXXFLAGS) 
 
 # Include all C++ files in src/ and its subdirectories: src/A and src/B
 LIB = $(wildcard lib/*.cpp)

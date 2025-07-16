@@ -7,11 +7,11 @@
 precursor_peak_calculator_DIY_averagine(AAstrs, Atom, Prob)
 }
 \arguments{
+\item{AAstrs}{a CharacterVector of peptides}
+
 \item{Atom}{a CharacterVector C13 or N15}
 
 \item{Prob}{a NumericVector for its abundance}
-
-\item{AAstr}{a CharacterVector of peptides}
 }
 \value{
 a list of DataFrames of spectra

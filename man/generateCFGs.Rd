@@ -12,12 +12,6 @@ generateCFGs(cfgPath, outPath, element)
 \item{outPath}{a full path for .cfg file output}
 
 \item{element}{a string of element name, "N" for example}
-
-\item{pct}{a integer of element SIP abundance}
-
-\item{center}{a integer of mass window center}
-
-\item{width}{a integer of mass half window width}
 }
 \value{
 a bool value if generate succeed or not

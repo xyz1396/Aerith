@@ -9,12 +9,10 @@ readScansMS1Vector(ftFile, scanNumbersVector)
 \arguments{
 \item{ftFile}{a ft1 file's full path}
 
-\item{startScanNumber}{read scans starting from this scanNumber}
-
-\item{endScanNumber}{read scans ending at this scanNumber}
+\item{scanNumbersVector}{a NumericVector of scan numbers}
 }
 \value{
-a list of MS1 scans with names of scan number
+A named list of MS1 scans with names of scan number. The names of the list correspond to the scan numbers.
 }
 \description{
 read MS1 scans with scanNumber as index in a vector

@@ -2,7 +2,6 @@
 #include "lib/initSIP.h"
 #include <Rcpp.h>
 #include <regex>
-#include <omp.h>
 using namespace Rcpp;
 
 // for create data.frame with more than 20 columns
@@ -56,7 +55,7 @@ private:
 //' @param topN store top N PSMs of each scan of one .FT2 file
 //' @param ftFilepath a full path with .FT1 and .FT2 files in it
 //' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
-//' @return the PSMs in a dataframe in a list
+//' @return A named list of data frames, each containing the extracted PSM features from the corresponding .Spe2Pep.txt file.
 //' @examples
 //' tmp <- tempdir()
 //' target_dir <- file.path(tmp, "target")

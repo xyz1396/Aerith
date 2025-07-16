@@ -7,7 +7,7 @@
 readPSMtsv(tsv)
 }
 \arguments{
-\item{file_path}{A character string specifying the path to the PSM TSV file.}
+\item{tsv}{A character string specifying the path to the PSM TSV file.}
 }
 \value{
 A data frame containing the data from the PSM TSV file.

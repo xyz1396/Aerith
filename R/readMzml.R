@@ -143,7 +143,7 @@ readMgf <- function(mgf) {
 #'
 #' This function reads a Peptide-Spectrum Match (PSM) file in TSV (Tab-Separated Values) format.
 #'
-#' @param file_path A character string specifying the path to the PSM TSV file.
+#' @param tsv A character string specifying the path to the PSM TSV file.
 #'
 #' @return A data frame containing the data from the PSM TSV file.
 #'
@@ -162,7 +162,7 @@ readPSMtsv <- function(tsv) {
 
 #' Read PSM table from .pepXML file
 #'
-#' @param ms A .pepXML files's path
+#' @param pepXML A .pepXML files's path
 #'
 #' @return A dataframe of psm table
 #' @export

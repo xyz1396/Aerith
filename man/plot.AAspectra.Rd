@@ -2,14 +2,17 @@
 % Please edit documentation in R/plotAAspectra.R
 \name{plot.AAspectra}
 \alias{plot.AAspectra}
+\alias{plot,AAspectra-method}
 \title{Draw AAspectra MS plot}
 \usage{
 plot.AAspectra(x, linewidth = 0.1)
+
+\S4method{plot}{AAspectra}(x, linewidth = 0.1)
 }
 \arguments{
 \item{x}{AAspectra object}
 
-\item{linewidth}{}
+\item{linewidth}{numeric, for width of MS peaks. Default is 0.1}
 }
 \value{
 a ggplot2 object

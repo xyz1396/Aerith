@@ -7,7 +7,7 @@
 calPepAtomCount(AAstrs)
 }
 \arguments{
-\item{AAstr}{a CharacterVector of peptides}
+\item{AAstrs}{a CharacterVector of peptides}
 }
 \value{
 a dataframe of C H O N P S atom count each row is for one peptide

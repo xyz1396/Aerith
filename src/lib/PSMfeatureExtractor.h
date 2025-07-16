@@ -4,7 +4,9 @@
 #include "averagine.h"
 #include "isotopicPeak.h"
 #include <unordered_map>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <array>
 
 class PSMfeatureExtractor

@@ -35,9 +35,6 @@ bool generateOneCFG(String cfgPath, String outPath, String element,
 //' @param cfgPath a full path of .cfg file
 //' @param outPath a full path for .cfg file output
 //' @param element a string of element name, "N" for example
-//' @param pct a integer of element SIP abundance
-//' @param center a integer of mass window center
-//' @param width a integer of mass half window width
 //' @return a bool value if generate succeed or not
 //' @export
 // [[Rcpp::export]]

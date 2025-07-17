@@ -106,7 +106,7 @@ DataFrame readFilesScansTopPSMsFromOneFT2(String workingPath, String pattern, si
     }
     if (matchedNames.size() == 0)
     {
-        std::cout << "No .sip file was matched!" << std::endl;
+        Rcout << "No .sip file was matched!" << std::endl;
         return DataFrame();
     }
     reader.sipFileNames = matchedNames;

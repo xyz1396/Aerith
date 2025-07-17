@@ -6,7 +6,7 @@
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @param ftFilepath a full path with .FT1 and .FT2 files in it
 #' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
-#' @return the PSMs in a dataframe in a list
+#' @return A named list of data frames, each containing the extracted PSM features from the corresponding .Spe2Pep.txt file.
 #' @examples
 #' tmp <- tempdir()
 #' target_dir <- file.path(tmp, "target")
@@ -162,9 +162,6 @@ generateOneCFG <- function(cfgPath, outPath, element, pct, center, width) {
 #' @param cfgPath a full path of .cfg file
 #' @param outPath a full path for .cfg file output
 #' @param element a string of element name, "N" for example
-#' @param pct a integer of element SIP abundance
-#' @param center a integer of mass window center
-#' @param width a integer of mass half window width
 #' @return a bool value if generate succeed or not
 #' @export
 generateCFGs <- function(cfgPath, outPath, element) {
@@ -210,7 +207,7 @@ precursor_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
 }
 
 #' Simple calculator of C H O N P S atom count of peptide
-#' @param AAstr a CharacterVector of peptides
+#' @param AAstrs a CharacterVector of peptides
 #' @return a dataframe of C H O N P S atom count each row is for one peptide
 #' @export
 #' @examples
@@ -220,7 +217,7 @@ calPepAtomCount <- function(AAstrs) {
 }
 
 #' Simple calculator of C H O N P S atom count and mass without isotope of B Y ions
-#' @param AAstr a CharacterVector of peptides
+#' @param AAstrs a CharacterVector of peptides
 #' @return a list of data.frame of C H O N P S atom count and each data.frame is for one peptide
 #' @export
 #' @examples
@@ -230,7 +227,7 @@ calBYAtomCountAndBaseMass <- function(AAstrs) {
 }
 
 #' Simple calculator of peptide precursor mass by binomial NP
-#' @param AAstr a CharacterVector of peptides
+#' @param AAstrs a CharacterVector of peptides
 #' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 #' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 #' @return a vector of peptide precursor masses
@@ -242,7 +239,7 @@ calPepPrecursorMass <- function(AAstrs, Atom, Probs) {
 }
 
 #' Simple calculator neutron mass by average delta mass of each isotope
-#' @param AAstr a CharacterVector of peptides
+#' @param AAstrs a CharacterVector of peptides
 #' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 #' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 #' @return a vector of peptide neutron masses
@@ -254,7 +251,7 @@ calPepNeutronMass <- function(AAstrs, Atom, Probs) {
 }
 
 #' Simple peak calculator of user defined isotopic distribution of one peptide by averagine
-#' @param AAstr a CharacterVector of peptides
+#' @param AAstrs a CharacterVector of peptides
 #' @param Atom a CharacterVector C13 or N15
 #' @param Prob a NumericVector for its abundance
 #' @return a list of DataFrames of spectra
@@ -326,9 +323,8 @@ readScansMS1 <- function(ftFile, startScanNumber, endScanNumber) {
 
 #' read MS1 scans with scanNumber as index in a vector
 #' @param ftFile a ft1 file's full path
-#' @param startScanNumber read scans starting from this scanNumber
-#' @param endScanNumber read scans ending at this scanNumber
-#' @return a list of MS1 scans with names of scan number
+#' @param scanNumbersVector a NumericVector of scan numbers
+#' @return A named list of MS1 scans with names of scan number. The names of the list correspond to the scan numbers.
 #' @examples
 #' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
 #' ft1 <- readScansMS1Vector(demo_file, c(1398, 1503, 1508))
@@ -621,6 +617,7 @@ annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom
 #' scorePSMold old function of scoreWeightSumHighMS2
 #' @param realMZ mz vector in MS2 scan
 #' @param realIntensity intensity vector in MS2 scan
+#' @param realCharge charge vector in MS2 scan
 #' @param pepSeq a string of peptide
 #' @param Atom "C13" or "N15"
 #' @param Prob its SIP abundance (0.0~1.0)
@@ -653,7 +650,7 @@ denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
 
 #' write all MS1 scans has charge
 #' @param header a list of FT file header
-#' @param scans a list of scans for output
+#' @param scansList a list of scans for output
 #' @param ftFile a ft1 file's output path
 #' @return void
 #' @examples
@@ -670,7 +667,7 @@ writeAllScanMS1 <- function(header, scansList, ftFile) {
 
 #' write all MS2 scans has charge
 #' @param header a list of FT file header
-#' @param scans a list of scans for output
+#' @param scansList a list of scans for output
 #' @param ftFile a ft2 file's output path
 #' @return void
 #' @examples

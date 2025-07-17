@@ -7,7 +7,7 @@
 readPepXMLtable(pepXML)
 }
 \arguments{
-\item{ms}{A .pepXML files's path}
+\item{pepXML}{A .pepXML files's path}
 }
 \value{
 A dataframe of psm table

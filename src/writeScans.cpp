@@ -51,7 +51,7 @@ List denoiseOneMS2ScanHasCharge(List scanList, float window, float step, float t
 
 //' write all MS1 scans has charge
 //' @param header a list of FT file header
-//' @param scans a list of scans for output
+//' @param scansList a list of scans for output
 //' @param ftFile a ft1 file's output path
 //' @return void
 //' @examples
@@ -99,7 +99,7 @@ bool writeAllScanMS1(List header, List scansList, const String &ftFile)
 
 //' write all MS2 scans has charge
 //' @param header a list of FT file header
-//' @param scans a list of scans for output
+//' @param scansList a list of scans for output
 //' @param ftFile a ft2 file's output path
 //' @return void
 //' @examples

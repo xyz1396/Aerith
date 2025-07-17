@@ -460,10 +460,12 @@ void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2Parallel(const st
         FT2s.push_back(pair.first);
     }
     sipPSMs = std::vector<sipPSM>(FT2s.size());
+#ifdef _OPENMP
     int num_cores = omp_get_num_procs();
     // Set the number of threads to the lesse of num_cores and 10
     int num_threads = std::min(num_cores, 10);
     omp_set_num_threads(num_threads);
+#endif
 #pragma omp parallel for
     for (size_t i = 0; i < FT2s.size(); i++)
     {
@@ -556,10 +558,12 @@ void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyPar
         FT2s.push_back(pair.first);
     }
     sipPSMs = std::vector<sipPSM>(FT2s.size());
+#ifdef _OPENMP
     int num_cores = omp_get_num_procs();
     // Set the number of threads to the lesse of num_cores and 10
     int num_threads = std::min(num_cores, 10);
     omp_set_num_threads(num_threads);
+#endif
 #pragma omp parallel for
     for (size_t i = 0; i < FT2s.size(); i++)
     {

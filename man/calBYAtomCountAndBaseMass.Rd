@@ -7,7 +7,7 @@
 calBYAtomCountAndBaseMass(AAstrs)
 }
 \arguments{
-\item{AAstr}{a CharacterVector of peptides}
+\item{AAstrs}{a CharacterVector of peptides}
 }
 \value{
 a list of data.frame of C H O N P S atom count and each data.frame is for one peptide

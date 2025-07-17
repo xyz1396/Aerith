@@ -7,7 +7,9 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <map>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <algorithm>
 #include "sipPSM.h"
 namespace fs = std::filesystem;

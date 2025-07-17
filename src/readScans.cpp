@@ -66,9 +66,8 @@ List readScansMS1(const String ftFile, const size_t startScanNumber, const size_
 
 //' read MS1 scans with scanNumber as index in a vector
 //' @param ftFile a ft1 file's full path
-//' @param startScanNumber read scans starting from this scanNumber
-//' @param endScanNumber read scans ending at this scanNumber
-//' @return a list of MS1 scans with names of scan number
+//' @param scanNumbersVector a NumericVector of scan numbers
+//' @return A named list of MS1 scans with names of scan number. The names of the list correspond to the scan numbers.
 //' @examples
 //' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
 //' ft1 <- readScansMS1Vector(demo_file, c(1398, 1503, 1508))

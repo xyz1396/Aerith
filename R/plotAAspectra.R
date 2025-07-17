@@ -236,7 +236,7 @@ getRealScanWithCharge <- function(scanNumber, ft) {
 #' Draw AAspectra MS plot
 #'
 #' @param x AAspectra object
-#' @param linewidth
+#' @param linewidth numeric, for width of MS peaks. Default is 0.1
 #'
 #' @return a ggplot2 object
 #' @importFrom ggplot2 ggplot
@@ -251,6 +251,7 @@ getRealScanWithCharge <- function(scanNumber, ft) {
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 scale_x_continuous
 #' @export
+#' @exportMethod plot
 #'
 #' @examples
 #' a <- getPrecursorSpectra("KHRIP", 2)
@@ -302,16 +303,9 @@ plot.AAspectra <- function(x, linewidth = 0.1) {
   )
 }
 
-#' Draw AAspectra MS plot
-#'
-#' @param AAspectra
-#'
-#' @return a ggplot2 object
-#'
-#' @examples
-#' a <- getPrecursorSpectra("KHRIP", 2)
-#' plot(a)
-#' @exportMethod plot
+#' @rdname plot.AAspectra
+#' @aliases plot,AAspectra-method
+#' @export
 setMethod("plot", "AAspectra", plot.AAspectra)
 
 #' Draw AAspectra MS plot with B Y ion Labels
@@ -386,7 +380,7 @@ plotRealScan <- function(spect, linewidth = 0.1) {
 
 #' plot PSM annotation
 #'
-#' @param obaservedSpect AAspectra object of real scan
+#' @param observedSpect AAspectra object of real scan
 #' @param pep peptide sequence
 #' @param Atom SIP labeled atom "13C" or "15N" for exmaple
 #' @param Prob its SIP abundance (0.0~1.0)

@@ -16,6 +16,8 @@ plotPSMannotation(
 )
 }
 \arguments{
+\item{observedSpect}{AAspectra object of real scan}
+
 \item{pep}{peptide sequence}
 
 \item{Atom}{SIP labeled atom "13C" or "15N" for exmaple}
@@ -29,8 +31,6 @@ plotPSMannotation(
 \item{isoWidth}{isolation window width, set it 0 as default if not remove peaks in isolation window}
 
 \item{ifRemoveNotFoundIon}{set it False as default}
-
-\item{obaservedSpect}{AAspectra object of real scan}
 }
 \value{
 ggplot2 layer

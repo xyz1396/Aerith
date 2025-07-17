@@ -537,6 +537,7 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
 //' scorePSMold old function of scoreWeightSumHighMS2
 //' @param realMZ mz vector in MS2 scan
 //' @param realIntensity intensity vector in MS2 scan
+//' @param realCharge charge vector in MS2 scan
 //' @param pepSeq a string of peptide
 //' @param Atom "C13" or "N15"
 //' @param Prob its SIP abundance (0.0~1.0)

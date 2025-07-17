@@ -1,10 +1,10 @@
 Package: Aerith
 Title: visualization and annotation of isotopic enrichment patterns of peptides and metabolites with stable isotope labeling from proteomics and metabolomics 
-Version: 0.99.1
+Version: 0.99.3
 Authors@R: person("Yi", "Xiong", email = "yixiong@ou.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0005-4591-2366"))
 Description: Visualisation of peptide isotopic peaks and SIP peptide spectra match (PSM). Filtration of high quality PSM. Accurate isotopic abundance calculation of peptide and metabolites. Visualisation of SIP proteomics results.
 Depends: R (>= 4.4.0)
-License: GPL-3.0
+License: GPL-3
 Encoding: UTF-8
 ByteCompile: TRUE
 Suggests: 
@@ -17,7 +17,8 @@ RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
     Rcpp
-Imports: 
+Imports:
+    methods, 
     Rcpp,
     ggplot2,
     ggrepel,

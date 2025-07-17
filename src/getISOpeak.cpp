@@ -84,7 +84,7 @@ DataFrame precursor_peak_calculator_DIY(String AAstr, String Atom,
 }
 
 //' Simple calculator of C H O N P S atom count of peptide
-//' @param AAstr a CharacterVector of peptides
+//' @param AAstrs a CharacterVector of peptides
 //' @return a dataframe of C H O N P S atom count each row is for one peptide
 //' @export
 //' @examples
@@ -116,7 +116,7 @@ DataFrame calPepAtomCount(StringVector AAstrs)
 }
 
 //' Simple calculator of C H O N P S atom count and mass without isotope of B Y ions
-//' @param AAstr a CharacterVector of peptides
+//' @param AAstrs a CharacterVector of peptides
 //' @return a list of data.frame of C H O N P S atom count and each data.frame is for one peptide
 //' @export
 //' @examples
@@ -173,7 +173,7 @@ List calBYAtomCountAndBaseMass(StringVector AAstrs)
 }
 
 //' Simple calculator of peptide precursor mass by binomial NP
-//' @param AAstr a CharacterVector of peptides
+//' @param AAstrs a CharacterVector of peptides
 //' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 //' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 //' @return a vector of peptide precursor masses
@@ -211,7 +211,7 @@ NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVecto
 	else
 	{
 		goodInput = false;
-		cout << Atom.get_cstring() << " element not supported!" << endl;
+		Rcout << Atom.get_cstring() << " element not supported!" << endl;
 	}
 	NumericVector v(AAstrs.size(), 0);
 	if (goodInput)
@@ -231,7 +231,7 @@ NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVecto
 }
 
 //' Simple calculator neutron mass by average delta mass of each isotope
-//' @param AAstr a CharacterVector of peptides
+//' @param AAstrs a CharacterVector of peptides
 //' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 //' @param Probs a NumericVector with the same length of AAstr for SIP abundances
 //' @return a vector of peptide neutron masses
@@ -269,7 +269,7 @@ NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector 
 	else
 	{
 		goodInput = false;
-		cout << Atom.get_cstring() << " element not supported!" << endl;
+		Rcout << Atom.get_cstring() << " element not supported!" << endl;
 	}
 	NumericVector v(AAstrs.size(), 0);
 	if (goodInput)
@@ -289,7 +289,7 @@ NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector 
 }
 
 //' Simple peak calculator of user defined isotopic distribution of one peptide by averagine
-//' @param AAstr a CharacterVector of peptides
+//' @param AAstrs a CharacterVector of peptides
 //' @param Atom a CharacterVector C13 or N15
 //' @param Prob a NumericVector for its abundance
 //' @return a list of DataFrames of spectra
@@ -318,7 +318,7 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 	else
 	{
 		goodInput = false;
-		cout << Atom.get_cstring() << " element not supported!" << endl;
+		Rcout << Atom.get_cstring() << " element not supported!" << endl;
 	}
 	List spectraList(AAstrs.size());
 	if (goodInput)

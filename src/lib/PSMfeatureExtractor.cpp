@@ -324,23 +324,23 @@ void PSMfeatureExtractor::loadFT1FT2fileParallel(const std::string &FTfileBasePa
     }
 }
 
-void ompForDemo()
-{
-    int numThreads = omp_get_max_threads();
-    int numIterations = 10000;
-    double sum = 0.0;
+// void ompForDemo()
+// {
+//     int numThreads = omp_get_max_threads();
+//     int numIterations = 10000;
+//     double sum = 0.0;
 
-    // #pragma omp parallel for reduction(+ : sum)
-    for (int i = 0; i < numIterations; i++)
-    {
-        double result = std::sqrt(std::pow(i, 20) + std::pow(i + 1, 20));
-        sum += result;
-    }
+//     // #pragma omp parallel for reduction(+ : sum)
+//     for (int i = 0; i < numIterations; i++)
+//     {
+//         double result = std::sqrt(std::pow(i, 20) + std::pow(i + 1, 20));
+//         sum += result;
+//     }
 
-    printf("Number of threads: %d\n", numThreads);
-    printf("Number of iterations: %d\n", numIterations);
-    printf("Sum: %f\n", sum);
-}
+//     printf("Number of threads: %d\n", numThreads);
+//     printf("Number of iterations: %d\n", numIterations);
+//     printf("Sum: %f\n", sum);
+// }
 
 void PSMfeatureExtractor::extractFeaturesOfEachPSM()
 {
@@ -413,6 +413,7 @@ void PSMfeatureExtractor::extractPSMfeature(const std::string &Spe2PepFilePath, 
 void PSMfeatureExtractor::extractPSMfeatureParallel(
     const std::string &ftFilepath, const int threadNumber)
 {
+#ifdef _OPENMP
     int num_cores = omp_get_num_procs();
     // Set the number of threads to the lesser of num_cores and 10
     int num_threads = std::min(num_cores, 10);
@@ -420,6 +421,7 @@ void PSMfeatureExtractor::extractPSMfeatureParallel(
     omp_set_num_threads(num_threads);
     // Enable nested parallelism
     omp_set_nested(1);
+#endif
 #pragma omp parallel for
     for (size_t i = 0; i < mSpe2PepFileReader.FT2s.size(); i++)
     {

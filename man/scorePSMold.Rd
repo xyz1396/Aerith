@@ -11,6 +11,8 @@ scorePSMold(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
 
 \item{realIntensity}{intensity vector in MS2 scan}
 
+\item{realCharge}{charge vector in MS2 scan}
+
 \item{pepSeq}{a string of peptide}
 
 \item{Atom}{"C13" or "N15"}

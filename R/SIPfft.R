@@ -112,14 +112,16 @@ cal_isotope_peaks_fft <- function(formula, N_width = 100, min_abundance = 0.0001
 #' @param charge An integer representing the charge. Default is 1.
 #' @param minProb A numeric value representing the minimum probability. Default is 0.0001.
 #' @param yshift A numeric value representing the vertical shift applied to the plot for better visualization of the abundance close to 0. Default is -1.
-#'
+#' @param peakWidth A numeric value representing the width of the peaks in the plot. Default is 0.5.
+#' @param textSize A numeric value representing the size of the text in the plot.
+#' 
 #' @return A ggplot object of molecular isotopes without fine structure by FFT algorithm
 #' @export
 #'
 #' @examples
 #' isotope_numbers <- cal_isotope_peaks_fft("C6H12O6", N_width = 200, min_abundance = 0.001, C13 = 0.5)
 #' plotMolecularFFTisotopes(isotope_numbers)
-plotMolecularFFTisotopes <- function(isotope_numbers, charge = 1, minProb = 0.0001, yshift = -1) {
+plotMolecularFFTisotopes <- function(isotope_numbers, charge = 1, minProb = 0.0001, yshift = -1, peakWidth = 0.5, textSize = 15) {
     isotope_numbers <- isotope_numbers[isotope_numbers$Prob > minProb, ]
     spectra <- data.frame(
         Mass = isotope_numbers$Mass,
@@ -135,7 +137,7 @@ plotMolecularFFTisotopes <- function(isotope_numbers, charge = 1, minProb = 0.00
     spectra$Kind <- paste0(spectra$Charge)
     p <- ggplot2::ggplot(spectra)
     p <- p + ggplot2::aes(x = MZ, ymax = Prob, ymin = yshift)
-    p <- p + ggplot2::geom_linerange(linewidth = 0.5)
+    p <- p + ggplot2::geom_linerange(linewidth = peakWidth)
     p <- p + ggplot2::scale_x_continuous(breaks = seq(min(spectra$MZ) - 1, max(spectra$MZ) + 1, by = 1))
     p <- p + ggplot2::scale_y_continuous(breaks = seq(0, 100, by = 10))
     p<- p + ggplot2::theme(
@@ -148,7 +150,7 @@ plotMolecularFFTisotopes <- function(isotope_numbers, charge = 1, minProb = 0.00
           linetype = 1,
           linewidth = 0.5
         ),
-        text = ggplot2::element_text(size = 15)
+        text = ggplot2::element_text(size = textSize)
       ) +
       ggplot2::xlab("M/Z") +
       ggplot2::ylab("Intensity") +

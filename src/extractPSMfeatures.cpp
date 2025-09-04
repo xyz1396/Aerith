@@ -141,7 +141,7 @@ List extractPSMfeatures(String Spe2PepFilePath, int topN,
                               .add("originalPeptides", wrap(sipPSMs[i].originalPeptides))
                               .add("nakePeptides", wrap(sipPSMs[i].nakePeptides))
                               .add("proteinNames", wrap(sipPSMs[i].proteinNames))
-                              .add("istopicPeakNumbers", wrap(sipPSMs[i].isotopicPeakNumbers))
+                              .add("isotopicPeakNumbers", wrap(sipPSMs[i].isotopicPeakNumbers))
                               .add("MS1IsotopicAbundances", wrap(sipPSMs[i].MS1IsotopicAbundances))
                               .add("MS2IsotopicAbundances", wrap(sipPSMs[i].MS2IsotopicAbundances))
                               .add("isotopicMZs", wrap(isotopicMZs))

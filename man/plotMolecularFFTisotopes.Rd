@@ -8,7 +8,9 @@ plotMolecularFFTisotopes(
   isotope_numbers,
   charge = 1,
   minProb = 1e-04,
-  yshift = -1
+  yshift = -1,
+  peakWidth = 0.5,
+  textSize = 15
 )
 }
 \arguments{
@@ -19,6 +21,10 @@ plotMolecularFFTisotopes(
 \item{minProb}{A numeric value representing the minimum probability. Default is 0.0001.}
 
 \item{yshift}{A numeric value representing the vertical shift applied to the plot for better visualization of the abundance close to 0. Default is -1.}
+
+\item{peakWidth}{A numeric value representing the width of the peaks in the plot. Default is 0.5.}
+
+\item{textSize}{A numeric value representing the size of the text in the plot.}
 }
 \value{
 A ggplot object of molecular isotopes without fine structure by FFT algorithm

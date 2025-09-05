@@ -18,5 +18,5 @@ a list of MS2 scan
 readOneScanMS2
 }
 \examples{
-ft2 <- readOneScanMS2("demo.ft2", 2)
+ft2 <- readOneScanMS2("demo.FT2", 2)
 }

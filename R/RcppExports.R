@@ -280,7 +280,7 @@ BYion_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
 #' @param scanNumber the scan at scanNumber
 #' @return a list of MS2 scan
 #' @examples
-#' ft2 <- readOneScanMS2("demo.ft2", 2)
+#' ft2 <- readOneScanMS2("demo.FT2", 2)
 #' @export
 readOneScanMS2 <- function(ftFile, scanNumber) {
     .Call(`_Aerith_readOneScanMS2`, ftFile, scanNumber)
@@ -291,7 +291,7 @@ readOneScanMS2 <- function(ftFile, scanNumber) {
 #' @param scanNumber the scan at scanNumber
 #' @return a list of MS1 scan
 #' @examples
-#' ft1 <- readOneScanMS1("demo.ft1", 2)
+#' ft1 <- readOneScanMS1("demo.FT1", 2)
 #' @export
 readOneScanMS1 <- function(ftFile, scanNumber) {
     .Call(`_Aerith_readOneScanMS1`, ftFile, scanNumber)
@@ -658,8 +658,8 @@ denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
 #' header <- readFTheader(demo_file)
 #' ft1 <- readAllScanMS1(demo_file)
 #' tmp <- tempdir()
-#' writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.ft1"))
-#' list.files(tmp, pattern = "demo10.ft1", full.names = TRUE)
+#' writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.FT1"))
+#' list.files(tmp, pattern = "demo10.FT1", full.names = TRUE)
 #' @export
 writeAllScanMS1 <- function(header, scansList, ftFile) {
     .Call(`_Aerith_writeAllScanMS1`, header, scansList, ftFile)
@@ -675,8 +675,8 @@ writeAllScanMS1 <- function(header, scansList, ftFile) {
 #' header <- readFTheader(demo_file)
 #' ft2 <- readAllScanMS2(demo_file)
 #' tmp <- tempdir()
-#' writeAllScanMS2(header,ft2[1:10],file.path(tmp, "demo10.ft2"))
-#' list.files(tmp, pattern = "demo10.ft2", full.names = TRUE)
+#' writeAllScanMS2(header,ft2[1:10],file.path(tmp, "demo10.FT2"))
+#' list.files(tmp, pattern = "demo10.FT2", full.names = TRUE)
 #' @export
 writeAllScanMS2 <- function(header, scansList, ftFile) {
     .Call(`_Aerith_writeAllScanMS2`, header, scansList, ftFile)

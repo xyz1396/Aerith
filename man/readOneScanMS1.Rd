@@ -18,5 +18,5 @@ a list of MS1 scan
 readOneScanMS1
 }
 \examples{
-ft1 <- readOneScanMS1("demo.ft1", 2)
+ft1 <- readOneScanMS1("demo.FT1", 2)
 }

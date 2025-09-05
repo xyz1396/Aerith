@@ -11,6 +11,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE, eval=FALSE}
+devtools::load_all()
+rmarkdown::render("Aerith.Rmd", output_dir = "../doc/")
+```
+
 # Abstract
 
 Aerith is an R package for the simulation and visualization of isotopic envelopes in stable isotope 
@@ -25,7 +30,17 @@ its utility for precise annotation and manual validation in proteomic and metabo
 
 # Introduction
 
-Aerith is an R package designed for the simulation and analysis of theoretical isotopic peaks, 
+Stable isotope probing (SIP) is indeed a powerful technique for tracing the fate of metabolic labels incorporated 
+into cells, offering insights into substrate assimilation and associated metabolic pathways.
+In a poetic sense, the journey of these isotopic labels through biological systems mirrors Aerith Gainsborough’s 
+fate—merging into the Lifestream of Planet Gaia. Just as Aerith’s essence becomes part of the planet’s life force, 
+isotopic tracers become part of the biological and geochemical narratives we seek to understand.
+Beyond biology, isotopes serve as cosmic storytellers—used to unravel the history of planets, stars, and the universe 
+itself through the analysis of fossils, meteorites, and interstellar matter. These isotope-based approaches,
+in a way, allow us to “listen” to the planet—echoing the unique ability of Aerith, the last of the Ancients, 
+to commune with the world around her. 
+
+Here, Aerith is an R package designed for the simulation and analysis of theoretical isotopic peaks, 
 fine structures, and spectral envelopes for user-defined chemical formulas or peptide sequences 
 in metabolomics and proteomics. Unlike existing tools, Aerith supports flexible specification of
 isotopic abundances for stable isotope probing (SIP) experiments, allowing users to model compounds
@@ -38,3 +53,46 @@ Aerith accepts spectral data files in multiple formats, including Raxport-proces
 and MGF files, as well as pepXML and PIN files (Percolator outputs), and TSV files from the Sipros 
 search engine for peptide amino acid sequences or PSM input. Integration with the mzR package from 
 Bioconductor allows direct parsing of mzML and MGF files, while MSnbase enables parsing of pepXML files.
+
+# Vignette contents
+
+### Input Data Format 
+
+For more details on the input data format, see the [Input Data Format vignette](Input-data-format.html).
+
+### PSM annotation and visualization
+
+For more details on PSM annotation and visualization, see the [PSM annotation and visualization vignette](PSM-annotation-and-visualization.html).
+
+### Simulation and visualization of isotopic envelopes for metabolites
+
+For more details on the simulation and visualization of isotopic envelopes for SIP labeled metabolites, see the [Simulation and visualization of isotopic envelopes for metabolites vignette](Theoretic-spectra-generation-of-SIP-labeled-compound.html).
+
+### Simulation and visualization of isotopic envelopes for peptides
+
+For more details on the simulation and visualization of isotopic envelopes for SIP labeled peptides, see the [Simulation and visualization of isotopic envelopes for peptides vignette](Theoretic-spectra-generation-of-SIP-labeled-peptide.html).
+
+### Score functions for PSM evaluation
+
+For more details on score functions for PSM evaluation, see the [Score functions for PSM evaluation vignette](Score-function-test-of-PSM.html).
+
+### Visualization of SIP proteomic result
+
+For more details on the visualization of SIP proteomic result, see the [Visualization of SIP proteomic result vignette](Visualization-of-SIP-proteomic-result.html).
+
+# S4 classes in Aerith
+
+The `AAspectra` class is specifically designed to:
+1. Extract visualization information from `.FT2` files
+2. Store theoretical spectra of peptides and metabolites with isotopic peak envelopes
+3. Support PSM (Peptide-Spectrum Match) plotting functionality
+
+The Aerith package requires specialized handling of `.FT2` format files from Raxport and Sipros output for proteomic SIP 
+searches. This format contains specific attributes including:
+
+- Peak intensity, m/z, charge, resolution
+- Noise-to-signal ratio, retention time
+- Precursor and fragment information at MS1 and MS2 levels
+
+The `mzml` and `pepXML` formats are also supported through the `mzR` package, while `mgf` files can be parsed using the `MSnbase` package.
+The imported spectra and peptides can be converted to the `AAspectra` class.

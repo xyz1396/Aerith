@@ -27,7 +27,8 @@ Please read the [vignettes](./vignettes/) to get the input files and detail tuto
 
 [Link to download Raxport and help pages](https://github.com/xyz1396/Raxport.net)  
 [Links to download ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser/)  
-[Links of tutorial of Sipros](https://github.com/thepanlab/Sipros4)  
+[Links of tutorial of Sipros4](https://github.com/thepanlab/Sipros4)  
+[Links of tutorial of Sipros5](https://github.com/thepanlab/Sipros5)  
 [conda env of Sipros](https://anaconda.org/bioconda/sipros)  
 
 ```{bash, eval=FALSE}
@@ -83,13 +84,13 @@ plotTIC(tic)
 ```{r eval=FALSE}
 header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
 ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
-writeAllScanMS1(header,ft1[1:100],"../rmd/input data format/demo.ft1")
+writeAllScanMS1(header,ft1[1:100],"../rmd/input data format/demo.FT1")
 ```
 
 ```{r eval=FALSE}
 header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
 ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
-writeAllScanMS2(header,ft2[1:100],"../rmd/input data format/demo.ft2")
+writeAllScanMS2(header,ft2[1:100],"../rmd/input data format/demo.FT2")
 ```
 
 ### Theoretic spectra generation of SIP labeled compound

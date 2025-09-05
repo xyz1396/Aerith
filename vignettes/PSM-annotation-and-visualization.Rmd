@@ -15,7 +15,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 10
+  fig.width = 12
 )
 ```
 
@@ -27,44 +27,13 @@ library(ggplot2)
 ```
 
 ```{r, include = FALSE, eval=FALSE}
+devtools::load_all()
 rmarkdown::render("PSM-annotation-and-visualization.Rmd", output_dir = "../doc/")
 ```
 
 ### Unlabeled PSM at 1.07% ^13^C 
 
-#### Annotate B and Y ion fragments
-
-```{r eval=FALSE}
-psm <- readPSMtsv("../rmd/input data format/pct1.psm.txt")
-psm <- arrange(psm, desc(Score))
-psm1 <- psm[8, ]
-pep <- psm1$OriginalPeptide
-pep <- str_sub(pep, 2, -2)
-scan1 <- readOneScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", psm1$ScanNumber)
-scan1 <- getRealScanFromList(scan1)
-```
-
-```{r eval=FALSE}
-isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
-anno <- annotatePSM(
-  scan1@spectra$MZ, scan1@spectra$Prob,
-  scan1@spectra$Charge,
-  pep, 1:2, "C13",
-  0.0107, isoCenter, 5.0
-)
-tb <- head(anno$ExpectedBYions[anno$ExpectedBYions$matchedIndices != -1, ])
-knitr::kable(tb)
-residuePos <- anno$ExpectedBYions$residuePositions[anno$ExpectedBYions$matchedIndices != -1]
-table(residuePos)
-# let the color be repeatable
-set.seed(9527)
-plotPSMannotation(
-  observedSpect = scan1,
-  pep = pep, Atom = "C13", Prob = 0.0107,
-  charges = c(1, 2), isoCenter = isoCenter,
-  isoWidth = 5, ifRemoveNotFoundIon = TRUE
-)
-```
+#### Annotate B and Y ion fragments at MS2 level
 
 ```{r}
 demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
@@ -73,44 +42,30 @@ anno <- annotatePSM(
   scan1$peaks$mz, scan1$peaks$intensity,
   scan1$peaks$charge,
   "HSQVFSTAEDNQSAVTIHVLQGER", 1:2, "C13",
-  0.0107, 886.65, 4.0
+  0.0107, scan1$isolationWindowCenterMZ, 4.0
 )
+head(anno$ExpectedBYions[anno$ExpectedBYions$matchedIndices != -1, ])
+residuePos <- anno$ExpectedBYions$residuePositions[anno$ExpectedBYions$matchedIndices != -1]
+table(residuePos)
+```
+
+```{r}
+# make the color be repeatable
+set.seed(9527)
 p <- plotPSMannotation(
   observedSpect = getRealScanFromList(scan1),
   pep = "HSQVFSTAEDNQSAVTIHVLQGER", Atom = "C13", Prob = 0.01,
-  charges = c(2), isoCenter = 886.65, isoWidth = 4.0,
+  charges = 1:2, isoCenter = 886.65, isoWidth = 4.0,
   ifRemoveNotFoundIon = TRUE
 )
 p
 ```
 
-#### plot fragments and precursor
-
-```{r eval=FALSE}
-# plot observed fragments peaks and theoretical B and Y ion isotopic peaks
-BY <- getSipBYionSpectra(pep, Prob = 0.0107, charges = 1:2, precursorCharges = 3)
-plot(BY) + plotRealScan(scan1) + plotSipBYionLabel(BY)
-```
-
-```{r eval=FALSE}
-ft1 <- readScansMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1", 3500, 3890)
-precursorScan1 <- getRealScan(3885, ft1)
-
-# plot observed precursor peaks and theoretical precursor isotopic peaks
-# precursorSP <- getSipPrecursorSpectra(pep, Prob = 0.012, charges = 3)
-precursorSP <- getSipPrecursorSpectra(pep, Prob = 0.0107, charges = 3)
-precursorSP@spectra$Kind <- "Expected"
-xlimit <- precursorScan1@spectra$MZ > 580 & precursorScan1@spectra$MZ < 600
-precursorScan1@spectra <- precursorScan1@spectra[xlimit, ]
-precursorScan1@spectra$Kind <- "Observed"
-maxInt <- max(precursorScan1@spectra$Prob)
-precursorScan1@spectra$Prob <- precursorScan1@spectra$Prob / maxInt * 100
-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
-  scale_x_continuous(breaks = seq(580, 600, by = 5))
-```
+#### plot fragments and precursor at MS2 level
 
 ```{r}
 a <- getSipBYionSpectra("HSQVFSTAEDNQSAVTIHVLQGER", "C13", 0.01, 1:2)
+a@spectra <- a@spectra[a@spectra$MZ < 2000, ]
 p <- plot(a)
 p <- p + plotSipBYionLabel(a)
 demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
@@ -120,72 +75,81 @@ p <- p + plotRealScan(c)
 p
 ```
 
-### Labeled PSM at 50% ^13^C 
+#### plot precursor at MS1 level
 
 ```{r}
-demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+demo_file <- system.file("extdata", "107695.FT1", package = "Aerith")
+ft1 <- readOneScanMS1(demo_file, 107695)
+precursorScan1 <- getRealScanFromList(ft1)
+
+# plot observed precursor peaks and theoretical precursor isotopic peaks
+pep <- "HSQVFSTAEDNQSAVTIHVLQGER"
+precursorSP <- getSipPrecursorSpectra(pep, Prob = 0.0107, charges = 3)
+precursorSP@spectra$Kind <- "Expected"
+xlimit <- precursorScan1@spectra$MZ > 880 & precursorScan1@spectra$MZ < 890
+precursorScan1@spectra <- precursorScan1@spectra[xlimit, ]
+precursorScan1@spectra$Kind <- "Observed"
+maxInt <- max(precursorScan1@spectra$Prob)
+precursorScan1@spectra$Prob <- precursorScan1@spectra$Prob / maxInt * 100
+p<-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
+  scale_x_continuous(breaks = seq(880, 890, by = 1)) + 
+  theme(legend.title = element_blank()) + 
+  scale_color_manual(values = c("#E7872B","#F3082F"))
+p
+```
+
+### Labeled PSM at 50% ^13^C 
+
+#### Annotate B and Y ion fragments at MS2 level
+
+```{r}
+demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
+scan1 <- readAllScanMS2(ftFile = demo_file)[["2596"]]
+anno <- annotatePSM(
+  scan1$peaks$mz, scan1$peaks$intensity,
+  scan1$peaks$charge,
+  "HYAHVDCPGHADYVK", 1:2, "C13",
+  0.52, scan1$isolationWindowCenterMZ, 5.0
+)
+head(anno$ExpectedBYions[anno$ExpectedBYions$matchedIndices != -1, ])
+residuePos <- anno$ExpectedBYions$residuePositions[anno$ExpectedBYions$matchedIndices != -1]
+table(residuePos)
+```
+
+```{r}
+# make the color be repeatable
+set.seed(9527)
+p <- plotPSMannotation(
+  observedSpect = getRealScanFromList(scan1),
+  pep = "HYAHVDCPGHADYVK", Atom = "C13", Prob = 0.52,
+  charges = 1:2, isoCenter = scan1$isolationWindowCenterMZ, isoWidth = 5.0,
+  ifRemoveNotFoundIon = TRUE
+)
+p
+```
+
+#### plot fragments and precursor at MS2 level
+
+```{r}
+demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 ft2 <- readAllScanMS2(demo_file)
 a <- getSipBYionSpectra("HYAHVDCPGHADYVK", "C13", 0.52, 1:2)
 p <- plot(a)
 p <- p + plotSipBYionLabel(a)
-demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
-b <- readAllScanMS2(demo_file)
-c <- getRealScan(2596, b)
+c <- getRealScan(2596, ft2)
 p <- p + plotRealScan(c)
 p
 ```
 
-#### Annotate B and Y ion fragments
+#### plot precursor at MS1 level
 
-```{r eval=FALSE}
-psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
-psm <- arrange(psm, desc(Score))
-# use the same peptide as 1% 13C chunk
-psm1 <- psm[4, ]
-pep <- psm1$OriginalPeptide
-pep <- str_sub(pep, 2, -2)
-pct <- psm1$SearchName
-pct <- as.numeric(str_sub(pct, 5, -4)) / 1000 / 100
-scan1 <- readOneScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2", psm1$ScanNumber)
-scan1 <- getRealScanFromList(scan1)
-```
-
-```{r eval=FALSE}
-isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
-anno <- annotatePSM(
-  scan1@spectra$MZ, scan1@spectra$Prob,
-  scan1@spectra$Charge,
-  pep, 1:2, "C13",
-  pct, isoCenter, 5.0
-)
-head(anno$ExpectedBYions[anno$ExpectedBYions$residuePositions != -1, ])
-residuePos <- anno$ExpectedBYions$residuePositions[anno$ExpectedBYions$matchedIndices != -1]
-table(residuePos)
-# let the color be repeatable
-set.seed(9527)
-plotPSMannotation(
-  observedSpect = scan1,
-  pep = pep, Atom = "C13", Prob = pct,
-  charges = c(1, 2), isoCenter = isoCenter,
-  isoWidth = 5, ifRemoveNotFoundIon = TRUE
-)
-```
-
-#### Plot fragments and precursor
-
-```{r eval=FALSE}
-# plot observed fragments peaks and theoretical B and Y ion isotopic peaks
-BY <- getSipBYionSpectra(pep, Prob = pct, charges = 1:2, precursorCharges = 3)
-plot(BY) + plotRealScan(scan1) + plotSipBYionLabel(BY)
-```
-
-```{r eval=FALSE}
-ft1 <- readScansMS1("../rmd/input data format/ft/Pan_052322_X13.FT1", 2000, 2561)
-# the nearest ms1 scan to ms2 scan of PSM
-precursorScan1 <- getRealScan(2559, ft1)
+```{r}
+demo_file <- system.file("extdata", "X13_2559.FT1", package = "Aerith")
+ft1 <- readOneScanMS1(demo_file, 2559)
+precursorScan1 <- getRealScanFromList(ft1)
 
 # plot observed precursor peaks and theoretical precursor isotopic peaks
-# precursorSP <- getSipPrecursorSpectra(pep, Prob = 0.012, charges = 3)
+pep <- "HYAHVDCPGHADYVK"
 precursorSP <- getSipPrecursorSpectra(pep, Prob = 0.5, charges = 3)
 precursorSP@spectra$Kind <- "Expected"
 xlimit <- precursorScan1@spectra$MZ > 590 & precursorScan1@spectra$MZ < 620
@@ -193,8 +157,11 @@ precursorScan1@spectra <- precursorScan1@spectra[xlimit, ]
 precursorScan1@spectra$Kind <- "Observed"
 maxInt <- max(precursorScan1@spectra$Prob)
 precursorScan1@spectra$Prob <- precursorScan1@spectra$Prob / maxInt * 100
-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
-  scale_x_continuous(breaks = seq(590, 620, by = 5))
+p<-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
+  scale_x_continuous(breaks = seq(590, 620, by = 5)) + 
+  theme(legend.title = element_blank()) + 
+  scale_color_manual(values = c("#E7872B","#F3082F"))
+p
 ```
 
 #### Plot PSMs in a batch
@@ -205,7 +172,7 @@ demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
 psm <- readPSMtsv(demo_file)
 psm <- psm[psm$Filename=="Pan_052322_X13.FT2", ]
 psm <- psm[psm$ScanNumber %in% c("4068","2596","8182"), ]
-demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 ft2 <- readAllScanMS2(demo_file)
 ftFileNames <- psm$Filename
 scanNumbers <- psm$ScanNumber
@@ -233,38 +200,6 @@ plotPSMs(
 list.files(tmp, pattern = ".pdf", full.names = TRUE)
 ```
 
-```{r eval=FALSE}
-psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
-psm <- psm[psm$Filename=="Pan_052322_X13.FT2",]
-psm <- arrange(psm, desc(Score))
-psm <- psm[1:10, ]
-ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2")
-ftFileNames <- psm$Filename
-scanNumbers <- psm$ScanNumber
-proNames <- psm$ProteinNames
-charges <- psm$ParentCharge
-element <- "C13"
-pep <- psm$OriginalPeptide
-pep <- str_sub(pep, 2, -2)
-pct <- psm$SearchName
-pct <- as.numeric(str_sub(str_split(pct, "_", simplify = TRUE)[, 2], 1, -4)) / 100 /1000
-realScans <- getRealScans(ft2, scanNumbers)
-plotPSMs(
-  realScans,
-  charges,
-  element,
-  pct,
-  BYcharge = 1:2,
-  ftFileNames,
-  scanNumbers,
-  pep,
-  proNames,
-  "/tmp/"
-)
-```
-
-
-
-```{r session-info, include=FALSE}
+```{r session-info}
 sessionInfo()
 ```

@@ -19,14 +19,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, include = FALSE, eval=FALSE}
-library(devtools)
-use_vignette("your-vignette-name")
-build_vignettes()
-getwd()
-rmarkdown::render("Input-data-format.Rmd", output_dir = "../doc/")
-```
-
 ```{r setup}
 library(Aerith)
 library(dplyr)
@@ -36,7 +28,8 @@ library(dplyr)
 
 [Link to download Raxport and help pages](https://github.com/xyz1396/Raxport.net)  
 [Links to download ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser/)  
-[Links of tutorial of Sipros](https://github.com/thepanlab/Sipros4)  
+[Links of tutorial of Sipros4](https://github.com/thepanlab/Sipros4)  
+[Links of tutorial of Sipros5](https://github.com/thepanlab/Sipros5)  
 [conda env of Sipros](https://anaconda.org/bioconda/sipros)  
 
 ```{bash, eval=FALSE}
@@ -114,8 +107,15 @@ header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
 ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
 a <- getRetentionTimeAndPrecursorInfo(ft1)
 a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
-writeAllScanMS1(header, ft1[as.character(a$ScanNumber)], "../rmd/input data format/demo.ft1")
-b <- readAllScanMS1("../rmd/input data format/demo.ft1")
+writeAllScanMS1(header, ft1[as.character(a$ScanNumber)], "../rmd/input data format/demo.FT1")
+b <- readAllScanMS1("../rmd/input data format/demo.FT1")
+```
+
+```{r eval=FALSE}
+header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT1")
+ft1 <- readOneScanMS1("../rmd/input data format/ft/Pan_052322_X13.FT1", 2559)
+writeAllScanMS1(header, list("2559"=ft1), "../rmd/input data format/X13_2559.FT1")
+b <- readAllScanMS1("../rmd/input data format/X13_2559.FT1")
 ```
 
 ```{r eval=FALSE}
@@ -123,16 +123,16 @@ header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
 ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
 a <- getRetentionTimeAndPrecursorInfo(ft2)
 a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
-writeAllScanMS2(header, ft2[as.character(a$ScanNumber)], "../rmd/input data format/demo.ft2")
-b <- readAllScanMS1("../rmd/input data format/demo.ft2")
+writeAllScanMS2(header, ft2[as.character(a$ScanNumber)], "../rmd/input data format/demo.FT2")
+b <- readAllScanMS2("../rmd/input data format/demo.FT2")
 ```
 
 ```{r eval=FALSE, include=FALSE}
 header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT2")
 ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2")
 writeAllScanMS2(header, ft2[c("4068","2596","8182")],
-                "../rmd/input data format/X13_4068_2596_8182.ft2")
-a <- readAllScanMS2("../rmd/input data format/X13_4068_2596_8182.ft2")
+                "../rmd/input data format/X13_4068_2596_8182.FT2")
+a <- readAllScanMS2("../rmd/input data format/X13_4068_2596_8182.FT2")
 ```
 
 ### Read mzml file

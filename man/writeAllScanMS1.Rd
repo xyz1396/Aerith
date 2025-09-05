@@ -24,6 +24,6 @@ demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
 header <- readFTheader(demo_file)
 ft1 <- readAllScanMS1(demo_file)
 tmp <- tempdir()
-writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.ft1"))
-list.files(tmp, pattern = "demo10.ft1", full.names = TRUE)
+writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.FT1"))
+list.files(tmp, pattern = "demo10.FT1", full.names = TRUE)
 }

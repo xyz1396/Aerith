@@ -32,353 +32,120 @@ library(Aerith)
 library(dplyr)
 ```
 
-### Convert raw file to FT1, FT2, and mzml file
-
+### Convert raw file to FT1, FT2, and mzml file  
+  
+Follow instructions in Aerith README to convert Thermo raw file to FT1, FT2, and mzml file.    
+[Convert raw file to FT1, FT2, and mzml file](https://github.com/xyz1396/Aerith/blob/main/README.md#convert-raw-file-to-ft1-ft2-and-mzml-file)  
+  
 [Link to download Raxport and help pages](https://github.com/xyz1396/Raxport.net)  
 [Links to download ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser/)  
-[Links of tutorial of Sipros](https://github.com/thepanlab/Sipros4)  
+[Links of tutorial of Sipros4](https://github.com/thepanlab/Sipros4)
+[Links of tutorial of Sipros5](https://github.com/thepanlab/Sipros5)  
 [conda env of Sipros](https://anaconda.org/bioconda/sipros)  
-
-```{bash, eval=FALSE}
-mkdir rmd
-mkdir "rmd/input data format"
-cd "rmd/input data format"
-wget https://github.com/xyz1396/Raxport.net/releases/download/Raxport5.02/Raxport
-chmod +x Raxport
-wget https://github.com/compomics/ThermoRawFileParser/releases/download/v1.4.5/ThermoRawFileParser1.4.5.zip
-unzip ThermoRawFileParser1.4.5.zip -d ThermoRawFileParser
-mkdir raw ft mzml mgf
-conda create -n sipros4 -c bioconda -c conda-forge sipros
-# for using mono in this conda env
-conda activate sipros4
-# Download raw file with 1% 13C
-wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/Pan_062822_X1iso5.raw -P raw
-# Download raw file with 50% 13C  
-wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/Pan_052322_X13.raw -P raw
-wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/pct50.psm.txt
-wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/pct1.psm.txt
-# convert raw to FT1 and FT2 file
-./Raxport -i raw -o ft -j 8
-# convert raw to mzml file
-mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -o mzml
-mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -f 0 -o mgf
-```
 
 ### Read one scan or scans from FT1 and FT2 file
 
-```{r eval=FALSE}
-ft1 <- readOneScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1", 10430)
-ft2 <- readOneScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", 10487)
-ft1 <- getRealScanFromList(ft1)
-plot(ft1)
-ft2 <- getRealScanFromList(ft2)
-plot(ft2)
-
-ft1 <- readScansMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1", 10430, 10500)
-ft1 <- getRealScanFromList(ft1[[1]])
-plot(ft1)
-ft1 <- readScansMS1Vector(
-  "../rmd/input data format/ft/Pan_062822_X1iso5.FT1",
-  c(10444, 10469, 10485)
-)
-ft1 <- getRealScanFromList(ft1[[1]])
-plot(ft1)
-
-ft2 <- readScansMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", 10487, 10600)
-ft2 <- getRealScanFromList(ft2[[1]])
-plot(ft2)
-ft2 <- readScansMS2Vector(
-  "../rmd/input data format/ft/Pan_062822_X1iso5.FT2",
-  c(10488, 10490, 10493)
-)
-ft2 <- getRealScanFromList(ft2[[1]])
-plot(ft2)
-```
-
 ```{r}
 demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- getRealScanFromList(a[[1]])
+a <- readAllScanMS1(demo_file)
+b <- readScansMS1(demo_file, 1527, 1550)
+b <- readOneScanMS1(demo_file, 1555)
+b <- getRealScanFromList(a[[88]])
 plot(b)
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 a <- readAllScanMS2(demo_file)
-b <- getRealScanFromList(a[[1]])
+b <- readScansMS2(demo_file, 1399, 1500)
+b <- readOneScanMS2(demo_file, 1371)
+b <- getRealScanFromList(a[[128]])
 plot(b)
-```
-
-### Read all scans from FT1 and FT2 file
-
-```{r eval=FALSE}
-ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
-ft2 <- getRealScan(10487, ft2)
-plot(ft2)
-
-ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
-ft1 <- getRealScan(10430, ft1)
-plot(ft1)
 ```
 
 ### Write small demo FT1 FT2 file
 
-```{r eval=FALSE}
-header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
-ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
-a <- getRetentionTimeAndPrecursorInfo(ft1)
-a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
-writeAllScanMS1(header, ft1[as.character(a$ScanNumber)], "../rmd/input data format/demo.ft1")
-b <- readAllScanMS1("../rmd/input data format/demo.ft1")
+```{r}
+demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+header <- readFTheader(demo_file)
+ft1 <- readAllScanMS1(demo_file)
+tmp <- tempdir()
+writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.FT1"))
+list.files(tmp, pattern = "demo10.FT1", full.names = TRUE)
 ```
 
-```{r eval=FALSE}
-header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
-ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
-a <- getRetentionTimeAndPrecursorInfo(ft2)
-a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
-writeAllScanMS2(header, ft2[as.character(a$ScanNumber)], "../rmd/input data format/demo.ft2")
-b <- readAllScanMS1("../rmd/input data format/demo.ft2")
-```
-
-```{r eval=FALSE, include=FALSE}
-header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT2")
-ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2")
-writeAllScanMS2(header, ft2[c("4068","2596","8182")],
-                "../rmd/input data format/X13_4068_2596_8182.ft2")
-a <- readAllScanMS2("../rmd/input data format/X13_4068_2596_8182.ft2")
+```{r}
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+header <- readFTheader(demo_file)
+ft2 <- readAllScanMS2(demo_file)
+tmp <- tempdir()
+writeAllScanMS2(header, ft2[1:10], file.path(tmp, "demo10.FT2"))
+list.files(tmp, pattern = "demo10.FT2", full.names = TRUE)
 ```
 
 ### Read mzml file
 
-```{r eval=FALSE}
-mzml1 <- readMzmlMS1("../rmd/input data format/mzml/Pan_052322_X13.mzML")
-scan1 <- getRealScan(11188, mzml1)
-plot(scan1)
-mzml2 <- readMzmlMS2("../rmd/input data format/mzml/Pan_052322_X13.mzML")
-scan2 <- getRealScan(12658, mzml2)
-plot(scan2)
-```
+```{r}
+if (!requireNamespace("mzR", quietly = TRUE)) {
+  install.packages("mzR")
+}
 
-```{r include=FALSE, eval=FALSE}
-ms_data <- mzR::openMSfile("../rmd/input data format/mzml/Pan_052322_X13.mzML")
-header <- mzR::header(ms_data)
-scan_indices <- header$seqNum
-start_ix <- 10005
-selected_indices <- (start_ix + 1):(start_ix + 100)
-peaks_list <- mzR::peaks(ms_data, selected_indices)
-selected_header <- header[selected_indices, ]
-selected_header$seqNum <- selected_header$seqNum - start_ix
-selected_header$acquisitionNum <- selected_header$acquisitionNum - start_ix
-selected_header$precursorScanNum <- selected_header$precursorScanNum - start_ix
-# first 5 ms2 scans' precursor is 9995, convert it to 10005
-selected_header$precursorScanNum[2:6] <- 1
-mzR::writeMSData(
-  peaks_list,
-  file = "../rmd/input data format/demo.mzML",
-  header = selected_header
-)
-mzR::close(ms_data)
-mzml1 <- readMzmlMS1("../rmd/input data format/demo.mzML")
-mzml2 <- readMzmlMS2("../rmd/input data format/demo.mzML")
+demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
+
+mzml1 <- readMzmlMS1(demo_file)
+scan1 <- getRealScan(99, mzml1)
+plot(scan1)
+
+mzml2 <- readMzmlMS2(demo_file)
+scan2 <- getRealScan(33, mzml2)
+plot(scan2)
 ```
 
 ### Read mgf file
 
-```{bash, include = FALSE, eval=FALSE}
-#!/bin/bash
-# generate small mgf file
-
-awk '
-BEGIN {
-  chunk_count = 0
-  inside_chunk = 0
-  start_chunk = 1000
-  end_chunk = 1100
+```{r}
+if (!requireNamespace("MSnbase", quietly = TRUE)) {
+  install.packages("MSnbase")
 }
-{
-  if ($0 == "BEGIN IONS") {
-    chunk_count++
-    if (chunk_count > start_chunk && chunk_count <= end_chunk) {
-      inside_chunk = 1
-    } else {
-      inside_chunk = 0
-    }
-  }
-  if (inside_chunk) {
-    print $0 >> "../rmd/input data format/mgf/demo.mgf"
-  }
-  if ($0 == "END IONS" && inside_chunk) {
-    inside_chunk = 0
-  }
-}
-' "../rmd/input data format/mgf/Pan_052322_X13.mgf"
-mv "../rmd/input data format/mgf/demo.mgf" "../rmd/input data format/"
-```
 
-```{r eval=FALSE}
-mgf <- readMgf("../rmd/input data format/mgf/Pan_052322_X13.mgf")
-scan1 <- getRealScan(3400, mgf)
+demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
+a <- readMgf(demo_file)
+scan1 <- getRealScan(2688, a)
 plot(scan1)
 ```
 
 ### Read PSM from pepXML file
 
-```{xml include = FALSE, eval=FALSE}
-<!-- essential chunk: --> 
-<search_summary precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic" search_engine="X! Tandem" search_engine_version="Sipros">
-<search_score name="hyperscore" value="8"/>
-<search_score name="nextscore" value="8"/>
-<search_score name="expect" value="2"/>
-```
+```{r}
+if (!requireNamespace("mzR", quietly = TRUE)) {
+  install.packages("mzR")
+}
 
-```{r, eval=FALSE}
-psm <- readPepXMLtable("../rmd/input data format/demo.pep.xml")
-psm$sequence
+demo_file <- system.file("extdata", "demo.pepXML", package = "Aerith")
+a <- readPepXMLtable(demo_file)
 ```
 
 ### Read PSM from TSV generated from Sipros
 
-```{r psm.txt, eval=FALSE}
-psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
+```{r}
+demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
+psm <- readPSMtsv(demo_file)
 ```
 
-```{r eval=FALSE, include=FALSE}
-set.seed(9527)
-psm2 <- psm[sample(nrow(psm), 2000), ]
-write.table(psm2, "../rmd/input data format/demo.psm.txt",
-  sep = "\t", row.names = FALSE, quote = FALSE
-)
-
-# top 3 in demo in X13
-psm2 <- psm2[psm2$Filename=="Pan_052322_X13.FT2",]
-psm2 <- arrange(psm2, desc(Score))
-# 4068 2596 8182
-psm2$"ScanNumber"[1:3]
+```{r pro.cluster.txt}
+demo_file <- system.file("extdata", "demo.pro.cluster.txt", package = "Aerith")
+pro <- readPSMtsv(demo_file)
 ```
 
-```{r pro.cluster.txt, eval=FALSE, include=FALSE}
-header <- readLines("../rmd/input data format/pct50.pro.cluster.txt", n = 100)
-header <- header[grepl("^#", header)]
-pro <- readPSMtsv("../rmd/input data format/pct50.pro.cluster.txt")
-set.seed(9527)
-pro <- pro[sample(nrow(pro), 2000), ]
-colnames(pro)[1] <- ""
-writeLines(header, "../rmd/input data format/demo.pro.cluster.txt")
-write.table(pro, "../rmd/input data format/demo.pro.cluster.txt",
-  sep = "\t", row.names = FALSE, quote = FALSE, append = T
-)
-# test
-pro <- readPSMtsv("../rmd/input data format/demo.pro.cluster.txt")
+```{r .sip}
+demo_file <- system.file("extdata", "demo.sip", package = "Aerith")
+sip <- readPSMtsv(demo_file)
 ```
 
-```{r .sip, eval=FALSE, include=FALSE}
-header <- readLines("/prebiotics/ubuntuShare/EcoliSIP/goodResults/pct50/Pan_052322_X13/Pan_052322_X13.C13_50000Pct.sip", n = 200)
-header <- header[grepl("^#", header)]
-sip <- readPSMtsv("/prebiotics/ubuntuShare/EcoliSIP/goodResults/pct50/Pan_052322_X13/Pan_052322_X13.C13_50000Pct.sip")
-set.seed(9527)
-sip <- sip[sample(nrow(sip), 2000), ]
-writeLines(header, "../rmd/input data format/demo.sip")
-write.table(sip, "../rmd/input data format/demo.sip",
-  sep = "\t", row.names = FALSE, quote = FALSE, append = T
-)
-# test
-sip <- readPSMtsv("../rmd/input data format/demo.sip")
-```
-
-```{r spe2pep.txt, eval=FALSE, include=FALSE}
-parse_chunks <- function(filepath) {
-  lines <- readLines(filepath)
-  # Find the first '+', marking the start of data
-  start_idx <- which(startsWith(lines[seq_len(300)], "+"))[1]
-  if (is.na(start_idx)) stop("No data section found.")
-  header <- lines[1:(start_idx - 1)]
-  data_lines <- lines[start_idx:length(lines)]
-  
-  # Parse chunks: each '+' line and its following '*' lines
-  chunks <- list()
-  i <- 1
-  while (i <= length(data_lines)) {
-    if (startsWith(data_lines[i], "+")) {
-      chunk <- data_lines[i]
-      j <- i + 1
-      while (j <= length(data_lines) && startsWith(data_lines[j], "*")) {
-        chunk <- c(chunk, data_lines[j])
-        j <- j + 1
-      }
-      chunks[[length(chunks) + 1]] <- chunk
-      i <- j
-    } else {
-      i <- i + 1
-    }
-  }
-  return(list(header = header, chunks = chunks))
-}
-
-subsample_and_write_chunks <- function(parsed, out_file, n = 50, seed = 42) {
-  header <- parsed$header
-  chunks <- parsed$chunks
-  set.seed(seed)
-  n_sub <- min(n, length(chunks) - 1)
-  selected <- sample(chunks[-1], n_sub)
-  writeLines(header, out_file)
-  con <- file(out_file, "a")
-  writeLines(chunks[[1]], con)
-  for (chunk in selected) {
-    writeLines(chunk, con)
-  }
-  close(con)
-}
-
-write_chunks_continus <- function(parsed, out_file, start = 10000, len = 100) {
-  header <- parsed$header
-  chunks <- parsed$chunks
-  writeLines(header, out_file)
-  con <- file(out_file, "a")
-  # for annotation
-  writeLines(chunks[[1]], con)
-  start <- start + 1
-  for (i in seq(start, start + len - 1)) {
-    writeLines(chunks[[i]], con)
-  }
-  close(con)
-}
-
-target <- parse_chunks("../rmd/input data format/X13target.Spe2Pep.txt")
-write_chunks_continus(
-  target,
-  "../rmd/input data format/demo_target.Spe2Pep.txt"
-)
-target <- readSpe2Pep("../rmd/input data format/demo_target.Spe2Pep.txt")
-range(target$PSM$precursorScanNumbers)
-length(unique(target$PSM$scanNumbers))
-
-decoy <- parse_chunks("../rmd/input data format/X13decoy.Spe2Pep.txt")
-write_chunks_continus(
-  decoy,
-  "../rmd/input data format/demo_decoy.Spe2Pep.txt"
-)
-decoy <- readSpe2Pep("../rmd/input data format/demo_decoy.Spe2Pep.txt")
-range(decoy$PSM$precursorScanNumbers)
-
-header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT1")
-# precursor may exist in scans before precursor scan
-ms1 <- readScansMS1("../rmd/input data format/ft/Pan_052322_X13.FT1",
-                          12666, 12888)
-writeAllScanMS1(header, ms1, "../rmd/input data format/demo_target_decoy.FT1")
-ms1 <- readAllScanMS1("../rmd/input data format/demo_target_decoy.FT1")
-file_content <- readLines("../rmd/input data format/demo_target_decoy.FT1")
-saveRDS(file_content, "../rmd/input data format/demo_target_decoy.FT1.rds")
-file_content<- readRDS("../rmd/input data format/demo_target_decoy.FT1.rds")
+```{r spe2pep.txt}
+target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
+psm <- readSpe2Pep(target_file)
+psm <- psm$PSM
 ```
 
 ### TIC visualization
-
-```{r, eval=FALSE}
-ms1 <- readAllScanMS1("../rmd/input data format/ft/Pan_052322_X13.FT1")
-tic <- getTIC(ms1)
-plotTIC(tic)
-ms2 <- readAllScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2")
-tic <- getTIC(ms2)
-plotTIC(tic)
-```
 
 ```{r}
 demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
@@ -393,28 +160,6 @@ plotTIC(b, seq(9, 10, by = 0.2))
 
 ### Scan speed visualization in retention times
 
-```{r, eval=FALSE}
-# MS1 has 6434 scans
-length(ms1)
-
-# MS2 has 44259 scans
-length(ms2)
-
-# MS1 has average 7 MS2 scan
-length(ms2) / length(ms1)
-
-infoMS1 <- getRetentionTimeAndPrecursorInfo(ms1)
-plotScanFrequency(infoMS1)
-
-infoMS2 <- getRetentionTimeAndPrecursorInfo(ms2)
-plotScanFrequency(infoMS2)
-
-# 1980 MS1 scans do not have ms2 scan
-length(unique(infoMS1$ScanNumber)) - length(unique(infoMS2$PrecursorScanNumber))
-
-plotScanFrequency(infoMS1) + plotScanFrequencyMS2(infoMS2)
-```
-
 ```{r}
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 a <- readAllScanMS2(demo_file)
@@ -427,10 +172,6 @@ plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) + plotScanFr
 
 ### Precursor density visualization in retention times
 
-```{r, eval=FALSE}
-plotPrecursorMzFrequency(infoMS2)
-```
-
 ```{r}
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 a <- readAllScanMS2(demo_file)
@@ -438,6 +179,6 @@ a <- getRetentionTimeAndPrecursorInfo(a)
 plotPrecursorMzFrequency(a, timeBinWidth = 0.1, x_breaks = seq(8, 11, by = 0.2))
 ```
 
-```{r session-info, include=FALSE}
+```{r session-info}
 sessionInfo()
 ```

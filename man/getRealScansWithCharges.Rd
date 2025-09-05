@@ -19,7 +19,7 @@ get real scans with real charges and raw intensities from scans list of one ft f
 }
 \examples{
 scanNumbers <- c("2596","8182")
-demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 ft2 <- readAllScanMS2(demo_file)
 realScans <- getRealScansWithCharges(ft2, scanNumbers)
 }

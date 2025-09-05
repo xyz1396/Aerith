@@ -115,7 +115,7 @@ ggplot(scores_long, aes(x = abundance, y = score_value)) +
 #### Annotate B and Y ion fragments
 
 ```{r}
-demo_file <- system.file("extdata", "X13_4068_2596_8182.ft2", package = "Aerith")
+demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 ft2 <- readAllScanMS2(demo_file)
 scan2 <- ft2[["2596"]]
 scan1 <- getRealScanFromList(scan2)

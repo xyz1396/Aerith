@@ -20,10 +20,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r, include = FALSE, eval=FALSE}
-library(devtools)
-use_vignette("your-vignette-name")
-build_vignettes()
-getwd()
 rmarkdown::render("Visualization-of-SIP-proteomic-result.Rmd", output_dir = "../doc/")
 ```
 
@@ -39,15 +35,6 @@ summaryStats <- summaryPSMsipPCT(demo_file)
 print(summaryStats)
 ```
 
-```{r eval=FALSE}
-s <- summaryPSMsipPCT("../rmd/input data format/pct1.psm.txt", 
-    SIPthreshold = 0.5, chargeThreshold = 3)
-knitr::kable(s)
-s <- summaryPSMsipPCT("../rmd/input data format/pct50.psm.txt", 
-    SIPthreshold = 10, chargeThreshold = 3)
-knitr::kable(s)
-```
-
 ### Plot the distribution of SIP percent for PSMs
 
 ```{r}
@@ -56,13 +43,6 @@ p <- plotPSMsipPCT(demo_file)
 p
 ```
 
-```{r eval=FALSE}
-plotPSMsipPCT("../rmd/input data format/pct1.psm.txt")
-plotPSMsipPCT("../rmd/input data format/pct50.psm.txt")
-```
-
-
-
-```{r session-info, include=FALSE}
+```{r session-info}
 sessionInfo()
 ```

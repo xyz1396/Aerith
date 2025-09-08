@@ -43,16 +43,6 @@ pep <- "HSQVFSTAEDNQSAVTIHVLQGER"
 pep2 <- "[HSQVFSTAEDNQSAVTIHVLQGER]"
 ```
 
-```{r eval=FALSE}
-psm <- readPSMtsv("../rmd/input data format/pct1.psm.txt")
-psm <- arrange(psm, desc(Score))
-psm1 <- psm[8, ]
-pep2 <- psm1$OriginalPeptide
-pep <- str_sub(pep2, 2, -2)
-scan1 <- readOneScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", psm1$ScanNumber)
-scan1 <- getRealScanFromList(scan1)
-```
-
 ```{r}
 # isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
 isoCenter <- scan2$isolationWindowCenterMZ
@@ -124,19 +114,6 @@ pep2 <- "[HYAHVDCPGHADYVK]"
 pct <- 0.52
 ```
 
-```{r eval=FALSE}
-psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
-psm <- arrange(psm, desc(Score))
-# use the same peptide as 1% 13C chunk
-psm1 <- psm[4, ]
-pep2 <- psm1$OriginalPeptide
-pep <- str_sub(pep2, 2, -2)
-pct <- psm1$SearchName
-pct <- as.numeric(str_sub(pct,5,-4))/1000/100
-scan1 <- readOneScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2", psm1$ScanNumber)
-scan1 <- getRealScanFromList(scan1)
-```
-
 ```{r}
 # isoCenter <- psm1$MeasuredParentMass/psm1$ParentCharge + 1.007276
 isoCenter <- scan2$isolationWindowCenterMZ
@@ -188,9 +165,7 @@ ggplot(scores_long, aes(x = abundance, y = score_value)) +
   )
 ```
 
-
-
-```{r session-info, include=FALSE}
+```{r session-info}
 sessionInfo()
 ```
 

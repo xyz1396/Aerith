@@ -19,6 +19,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, include = FALSE, eval=FALSE}
+rmarkdown::render("Theoretic-spectra-generation-of-SIP-labeled-peptide.Rmd", output_dir = "../doc/")
+```
+
 ```{r setup}
 library(Aerith)
 library(ggplot2)
@@ -38,21 +42,6 @@ calPepAtomCount("PEPTIDECCCC")
 calPepPrecursorMass("PEPTIDECCCC", "C13", 0.0107)
 ```
 
-```{r include=FALSE}
-calPepAtomCount("PEPTIDECCCC")
-calPepPrecursorMass("PEPTIDECCCC", "C13", 0.0107)
-calPepPrecursorMass("PEPTIDECCCC", "C13", 0.5)
-calPepPrecursorMass("PEPTIDECCCC", "H2", 0.000115)
-calPepPrecursorMass("PEPTIDECCCC", "H2", 0.5)
-calPepPrecursorMass("PEPTIDECCCC", "N15", 0.00368)
-calPepPrecursorMass("PEPTIDECCCC", "N15", 0.5)
-calPepPrecursorMass("PEPTIDECCCC", "O18", 0.00205)
-calPepPrecursorMass("PEPTIDECCCC", "O18", 0.5)
-calPepPrecursorMass("PEPTIDECCCC", "S34", 0.0429)
-calPepPrecursorMass("PEPTIDECCCC", "S34", 0.5)
-```
-
-
 #### Plot precursor's theoretical spectra
 
 ```{r}
@@ -70,20 +59,6 @@ df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.0107)
 head(df, 5)
 ```
 
-```{r include=FALSE}
-calPepAtomCount("PEPTIDECCCC")
-df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.0107)
-df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.5)
-df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "H2", 0.000115)
-df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "H2", 0.5)
-df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.00368)
-df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.5)
-df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.00205)
-df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.5)
-df1 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "S34", 0.0429)
-df2 <- BYion_peak_calculator_DIY("PEPTIDECCCC", "S34", 0.5)
-```
-
 #### Plot peptide fragments' theoretical spectra
 
 ```{r}
@@ -91,7 +66,7 @@ a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 2)
 plot(a) + plotSipBYionLabel(a)
 ```
 
-```{r include=FALSE}
+```{r}
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 0)
 plot(a) + plotSipBYionLabel(a)
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 2:3)
@@ -110,8 +85,26 @@ head(a, 5)
 calPepPrecursorMass("PEPTIDECCCC", "C13", 0.55)
 ```
 
-```{r include=FALSE}
+```{r}
 calPepAtomCount("PEPTIDECCCC")
+calPepPrecursorMass("PEPTIDECCCC", "C13", 0.0107)
+calPepPrecursorMass("PEPTIDECCCC", "C13", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "H2", 0.000115)
+calPepPrecursorMass("PEPTIDECCCC", "H2", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "N15", 0.00368)
+calPepPrecursorMass("PEPTIDECCCC", "N15", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "O18", 0.00205)
+calPepPrecursorMass("PEPTIDECCCC", "O18", 0.5)
+calPepPrecursorMass("PEPTIDECCCC", "S34", 0.0429)
+calPepPrecursorMass("PEPTIDECCCC", "S34", 0.5)
+```
+
+```{r}
+calPepAtomCount("PEPTIDECCCC")
+df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.0107)
+df$Mass[which.max(df$Prob)]
+df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.5)
+df$Mass[which.max(df$Prob)]
 df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.00205)
 df$Mass[which.max(df$Prob)]
 df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "O18", 0.5)
@@ -121,7 +114,6 @@ df$Mass[which.max(df$Prob)]
 df <- precursor_peak_calculator_DIY("PEPTIDECCCC", "S34", 0.5)
 df$Mass[which.max(df$Prob)]
 ```
-
 
 #### Plot precursor's theoretical spectra
 
@@ -140,6 +132,27 @@ df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.55)
 head(df, 5)
 ```
 
+```{r}
+df <- BYion_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.0107)
+df <- df[which(df$Kind == "Y6"), ]
+df$Mass[which.max(df$Prob)]
+df <- BYion_peak_calculator_DIY("PEPTIDECCCC", "C13", 0.5)
+df <- df[which(df$Kind == "Y6"), ]
+df$Mass[which.max(df$Prob)]
+df <- BYion_peak_calculator_DIY("PEPTIDECCCC", "H2", 0.000115)
+df <- df[which(df$Kind == "Y6"), ]
+df$Mass[which.max(df$Prob)]
+df <- BYion_peak_calculator_DIY("PEPTIDECCCC", "H2", 0.5)
+df <- df[which(df$Kind == "Y6"), ]
+df$Mass[which.max(df$Prob)]
+df <- BYion_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.00368)
+df <- df[which(df$Kind == "Y6"), ]
+df$Mass[which.max(df$Prob)]
+df <- BYion_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.5)
+df <- df[which(df$Kind == "Y6"), ]
+df$Mass[which.max(df$Prob)]
+```
+
 #### Plot peptide fragments' theoretical spectra
 
 ```{r}
@@ -147,15 +160,13 @@ a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 2)
 plot(a) + plotSipBYionLabel(a)
 ```
 
-```{r include=FALSE}
+```{r}
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 0)
 plot(a) + plotSipBYionLabel(a)
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 2:3)
 plot(a) + plotSipBYionLabel(a)
 ```
 
-
-
-```{r session-info, include=FALSE}
+```{r session-info}
 sessionInfo()
 ```

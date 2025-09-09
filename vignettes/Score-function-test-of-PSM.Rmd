@@ -50,7 +50,7 @@ anno <- annotatePSM(
   scan1@spectra$MZ, scan1@spectra$Prob,
   scan1@spectra$Charge,
   pep, 1:2, "C13",
-  0.0107, isoCenter, 5.0
+  0.0107, isoCenter, 5.0, TRUE
 )
 WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   return(scorePSM(scan1@spectra$MZ,

@@ -8,7 +8,8 @@ using namespace Rcpp;
 //' @param scanNumber the scan at scanNumber
 //' @return a list of MS2 scan
 //' @examples
-//' ft2 <- readOneScanMS2("demo.FT2", 2)
+//' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+//' ft2 <- readOneScanMS2(demo_file, 1633)
 //' @export
 // [[Rcpp::export]]
 List readOneScanMS2(const String &ftFile, const size_t scanNumber) {
@@ -34,7 +35,8 @@ List readOneScanMS2(const String &ftFile, const size_t scanNumber) {
 //' @param scanNumber the scan at scanNumber
 //' @return a list of MS1 scan
 //' @examples
-//' ft1 <- readOneScanMS1("demo.FT1", 2)
+//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' ft1 <- readOneScanMS1(demo_file, 1588)
 //' @export
 // [[Rcpp::export]]
 List readOneScanMS1(const String &ftFile, const size_t scanNumber) {

@@ -182,7 +182,7 @@ std::tuple<size_t, size_t, float> peptidesFiltrator::getDecoyCountScoreThreshold
 			return {decoyCounts[i], pepCounts[i], scoreDecoyPairs[i].first};
 	}
 	// if Cannot find FDRthreshold
-	std::cout << "Cannot find FDRthreshold" << std::endl;
+	// std::cout << "Cannot find FDRthreshold" << std::endl;
 	return {0, 0, 0};
 }
 

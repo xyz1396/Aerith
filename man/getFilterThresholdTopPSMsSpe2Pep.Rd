@@ -21,7 +21,8 @@ getFilterThresholdTopPSMsSpe2Pep(
 \item{decoyPrefix}{the prefix of decoy sequence}
 }
 \value{
-a dataframe about filter threshold and FDR results
+a dataframe about filter threshold and FDR results,
+rows of {\if{html}{\out{<charge>}}, 0, 0 ,0} means cannot find threshold at this charge
 }
 \description{
 getFilterThresholdTopPSMsSpe2Pep get filter threshold of top PSMs of each scan from multiple .sip file

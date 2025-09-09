@@ -7,7 +7,7 @@
 #' @keywords internal
 .onLoad <- function(libname, pkgname) {
     # Set OpenMP stack size to avoid stack overflow in parallel processing
-    Sys.setenv(OMP_STACKSIZE = "16M")
+    # Sys.setenv(OMP_STACKSIZE = "16M")
     # Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
     invisible()
 }
@@ -19,7 +19,7 @@
 #' @param libpath character string giving the complete path to the package.
 #' @keywords internal
 .onUnload <- function(libpath) {
-    Sys.unsetenv("OMP_STACKSIZE")
+    # Sys.unsetenv("OMP_STACKSIZE")
     # Sys.unsetenv("OMP_NUM_THREADS")
     library.dynam.unload("Aerith", libpath)
 }

@@ -18,5 +18,6 @@ a list of MS2 scan
 readOneScanMS2
 }
 \examples{
-ft2 <- readOneScanMS2("demo.FT2", 2)
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+ft2 <- readOneScanMS2(demo_file, 1633)
 }

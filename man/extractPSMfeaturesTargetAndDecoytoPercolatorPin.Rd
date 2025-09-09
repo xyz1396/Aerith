@@ -51,5 +51,6 @@ file_content <- readRDS(ft_file)
 writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
 pin_path <- file.path(tmp, "a.pin")
 extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
-list.files(tmp, full.names = TRUE, recursive = TRUE)
+print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
+print(file.info(pin_path))
 }

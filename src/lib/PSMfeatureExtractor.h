@@ -35,7 +35,7 @@ public:
     // return precursor scan number and isotopic peaks
     std::vector<isotopicPeak> findIsotopicPeaks(int &MS1ScanNumber,
                                                 const int precursorCharge,
-                                                const double observedPrecursorMass);
+                                                const double observedPrecursorMass, const double calculatedPrecursorMass);
     double getSIPelementAbundanceFromMS1(const std::string &peptideSeq,
                                          const std::vector<isotopicPeak> &isotopicPeaks, const int precursorCharge);
     std::pair<int, int> getSeqLengthAndMissCleavageSiteNumber(const std::string &peptideSeq);

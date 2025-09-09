@@ -1,23 +1,25 @@
-# context("readScansMS1")
+context("readScansMS1")
 
-# test_that("readScansMS1 works", {
-#   ft1 <- readOneScanMS1("/mnt/d/work/202210/ecoliSIPpct1_pct100/data/pct1/Pan_062822_X1iso5.FT1", 10430)
-#   expect_equal(nrow(ft1$peaks), 1315)
-# })
+test_that("readScansMS1 works", {
+    demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+    ft1 <- readOneScanMS1(demo_file, 1588)
+    expect_true(nrow(ft1$peaks) > 8)
+})
+
+context("readOneScanMS2")
+
+test_that("readOneScanMS2 works", {
+    demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+    ft2 <- readOneScanMS2(demo_file, 1633)
+    expect_true(nrow(ft2$peaks) > 8)
+})
 
 context("readScansMS2")
 
-# test_that("readScansMS2 works", {
-#   ft2 <- readOneScanMS2("/mnt/d/work/202210/ecoliSIPpct1_pct100/data/pct1/Pan_062822_X1iso5.FT2", 10487)
-#   expect_equal(nrow(ft2$peaks), 588)
-# })
+test_that("readScansMS2 works", {
+    demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+    ft2 <- readScansMS2(demo_file, 1506, 1593)
+    expect_true(length(ft2) > 8)
+})
 
-# test_that("readScansMS2 works", {
-#   ft2 <- readScansMS2("/mnt/d/work/202210/ecoliSIPpct1_pct100/data/pct1/Pan_062822_X1iso5.FT2", 10487, 10600)
-#   expect_equal(length(ft2), 588)
-# })
-
-# test_that("readScansMS2 works", {
-#   ft2 <- readScansMS2Vector("/mnt/d/work/202210/ecoliSIPpct1_pct100/data/pct1/Pan_062822_X1iso5.FT2", 10487:10600)
-#   expect_equal(length(ft2), 100)
-# })
+# test_file("tests/testthat/test_ftFileReader.R")

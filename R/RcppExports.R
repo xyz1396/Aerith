@@ -18,7 +18,7 @@
 #' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
 #' file_content <- readRDS(ft_file)
 #' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
-#' list.files(tmp, full.names = TRUE, recursive = TRUE)
+#' print(list.files(c(ft_dir, target_dir), full.names = TRUE, recursive = TRUE))
 #' psm <- extractPSMfeatures(target_dir, 5, ft_dir, 3)
 #' @export
 extractPSMfeatures <- function(Spe2PepFilePath, topN, ftFilepath, ThreadNumber = 3L) {
@@ -47,7 +47,7 @@ extractPSMfeatures <- function(Spe2PepFilePath, topN, ftFilepath, ThreadNumber =
 #' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
 #' file_content <- readRDS(ft_file)
 #' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
-#' list.files(tmp, full.names = TRUE, recursive = TRUE)
+#' print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
 #' psm <- extractPSMfeaturesTargetAndDecoy(target_dir, decoy_dir, 3, ft_dir, 3)
 #' @export
 extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFilepath, ThreadNumber = 3L) {
@@ -80,7 +80,8 @@ extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFile
 #' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
 #' pin_path <- file.path(tmp, "a.pin")
 #' extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
-#' list.files(tmp, full.names = TRUE, recursive = TRUE)
+#' print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
+#' print(file.info(pin_path))
 #' @export
 extractPSMfeaturesTargetAndDecoytoPercolatorPin <- function(targetPath, decoyPath, topN, ftFilepath, ThreadNumber = 3L, doProteinInference = FALSE, fileName = "a.pin") {
     invisible(.Call(`_Aerith_extractPSMfeaturesTargetAndDecoytoPercolatorPin`, targetPath, decoyPath, topN, ftFilepath, ThreadNumber, doProteinInference, fileName))
@@ -128,7 +129,8 @@ getFilterThresholdTopPSMs <- function(workingPath, OverallThreshold, topN) {
 #' @param OverallThreshold FDR thredhold of peptides
 #' @param topN store top N PSMs of each scan of one .FT file
 #' @param decoyPrefix the prefix of decoy sequence
-#' @return a dataframe about filter threshold and FDR results
+#' @return a dataframe about filter threshold and FDR results, 
+#' rows of {<charge>, 0, 0 ,0} means cannot find threshold at this charge
 #' @examples
 #' tmp <- tempdir()
 #' sip_dir <- file.path(tmp, "sip")
@@ -280,7 +282,8 @@ BYion_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
 #' @param scanNumber the scan at scanNumber
 #' @return a list of MS2 scan
 #' @examples
-#' ft2 <- readOneScanMS2("demo.FT2", 2)
+#' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+#' ft2 <- readOneScanMS2(demo_file, 1633)
 #' @export
 readOneScanMS2 <- function(ftFile, scanNumber) {
     .Call(`_Aerith_readOneScanMS2`, ftFile, scanNumber)
@@ -291,7 +294,8 @@ readOneScanMS2 <- function(ftFile, scanNumber) {
 #' @param scanNumber the scan at scanNumber
 #' @return a list of MS1 scan
 #' @examples
-#' ft1 <- readOneScanMS1("demo.FT1", 2)
+#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' ft1 <- readOneScanMS1(demo_file, 1588)
 #' @export
 readOneScanMS1 <- function(ftFile, scanNumber) {
     .Call(`_Aerith_readOneScanMS1`, ftFile, scanNumber)
@@ -542,6 +546,7 @@ readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel <- function(target
 #' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
 #' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3, file.path(sip_dir, "top3.tsv"))
 #' list.files(sip_dir, full.names = TRUE)
+#' print(file.info(file.path(sip_dir, "top3.tsv")))
 #' @export
 writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN = 5L, fileName = "a.tsv") {
     invisible(.Call(`_Aerith_writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel`, workingPath, topN, fileName))
@@ -607,7 +612,7 @@ scorePSM <- function(realMZ, realIntensity, realCharge, parentCharge, pepSeq, At
 #'   scan1$peaks$mz, scan1$peaks$intensity,
 #'   scan1$peaks$charge,
 #'   "HSQVFSTAEDNQSAVTIHVLQGER", 1:2, "C13",
-#'   0.0107, 886.65, 4.0
+#'   0.0107, 886.65, 4.0, TRUE
 #' )
 #' @export
 annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter = 0, isoWidth = 0, calScores = FALSE) {

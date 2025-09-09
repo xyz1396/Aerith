@@ -301,6 +301,7 @@ List readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyParallel(String target
 //' file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
 //' writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3, file.path(sip_dir, "top3.tsv"))
 //' list.files(sip_dir, full.names = TRUE)
+//' print(file.info(file.path(sip_dir, "top3.tsv")))
 //' @export
 // [[Rcpp::export]]
 void writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(String workingPath, size_t topN = 5, String fileName = "a.tsv")

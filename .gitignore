@@ -1,6 +1,9 @@
+.gitignore
+
 # History files
 .Rhistory
 .Rapp.history
+tests/testthat/_snaps
 
 # Session Data files
 .RData
@@ -50,3 +53,4 @@ inst/doc
 /doc/
 /Meta/
 /extdata/
+configure.sh

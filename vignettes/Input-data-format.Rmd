@@ -83,9 +83,9 @@ list.files(tmp, pattern = "demo10.FT2", full.names = TRUE)
 ### Read mzml file
 
 ```{r}
-if (!requireNamespace("mzR", quietly = TRUE)) {
-  install.packages("mzR")
-}
+# if (!requireNamespace("mzR", quietly = TRUE)) {
+#   install.packages("mzR")
+# }
 
 demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
 
@@ -101,9 +101,9 @@ plot(scan2)
 ### Read mgf file
 
 ```{r}
-if (!requireNamespace("MSnbase", quietly = TRUE)) {
-  install.packages("MSnbase")
-}
+# if (!requireNamespace("MSnbase", quietly = TRUE)) {
+#   install.packages("MSnbase")
+# }
 
 demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
 a <- readMgf(demo_file)
@@ -114,9 +114,9 @@ plot(scan1)
 ### Read PSM from pepXML file
 
 ```{r}
-if (!requireNamespace("mzR", quietly = TRUE)) {
-  install.packages("mzR")
-}
+# if (!requireNamespace("mzR", quietly = TRUE)) {
+#   install.packages("mzR")
+# }
 
 demo_file <- system.file("extdata", "demo.pepXML", package = "Aerith")
 a <- readPepXMLtable(demo_file)

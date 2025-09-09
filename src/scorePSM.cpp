@@ -486,7 +486,7 @@ std::vector<std::string> enumsToStrings(std::vector<PSMpeakAnnotator::ionKind> i
 //'   scan1$peaks$mz, scan1$peaks$intensity,
 //'   scan1$peaks$charge,
 //'   "HSQVFSTAEDNQSAVTIHVLQGER", 1:2, "C13",
-//'   0.0107, 886.65, 4.0
+//'   0.0107, 886.65, 4.0, TRUE
 //' )
 //' @export
 // [[Rcpp::export]]

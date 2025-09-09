@@ -132,10 +132,12 @@ void PSMfeatureExtractor::filterIsotopicPeaksTopN(
 
 std::vector<isotopicPeak> PSMfeatureExtractor::findIsotopicPeaks(
     int &MS1ScanNumber, const int precursorCharge,
-    const double observedPrecursorMass) {
+    const double observedPrecursorMass, const double calculatedPrecursorMass) {
     std::vector<isotopicPeak> isotopicPeaks = {};
     double observedPrecursorMZ = observedPrecursorMass / precursorCharge +
                                  ProNovoConfig::getProtonMass();
+    double calculatedPrecursorMZ = calculatedPrecursorMass / precursorCharge +
+                                 ProNovoConfig::getProtonMass();                            
     Scan *MS1Scan = scanNumerFT1ScanMap[MS1ScanNumber];
     size_t peakIX = std::numeric_limits<size_t>::max();
     // if first search failed, search 2 scans before it
@@ -201,11 +203,11 @@ std::vector<isotopicPeak> PSMfeatureExtractor::findIsotopicPeaks(
                       return a.mz < b.mz;
                   });
     }
-    // if (isotopicPeaks.size() > 2)
-    if (isotopicPeaks.size() > NisotopicPeak / 4) {
-        // filterIsotopicPeaks(isotopicPeaks, calculatedPrecursorMZ);
-        filterIsotopicPeaksTopN(isotopicPeaks, observedPrecursorMZ,
-                                NisotopicPeak);
+    if (isotopicPeaks.size() > 2) {
+    // if (isotopicPeaks.size() > NisotopicPeak / 4) {
+        filterIsotopicPeaks(isotopicPeaks, calculatedPrecursorMZ);
+        // filterIsotopicPeaksTopN(isotopicPeaks, observedPrecursorMZ,
+        //                         NisotopicPeak);
     }
     return isotopicPeaks;
 }
@@ -369,7 +371,7 @@ void PSMfeatureExtractor::extractFeaturesOfEachPSM() {
     for (size_t i = 0; i < mSipPSM->isotopicPeakss.size(); i++) {
         mSipPSM->isotopicPeakss[i] = findIsotopicPeaks(
             mSipPSM->precursorScanNumbers[i], mSipPSM->parentCharges[i],
-            mSipPSM->measuredParentMasses[i]);
+            mSipPSM->measuredParentMasses[i], mSipPSM ->calculatedParentMasses[i]);
         mSipPSM->isotopicPeakNumbers[i] = mSipPSM->isotopicPeakss[i].size();
         mSipPSM->MS1IsotopicAbundances[i] = getSIPelementAbundanceFromMS1(
             mSipPSM->nakePeptides[i], mSipPSM->isotopicPeakss[i],

@@ -1,9 +1,9 @@
 
-### Aerith <img src="./png/logo.png" alt="Aerith" height="30" style="vertical-align: middle;" />
+### Aerith <img src="./inst/png/logo.png" alt="Aerith" height="30" style="vertical-align: middle;" />
 
 Aerith is an R package that provides interfaces to read and write mass spectrum scans, calculate the theoretical isotopic peak envelope of peptide precursors and their B Y ions, score and visualize the PSM (peptide and spectra match), and visualize the TIC (total ion current) using Rcpp. In Final Fantasy VII, Aerith is the last surviving Cetra or “Ancient” who can communicate with the planet. In stable isotope analysis such as SIP (stable isotope probe), we study Earth or even the universe by analyzing isotopes of elements.
 
-![Abstract](./png/AerithAbstract.png)
+![Abstract](./inst/png/AerithAbstract.png)
 
 ### Citation
 
@@ -19,9 +19,11 @@ install_github("xyz1396/Aerith")
 library(Aerith)
 ```
 
-### Download the test files
+### Tutorial
 
-Please read the [vignettes](./vignettes/) to get the input files and detail tutorial.
+Please read the [vignettes](./vignettes/) to get the detail tutorial.
+
+### Demo on the <sup>13</sup>C proteomic SIP *E. coli* data
 
 #### Convert raw file to FT1, FT2, and mzml file
 
@@ -71,13 +73,13 @@ ft1 <- getRealScan(10430, ft1)
 plot(ft1)
 ```
 
-![ft2](./png/ft2plot.png)
+![ft2](./inst/png/ft2plot.png)
 
 ```{r eval=FALSE}
 plotTIC(tic)
 ```
 
-![tic](./png/tic.png)
+![tic](./inst/png/tic.png)
 
 #### Write small demo FT1 FT2 file
 
@@ -106,7 +108,7 @@ plotMolecularIsotopes(iso2) +
   ggtitle(expression(C[6]*H[11]*O[6]^"-"~50*"% "*{}^{13}*C))
 ```
 
-![Peak](./png/glucoseNaMC.png)
+![Peak](./inst/png/glucoseNaMC.png)
 
 ```{r}
 # natural abundance of (M+Na)⁺ of glucose
@@ -119,7 +121,7 @@ plotMolecularFFTisotopes(iso2) +
   ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~50*"% "*{}^{13}*C))
 ```
 
-![Peak](png/glucoseNaFFT.png)
+![Peak](./inst/png/glucoseNaFFT.png)
 
 ### Calculate theorotic peak
 
@@ -130,7 +132,7 @@ a <- getSipPrecursorSpectra("KHRIPCDRK", "C13", 0.25, 2)
 plot(a)
 ```
 
-![Peak](./png/theoreticPeaks.png)
+![Peak](./inst/png/theoreticPeaks.png)
 
 #### B Y ions
 
@@ -139,7 +141,7 @@ a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.25, 1:2, 2)
 plot(a)
 ```
 
-![BY](./png/BYions.png)
+![BY](./inst/png/BYions.png)
 
 ### PSM visualization
 
@@ -177,4 +179,4 @@ plotPSMannotation(
 )
 ```
 
-![PSM](./png/PSM.png)
+![PSM](./inst/png/PSM.png)

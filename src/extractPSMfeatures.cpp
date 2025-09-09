@@ -51,6 +51,10 @@ private:
 };
 
 //' extractPSMfeatures extract featueres of top PSMs from multiple .Spe2Pep.txt files
+//' @details
+//' Set OpenMP stack size to avoid stack overflow in parallel processing before loading Aerith package:
+//' Sys.setenv(OMP_STACKSIZE = "16M")
+//' Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
 //' @param Spe2PepFilePath a full path with .Spe2Pep.txt files in it
 //' @param topN store top N PSMs of each scan of one .FT2 file
 //' @param ftFilepath a full path with .FT1 and .FT2 files in it
@@ -67,7 +71,7 @@ private:
 //' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
 //' file_content <- readRDS(ft_file)
 //' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
-//' list.files(tmp, full.names = TRUE, recursive = TRUE)
+//' print(list.files(c(ft_dir, target_dir), full.names = TRUE, recursive = TRUE))
 //' psm <- extractPSMfeatures(target_dir, 5, ft_dir, 3)
 //' @export
 // [[Rcpp::export]]
@@ -155,6 +159,10 @@ List extractPSMfeatures(String Spe2PepFilePath, int topN,
 }
 
 //' extractPSMfeaturesTargetAndDecoy extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
+//' @details
+//' Set OpenMP stack size to avoid stack overflow in parallel processing before loading Aerith package:
+//' Sys.setenv(OMP_STACKSIZE = "16M")
+//' Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
 //' @param targetPath a full path with target .Spe2PepFile.txt files in it
 //' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
 //' @param topN store top N PSMs of each scan of one .FT2 file
@@ -176,7 +184,7 @@ List extractPSMfeatures(String Spe2PepFilePath, int topN,
 //' ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith")
 //' file_content <- readRDS(ft_file)
 //' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
-//' list.files(tmp, full.names = TRUE, recursive = TRUE)
+//' print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
 //' psm <- extractPSMfeaturesTargetAndDecoy(target_dir, decoy_dir, 3, ft_dir, 3)
 //' @export
 // [[Rcpp::export]]
@@ -265,6 +273,10 @@ List extractPSMfeaturesTargetAndDecoy(String targetPath, String decoyPath, int t
 
 //' extractPSMfeaturesTargetAndDecoytoPercolatorPin extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
 //' to pecorlator pin format
+//' @details
+//' Set OpenMP stack size to avoid stack overflow in parallel processing before loading Aerith package:
+//' Sys.setenv(OMP_STACKSIZE = "16M")
+//' Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
 //' @param targetPath a full path with target .Spe2PepFile.txt files in it
 //' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
 //' @param topN store top N PSMs of each scan of one .FT2 file
@@ -289,7 +301,8 @@ List extractPSMfeaturesTargetAndDecoy(String targetPath, String decoyPath, int t
 //' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
 //' pin_path <- file.path(tmp, "a.pin")
 //' extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
-//' list.files(tmp, full.names = TRUE, recursive = TRUE)
+//' print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
+//' print(file.info(pin_path))
 //' @export
 // [[Rcpp::export]]
 

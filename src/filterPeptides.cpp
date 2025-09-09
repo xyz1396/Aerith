@@ -101,7 +101,8 @@ List getFilterThresholdTopPSMs(CharacterVector workingPath, NumericVector Overal
 //' @param OverallThreshold FDR thredhold of peptides
 //' @param topN store top N PSMs of each scan of one .FT file
 //' @param decoyPrefix the prefix of decoy sequence
-//' @return a dataframe about filter threshold and FDR results
+//' @return a dataframe about filter threshold and FDR results, 
+//' rows of {<charge>, 0, 0 ,0} means cannot find threshold at this charge
 //' @examples
 //' tmp <- tempdir()
 //' sip_dir <- file.path(tmp, "sip")
@@ -155,7 +156,8 @@ List getFilterThresholdTopPSMsSpe2Pep(String workingPath, float OverallThreshold
     std::vector<float> scoreThreshold{filtrator.scoreThresholdCharge2, filtrator.scoreThresholdCharge3,
                                       filtrator.scoreThresholdChargeLargerThan3};
     return List::create(Named("threshold") = DataFrame::create(
-                            Named("decoyCount") = decoyCount,
+                            Named("charge") = std::vector<int>{2, 3, 4},
+                            _["decoyCount"] = decoyCount,
                             _["pepCount"] = pepCount,
                             _["scoreThreshold"] = scoreThreshold),
                         _["topPSMs"] = std::move(psmList));

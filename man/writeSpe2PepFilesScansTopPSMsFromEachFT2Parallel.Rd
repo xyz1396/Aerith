@@ -35,4 +35,5 @@ demo_file <- system.file("extdata", "demo_decoy.Spe2Pep.txt", package = "Aerith"
 file.copy(demo_file, file.path(sip_dir, "Pan_052322_X13.SIP_C13_050_000decoy.Spe2Pep.txt"))
 writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel(sip_dir, 3, file.path(sip_dir, "top3.tsv"))
 list.files(sip_dir, full.names = TRUE)
+print(file.info(file.path(sip_dir, "top3.tsv")))
 }

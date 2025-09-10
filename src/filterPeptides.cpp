@@ -102,7 +102,7 @@ List getFilterThresholdTopPSMs(CharacterVector workingPath, NumericVector Overal
 //' @param topN store top N PSMs of each scan of one .FT file
 //' @param decoyPrefix the prefix of decoy sequence
 //' @return a dataframe about filter threshold and FDR results, 
-//' rows of {<charge>, 0, 0 ,0} means cannot find threshold at this charge
+//' rows of "<charge>, 0, 0 ,0" means cannot find threshold at this charge
 //' @examples
 //' tmp <- tempdir()
 //' sip_dir <- file.path(tmp, "sip")

@@ -236,79 +236,75 @@ getRealScanWithCharge <- function(scanNumber, ft) {
   return(AAsOBJ)
 }
 
-#' Draw AAspectra MS plot
-#' @name plot
-#' @docType methods
-#' @rdname plot.AAspectra
+#' Plot an AAspectra object
+#'
+#' @description S4 plot method producing a ggplot2 spectrum for an AAspectra object.
+#'
+#' @param x AAspectra object.
+#' @param y (ignored, must be missing)
+#' @param linewidth Numeric width of MS peaks. Default 0.1.
+#' @param ... Passed on (currently unused).
+#'
+#' @return A ggplot2 object.
+#' @seealso AAspectra
+#' @rdname plot-AAspectra
+#' @aliases plot,AAspectra,missing-method
 #' @aliases plot,AAspectra-method
+#' @export
 #'
-#' @description S4 plot method for AAspectra objects.
-#'
-#' @param x AAspectra object
-#' @param linewidth numeric, for width of MS peaks. Default is 0.1
-#'
-#' @return a ggplot2 object
-#' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 geom_linerange
-#' @importFrom ggplot2 theme
-#' @importFrom ggplot2 xlab
-#' @importFrom ggplot2 ylab
-#' @importFrom ggplot2 element_blank
-#' @importFrom ggplot2 element_rect
-#' @importFrom ggplot2 element_text
-#' @importFrom ggplot2 guide_legend
-#' @importFrom ggplot2 guides
-#' @importFrom ggplot2 scale_x_continuous
-#' @exportMethod plot
 #' @examples
 #' a <- getPrecursorSpectra("KHRIP", 2)
 #' plot(a) +
 #'   ggplot2::scale_x_continuous(breaks = seq(324, 329, by = 0.5)) +
 #'   ggplot2::geom_linerange(linewidth = 0.2)
-setMethod("plot", signature(c(x = "AAspectra")), function(x, linewidth = 0.1) {
-  return(
-    ggplot2::ggplot(
-      x@spectra,
-      ggplot2::aes(
-        x = MZ,
-        ymax = Prob,
-        ymin = 0,
-        color = Kind
-      )
-    ) +
-      ggplot2::geom_linerange(linewidth = linewidth) +
-      ggplot2::scale_x_continuous(breaks = seq(0, 2000, by = 100)) +
-      ggplot2::scale_y_continuous(
-        breaks = seq(-100, 100, by = 25),
-        # convert negative tick to positive
-        labels = abs(seq(-100, 100, 25))
+setMethod(
+  "plot",
+  signature(x = "AAspectra", y = "missing"),
+  function(x, y, linewidth = 0.1, ...) {
+    return(
+      ggplot2::ggplot(
+        x@spectra,
+        ggplot2::aes(
+          x = MZ,
+          ymax = Prob,
+          ymin = 0,
+          color = Kind
+        )
       ) +
-      ggplot2::theme(
-        # axis.text = ggplot2::element_blank(),
-        # axis.ticks = ggplot2::element_blank(),
-        # axis.title = ggplot2::element_blank(),
-        panel.grid = ggplot2::element_blank(),
-        panel.background = ggplot2::element_blank(),
-        legend.key = ggplot2::element_blank(),
-        panel.border = ggplot2::element_rect(
-          fill = NA,
-          color = "grey10",
-          linetype = 1,
-          linewidth = 0.5
-        ),
-        text = ggplot2::element_text(size = 15)
-      ) +
-      ggplot2::xlab("M/Z") +
-      ggplot2::ylab("Intensity") +
-      ggplot2::guides(color = ggplot2::guide_legend(
-        override.aes =
-          list(
-            linewidth = 5, fill =
-              NA
-          )
-      ))
-  )
-})
+        ggplot2::geom_linerange(linewidth = linewidth) +
+        ggplot2::scale_x_continuous(breaks = seq(0, 2000, by = 100)) +
+        ggplot2::scale_y_continuous(
+          breaks = seq(-100, 100, by = 25),
+          # convert negative tick to positive
+          labels = abs(seq(-100, 100, 25))
+        ) +
+        ggplot2::theme(
+          # axis.text = ggplot2::element_blank(),
+          # axis.ticks = ggplot2::element_blank(),
+          # axis.title = ggplot2::element_blank(),
+          panel.grid = ggplot2::element_blank(),
+          panel.background = ggplot2::element_blank(),
+          legend.key = ggplot2::element_blank(),
+          panel.border = ggplot2::element_rect(
+            fill = NA,
+            color = "grey10",
+            linetype = 1,
+            linewidth = 0.5
+          ),
+          text = ggplot2::element_text(size = 15)
+        ) +
+        ggplot2::xlab("M/Z") +
+        ggplot2::ylab("Intensity") +
+        ggplot2::guides(color = ggplot2::guide_legend(
+          override.aes =
+            list(
+              linewidth = 5, fill =
+                NA
+            )
+        ))
+    )
+  }
+)
 
 #' Draw AAspectra MS plot with B Y ion Labels
 #'

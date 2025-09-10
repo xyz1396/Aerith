@@ -15,6 +15,10 @@ plotFilteredPCTIntensitySummary(
 \item{psms_dir}{Directory containing filtered PSM files (default: "psms/").}
 
 \item{output_file}{Output PDF file name for the plot.}
+
+\item{width}{Width of the output PDF (default: 16).}
+
+\item{height}{Height of the output PDF (default: 12).}
 }
 \description{
 This function reads all filtered PSM files in from output directory of Sipros 5, combines them, filters for labeled PSMs,

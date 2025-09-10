@@ -12,11 +12,11 @@
 #' spectra <- getPrecursorSpectra(AAstr, 1:2)
 #' class(spectra)
 setClass("AAspectra",
-    slots = c(
-        spectra = "data.frame",
-        charges = "numeric",
-        AAstr = "character"
-    )
+  slots = c(
+    spectra = "data.frame",
+    charges = "numeric",
+    AAstr = "character"
+  )
 )
 
 #' add MZ to spectra data.frame
@@ -170,8 +170,9 @@ getRealScanFromList <- function(scan) {
     Charge = Charge
   )
   charges <- 0
-  if (!is.null(scan$precursorCharges))
+  if (!is.null(scan$precursorCharges)) {
     charges <- scan$precursorCharges
+  }
   AAsOBJ <- new("AAspectra",
     spectra = BYreal,
     charges = charges,
@@ -195,10 +196,12 @@ getRealScanFromList <- function(scan) {
 #' plot(b)
 getRealScan <- function(scanNumber, ft) {
   scanNumber <- paste0("", scanNumber)
-    if (!scanNumber %in% names(ft)) {
-        stop(paste0("Scan ", scanNumber, " not found in Scan ",
-            paste0(head(names(ft)), collapse = " "), "..."))
-    }
+  if (!scanNumber %in% names(ft)) {
+    stop(paste0(
+      "Scan ", scanNumber, " not found in Scan ",
+      paste0(head(names(ft)), collapse = " "), "..."
+    ))
+  }
   scan <- ft[[scanNumber]]
   return(getRealScanFromList(scan))
 }
@@ -234,6 +237,12 @@ getRealScanWithCharge <- function(scanNumber, ft) {
 }
 
 #' Draw AAspectra MS plot
+#' @name plot
+#' @docType methods
+#' @rdname plot.AAspectra
+#' @aliases plot,AAspectra-method
+#'
+#' @description S4 plot method for AAspectra objects.
 #'
 #' @param x AAspectra object
 #' @param linewidth numeric, for width of MS peaks. Default is 0.1
@@ -250,15 +259,13 @@ getRealScanWithCharge <- function(scanNumber, ft) {
 #' @importFrom ggplot2 guide_legend
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 scale_x_continuous
-#' @export
 #' @exportMethod plot
-#'
 #' @examples
 #' a <- getPrecursorSpectra("KHRIP", 2)
 #' plot(a) +
 #'   ggplot2::scale_x_continuous(breaks = seq(324, 329, by = 0.5)) +
 #'   ggplot2::geom_linerange(linewidth = 0.2)
-plot.AAspectra <- function(x, linewidth = 0.1) {
+setMethod("plot", signature(c(x = "AAspectra")), function(x, linewidth = 0.1) {
   return(
     ggplot2::ggplot(
       x@spectra,
@@ -301,12 +308,7 @@ plot.AAspectra <- function(x, linewidth = 0.1) {
           )
       ))
   )
-}
-
-#' @rdname plot.AAspectra
-#' @aliases plot,AAspectra-method
-#' @export
-setMethod("plot", "AAspectra", plot.AAspectra)
+})
 
 #' Draw AAspectra MS plot with B Y ion Labels
 #'

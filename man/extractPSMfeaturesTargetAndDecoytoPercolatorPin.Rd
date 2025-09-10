@@ -34,6 +34,11 @@ extractPSMfeaturesTargetAndDecoytoPercolatorPin(
 extractPSMfeaturesTargetAndDecoytoPercolatorPin extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
 to pecorlator pin format
 }
+\details{
+Set OpenMP stack size to avoid stack overflow in parallel processing before loading Aerith package:
+Sys.setenv(OMP_STACKSIZE = "16M")
+Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
+}
 \examples{
 tmp <- tempdir()
 target_dir <- file.path(tmp, "target")

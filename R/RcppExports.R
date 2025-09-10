@@ -2,6 +2,10 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' extractPSMfeatures extract featueres of top PSMs from multiple .Spe2Pep.txt files
+#' @details
+#' Set OpenMP stack size to avoid stack overflow in parallel processing before loading Aerith package:
+#' Sys.setenv(OMP_STACKSIZE = "16M")
+#' Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
 #' @param Spe2PepFilePath a full path with .Spe2Pep.txt files in it
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @param ftFilepath a full path with .FT1 and .FT2 files in it
@@ -26,6 +30,10 @@ extractPSMfeatures <- function(Spe2PepFilePath, topN, ftFilepath, ThreadNumber =
 }
 
 #' extractPSMfeaturesTargetAndDecoy extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
+#' @details
+#' Set OpenMP stack size to avoid stack overflow in parallel processing before loading Aerith package:
+#' Sys.setenv(OMP_STACKSIZE = "16M")
+#' Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
 #' @param targetPath a full path with target .Spe2PepFile.txt files in it
 #' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
 #' @param topN store top N PSMs of each scan of one .FT2 file
@@ -56,6 +64,10 @@ extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFile
 
 #' extractPSMfeaturesTargetAndDecoytoPercolatorPin extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
 #' to pecorlator pin format
+#' @details
+#' Set OpenMP stack size to avoid stack overflow in parallel processing before loading Aerith package:
+#' Sys.setenv(OMP_STACKSIZE = "16M")
+#' Sys.setenv(OMP_NUM_THREADS = parallel::detectCores())
 #' @param targetPath a full path with target .Spe2PepFile.txt files in it
 #' @param decoyPath a full path with decoy .Spe2PepFile.txt files in it
 #' @param topN store top N PSMs of each scan of one .FT2 file
@@ -130,7 +142,7 @@ getFilterThresholdTopPSMs <- function(workingPath, OverallThreshold, topN) {
 #' @param topN store top N PSMs of each scan of one .FT file
 #' @param decoyPrefix the prefix of decoy sequence
 #' @return a dataframe about filter threshold and FDR results, 
-#' rows of {<charge>, 0, 0 ,0} means cannot find threshold at this charge
+#' rows of "<charge>, 0, 0 ,0" means cannot find threshold at this charge
 #' @examples
 #' tmp <- tempdir()
 #' sip_dir <- file.path(tmp, "sip")

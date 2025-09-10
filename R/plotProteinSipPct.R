@@ -197,6 +197,8 @@ plotProSipPct <- function(proPath) {
 #'
 #' @param psms_dir Directory containing filtered PSM files (default: "psms/").
 #' @param output_file Output PDF file name for the plot.
+#' @param width Width of the output PDF (default: 16).
+#' @param height Height of the output PDF (default: 12).
 #' @import data.table
 #' @import stringr
 #' @import ggplot2

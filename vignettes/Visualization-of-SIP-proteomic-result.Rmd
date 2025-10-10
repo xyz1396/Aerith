@@ -1,5 +1,5 @@
 ---
-title: "Visualization-of-SIP-proteomic-result"
+title: "Visualization of SIP proteomic result"
 output:
   rmarkdown::html_document:
     toc: true
@@ -27,6 +27,12 @@ rmarkdown::render("Visualization-of-SIP-proteomic-result.Rmd", output_dir = "../
 library(Aerith)
 ```
 
+The Aerith package streamlines stable isotope probing (SIP) proteomics workflows by combining data summarization, visualization, and result interpretation within a reproducible R environment. This vignette demonstrates how to explore peptide-spectrum match (PSM) SIP percentages using the curated `demo.psm.txt` dataset shipped with the package. Each section begins with a short overview, followed by runnable code and guidance on how to adapt the workflow to new datasets.
+
+## Overview of SIP Percent Summaries
+
+Peptide SIP percent summarizes the incorporation level of heavy isotopes within identified PSMs. Summaries help benchmark labeling efficiency, compare experimental conditions, and flag outliers before downstream modeling. The `summaryPSMsipPCT` helper accepts a tab-delimited file with SIP annotations and returns descriptive statistics for every label channel detected. When operating on custom datasets, verify that the file adheres to the Aerith column conventions documented in `?summaryPSMsipPCT`, and adjust filtering parameters (for example, minimum score thresholds) upstream to focus on high-confidence identifications.
+
 ### Summarize SIP percent for PSMs
 
 ```{r}
@@ -35,6 +41,12 @@ summaryStats <- summaryPSMsipPCT(demo_file)
 print(summaryStats)
 ```
 
+The printed table reports key statistics (count, mean, sd) for each SIP channel, enabling rapid checks of labeling distributions. In routine analyses, inspect the upper quantiles to ensure they align with expected enrichment levels; substantial deviations may indicate instrument artifacts or misassigned labels. For large experiments, consider stratifying inputs by experimental group prior to summarization to support targeted quality control.
+
+## Visualizing SIP Percent Distributions
+
+Density plots illustrate how isotope incorporation varies across all PSMs.
+
 ### Plot the distribution of SIP percent for PSMs
 
 ```{r}
@@ -42,6 +54,12 @@ demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
 p <- plotPSMsipPCT(demo_file)
 p
 ```
+
+The resulting visualization highlights the central tendency and spread of SIP incorporation. Tight, unimodal peaks near the theoretical enrichment confirm consistent labeling, whereas multimodal or broadened distributions suggest heterogeneous uptake or mixed populations. Use this insight to decide whether additional normalization, replicate screening, or targeted re-analysis is warranted before quantitative comparisons.
+
+## Why Aerith Fits Modern SIP Proteomics
+
+Aerith integrates contemporary best practices—automated feature extraction, SIP-aware scoring, and publication-ready graphics—into a single package. Its functions interoperate with widely adopted formats (`mzML`, `pepXML`, tabular exports) and embrace tidy data principles, simplifying workflows that otherwise require bespoke scripting. By combining high-level summaries with customizable visual outputs, Aerith enables both rapid assessments and in-depth explorations aligned with current state-of-the-art SIP proteomics pipelines.
 
 ```{r session-info}
 sessionInfo()

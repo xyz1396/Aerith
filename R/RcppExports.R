@@ -103,7 +103,9 @@ extractPSMfeaturesTargetAndDecoytoPercolatorPin <- function(targetPath, decoyPat
 #' @param sipPath a full path with .sip files in it
 #' @param ftPath a full path with .ft files in it
 #' @param topN store top N PSMs of each scan of one .FT file
-#' @return a dataframe of unique PSMs and whether it is decoy sequence
+#' @examples
+#' demo_dir <- system.file("extdata", package = "Aerith")
+#' head(getUnfilteredPSMs(demo_dir, demo_dir, 10))
 #' @export
 getUnfilteredPSMs <- function(sipPath, ftPath, topN) {
     .Call(`_Aerith_getUnfilteredPSMs`, sipPath, ftPath, topN)
@@ -112,6 +114,9 @@ getUnfilteredPSMs <- function(sipPath, ftPath, topN) {
 #' getUnfilteredPeptides
 #' @param workingPath a full path with .sip files in it
 #' @return a dataframe of unique peptides and whether it is decoy sequence
+#' @examples
+#' demo_dir <- system.file("extdata", package = "Aerith")
+#' head(getUnfilteredPeptides(demo_dir))
 #' @export
 getUnfilteredPeptides <- function(workingPath) {
     .Call(`_Aerith_getUnfilteredPeptides`, workingPath)
@@ -121,6 +126,9 @@ getUnfilteredPeptides <- function(workingPath) {
 #' @param workingPath a full path with .sip files in it
 #' @param OverallThreshold FDR thredhold of peptides
 #' @return a dataframe about filter threshold and FDR results
+#' @examples
+#' demo_dir <- system.file("extdata", package = "Aerith")
+#' getFilterThreshold(demo_dir, 0.01)
 #' @export
 getFilterThreshold <- function(workingPath, OverallThreshold) {
     .Call(`_Aerith_getFilterThreshold`, workingPath, OverallThreshold)
@@ -131,6 +139,11 @@ getFilterThreshold <- function(workingPath, OverallThreshold) {
 #' @param OverallThreshold FDR thredhold of peptides
 #' @param topN store top N PSMs of each scan of one .FT file
 #' @return a dataframe about filter threshold and FDR results
+#' @examples
+#' demo_dir <- system.file("extdata", package = "Aerith")
+#' re <- getFilterThresholdTopPSMs(demo_dir, 0.01, 3)
+#' re$threshold
+#' head(re$topPSMs)
 #' @export
 getFilterThresholdTopPSMs <- function(workingPath, OverallThreshold, topN) {
     .Call(`_Aerith_getFilterThresholdTopPSMs`, workingPath, OverallThreshold, topN)
@@ -167,6 +180,12 @@ getFilterThresholdTopPSMsSpe2Pep <- function(workingPath, OverallThreshold, topN
 #' @param center a integer of mass window center
 #' @param width a integer of mass half window width
 #' @return a bool value if generate succeed or not
+#' @examples
+#' cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
+#' tmp <- tempdir()
+#' tmp <- file.path(tmp, "configs")
+#' generateOneCFG(cfg, tmp, "N", 50, 0, 2)
+#' list.files(tmp, full.names = TRUE)
 #' @export
 generateOneCFG <- function(cfgPath, outPath, element, pct, center, width) {
     .Call(`_Aerith_generateOneCFG`, cfgPath, outPath, element, pct, center, width)
@@ -177,6 +196,12 @@ generateOneCFG <- function(cfgPath, outPath, element, pct, center, width) {
 #' @param outPath a full path for .cfg file output
 #' @param element a string of element name, "N" for example
 #' @return a bool value if generate succeed or not
+#' @examples
+#' cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
+#' tmp <- tempdir()
+#' tmp <- file.path(tmp, "configs")
+#' generateCFGs(cfg, tmp, "N")
+#' list.files(tmp, full.names = TRUE)
 #' @export
 generateCFGs <- function(cfgPath, outPath, element) {
     .Call(`_Aerith_generateCFGs`, cfgPath, outPath, element)
@@ -398,21 +423,43 @@ readAllScanMS2 <- function(ftFile) {
 
 #' readSip
 #' @param sipFile a .sip file's full path
+#' @description Read a single .sip file and convert its peptide-spectrum matches (PSMs) into an R list.
+#' @details The reader parses the provided .sip file and returns metadata together with a data.frame of PSM-level attributes.
+#' @param sipFile A character vector of length one containing the full path to a .sip file.
+#' @return An R list with file-level metadata (`fileName`, `scanType`, `searchName`, `scoringFunction`) and a `PSM` data frame containing scan numbers, charges, masses, scores, ranks, peptides, and protein names.
+#' @examples
+#' demo_file <- system.file("extdata", "demo.sip", package = "Aerith")
+#' re <- readSip(demo_file)
+#' head(re$PSM)
 #' @export
 readSip <- function(sipFile) {
     .Call(`_Aerith_readSip`, sipFile)
 }
 
 #' readSips
-#' @param workingPath a full path with .sip files in it
+#' @description Read every `.sip` file found in the provided directory and transform each file's peptide-spectrum matches into an R list entry.
+#' @details This function constructs a `sipFileReader` for the supplied folder, loads all `.sip` files, and for each file returns a list containing metadata and a `data.frame` of peptide-spectrum matches (PSMs). The resulting object is an R list whose elements correspond to individual input files.
+#' @param workingPath Character vector of length one giving the directory that contains `.sip` files.
+#' @return An R list; each element represents one `.sip` file and provides file-level descriptors (`fileName`, `scanType`, `searchName`, `scoringFunction`) together with a `PSM` data frame holding scan numbers, precursor charges, observed/calculated masses, scores, ranks, peptide sequences, and protein assignments.
+#' @examples
+#' demo_dir <- system.file("extdata", package = "Aerith")
+#' re <- readSips(demo_dir)
+#' head(re[[1]]$PSM)
 #' @export
 readSips <- function(workingPath) {
     .Call(`_Aerith_readSips`, workingPath)
 }
 
-#' readFilesScansTopPSMs read each scan's top PSMs from multiple .sip files
-#' @param workingPath a full path with .sip files in it
-#' @param topN store top N PSMs of each scan of one .FT file
+#' readFilesScansTopPSMs
+#' @description Aggregate the top-ranked peptide-spectrum matches (PSMs) from each scan across all `.sip` files found in a directory.
+#' @details This helper constructs an internal `sipFileReader`, loads every `.sip` file located in the supplied path, and extracts the best `topN` PSMs per scan. The result is returned as a single `data.frame` with file identifiers, scan numbers, charge states, mass measurements, scores, peptide assignments, and protein annotations.
+#' @param workingPath Character vector of length one giving the directory that contains `.sip` files.
+#' @param topN Integer specifying how many top-ranked PSMs per scan to retain for each `.sip` file.
+#' @return An R `data.frame` with one row per retained PSM and the columns `fileNames`, `scanNumbers`, `parentCharges`, `measuredParentMasses`, `calculatedParentMasses`, `searchNames`, `scores`, `identifiedPeptides`, `originalPeptides`, and `proteinNames`.
+#' @examples
+#' demo_dir <- system.file("extdata", package = "Aerith")
+#' re <- readFilesScansTopPSMs(demo_dir, 10)
+#' head(re)
 #' @export
 readFilesScansTopPSMs <- function(workingPath, topN) {
     .Call(`_Aerith_readFilesScansTopPSMs`, workingPath, topN)
@@ -424,7 +471,9 @@ readFilesScansTopPSMs <- function(workingPath, topN) {
 #' @param topN store top N PSMs of each scan of one .FT2 file
 #' @return a dataframe of top N PSMs
 #' @examples
-#' top3 <-  readFilesScansTopPSMsFromOneFT2(".", ".*demo1.*", 3)
+#' demo_dir <- system.file("extdata", package = "Aerith")
+#' re <- readFilesScansTopPSMsFromOneFT2(demo_dir, ".*demo.*", 3)
+#' head(re)
 #' @export
 readFilesScansTopPSMsFromOneFT2 <- function(workingPath, pattern, topN) {
     .Call(`_Aerith_readFilesScansTopPSMsFromOneFT2`, workingPath, pattern, topN)
@@ -571,6 +620,8 @@ writeSpe2PepFilesScansTopPSMsFromEachFT2Parallel <- function(workingPath, topN =
 #' @param Atom "C13" or "N15"
 #' @param Prob its SIP abundance (0.0~1.0)
 #' @return a score of this intensity match
+#' @examples
+#' scoreIntensity(TRUE, 1200.0, 1180.0, "C13", 0.02)
 #' @export
 scoreIntensity <- function(observed, realIntensity, expectedIntensity, Atom, Prob) {
     .Call(`_Aerith_scoreIntensity`, observed, realIntensity, expectedIntensity, Atom, Prob)
@@ -580,6 +631,8 @@ scoreIntensity <- function(observed, realIntensity, expectedIntensity, Atom, Pro
 #' @param expectedIntensity expected intensityreal
 #' @param observedIntensity observed intensity in MS2 scan
 #' @return numeric, a score of this intensity match
+#' @examples
+#' scoreIntensityByCE(c(10.0, 20.0, 30.0), c(9.5, 21.0, 28.0))
 #' @export
 scoreIntensityByCE <- function(expectedIntensity, observedIntensity) {
     .Call(`_Aerith_scoreIntensityByCE`, expectedIntensity, observedIntensity)
@@ -631,7 +684,7 @@ annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom
     .Call(`_Aerith_annotatePSM`, realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter, isoWidth, calScores)
 }
 
-#' scorePSMold old function of scoreWeightSumHighMS2
+#' scorePSMsimple Score a PSM without isotopic envelope shape modeling
 #' @param realMZ mz vector in MS2 scan
 #' @param realIntensity intensity vector in MS2 scan
 #' @param realCharge charge vector in MS2 scan
@@ -639,11 +692,29 @@ annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom
 #' @param Atom "C13" or "N15"
 #' @param Prob its SIP abundance (0.0~1.0)
 #' @return a score of this PSM
+#' @examples
+#' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+#' scan1 <- readOneScanMS2(ftFile = demo_file, scanNumber = 107728)
+#' score <- scorePSMsimple(
+#'   scan1$peaks$mz,
+#'   scan1$peaks$intensity,
+#'   scan1$peaks$charge,
+#'   "[HSQVFSTAEDNQSAVTIHVLQGER]",
+#'   "C13",
+#'   0.0107
+#' )
 #' @export
-scorePSMold <- function(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob) {
-    .Call(`_Aerith_scorePSMold`, realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
+scorePSMsimple <- function(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob) {
+    .Call(`_Aerith_scorePSMsimple`, realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
 }
 
+#' rankify numeric vector via ftFileWriter
+#' @param a A numeric vector whose values will be rank-transformed.
+#' @return A numeric vector containing the ranks of the input values.
+#' @examples
+#' demo_vec <- c(12.5, 3.2, 7.7, 3.2)
+#' rankyfify(demo_vec)
+#' @export
 rankyfify <- function(a) {
     .Call(`_Aerith_rankyfify`, a)
 }

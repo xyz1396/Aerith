@@ -5,6 +5,14 @@ using namespace Rcpp;
 
 //' readSip
 //' @param sipFile a .sip file's full path
+//' @description Read a single .sip file and convert its peptide-spectrum matches (PSMs) into an R list.
+//' @details The reader parses the provided .sip file and returns metadata together with a data.frame of PSM-level attributes.
+//' @param sipFile A character vector of length one containing the full path to a .sip file.
+//' @return An R list with file-level metadata (`fileName`, `scanType`, `searchName`, `scoringFunction`) and a `PSM` data frame containing scan numbers, charges, masses, scores, ranks, peptides, and protein names.
+//' @examples
+//' demo_file <- system.file("extdata", "demo.sip", package = "Aerith")
+//' re <- readSip(demo_file)
+//' head(re$PSM)
 //' @export
 // [[Rcpp::export]]
 List readSip(CharacterVector sipFile)
@@ -29,7 +37,14 @@ List readSip(CharacterVector sipFile)
 }
 
 //' readSips
-//' @param workingPath a full path with .sip files in it
+//' @description Read every `.sip` file found in the provided directory and transform each file's peptide-spectrum matches into an R list entry.
+//' @details This function constructs a `sipFileReader` for the supplied folder, loads all `.sip` files, and for each file returns a list containing metadata and a `data.frame` of peptide-spectrum matches (PSMs). The resulting object is an R list whose elements correspond to individual input files.
+//' @param workingPath Character vector of length one giving the directory that contains `.sip` files.
+//' @return An R list; each element represents one `.sip` file and provides file-level descriptors (`fileName`, `scanType`, `searchName`, `scoringFunction`) together with a `PSM` data frame holding scan numbers, precursor charges, observed/calculated masses, scores, ranks, peptide sequences, and protein assignments.
+//' @examples
+//' demo_dir <- system.file("extdata", package = "Aerith")
+//' re <- readSips(demo_dir)
+//' head(re[[1]]$PSM)
 //' @export
 // [[Rcpp::export]]
 List readSips(CharacterVector workingPath)
@@ -61,9 +76,16 @@ List readSips(CharacterVector workingPath)
     return psmList;
 }
 
-//' readFilesScansTopPSMs read each scan's top PSMs from multiple .sip files
-//' @param workingPath a full path with .sip files in it
-//' @param topN store top N PSMs of each scan of one .FT file
+//' readFilesScansTopPSMs
+//' @description Aggregate the top-ranked peptide-spectrum matches (PSMs) from each scan across all `.sip` files found in a directory.
+//' @details This helper constructs an internal `sipFileReader`, loads every `.sip` file located in the supplied path, and extracts the best `topN` PSMs per scan. The result is returned as a single `data.frame` with file identifiers, scan numbers, charge states, mass measurements, scores, peptide assignments, and protein annotations.
+//' @param workingPath Character vector of length one giving the directory that contains `.sip` files.
+//' @param topN Integer specifying how many top-ranked PSMs per scan to retain for each `.sip` file.
+//' @return An R `data.frame` with one row per retained PSM and the columns `fileNames`, `scanNumbers`, `parentCharges`, `measuredParentMasses`, `calculatedParentMasses`, `searchNames`, `scores`, `identifiedPeptides`, `originalPeptides`, and `proteinNames`.
+//' @examples
+//' demo_dir <- system.file("extdata", package = "Aerith")
+//' re <- readFilesScansTopPSMs(demo_dir, 10)
+//' head(re)
 //' @export
 // [[Rcpp::export]]
 DataFrame readFilesScansTopPSMs(CharacterVector workingPath, size_t topN)
@@ -91,7 +113,9 @@ DataFrame readFilesScansTopPSMs(CharacterVector workingPath, size_t topN)
 //' @param topN store top N PSMs of each scan of one .FT2 file
 //' @return a dataframe of top N PSMs
 //' @examples
-//' top3 <-  readFilesScansTopPSMsFromOneFT2(".", ".*demo1.*", 3)
+//' demo_dir <- system.file("extdata", package = "Aerith")
+//' re <- readFilesScansTopPSMsFromOneFT2(demo_dir, ".*demo.*", 3)
+//' head(re)
 //' @export
 // [[Rcpp::export]]
 DataFrame readFilesScansTopPSMsFromOneFT2(String workingPath, String pattern, size_t topN)

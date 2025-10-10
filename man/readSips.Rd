@@ -7,8 +7,19 @@
 readSips(workingPath)
 }
 \arguments{
-\item{workingPath}{a full path with .sip files in it}
+\item{workingPath}{Character vector of length one giving the directory that contains \code{.sip} files.}
+}
+\value{
+An R list; each element represents one \code{.sip} file and provides file-level descriptors (\code{fileName}, \code{scanType}, \code{searchName}, \code{scoringFunction}) together with a \code{PSM} data frame holding scan numbers, precursor charges, observed/calculated masses, scores, ranks, peptide sequences, and protein assignments.
 }
 \description{
-readSips
+Read every \code{.sip} file found in the provided directory and transform each file's peptide-spectrum matches into an R list entry.
+}
+\details{
+This function constructs a \code{sipFileReader} for the supplied folder, loads all \code{.sip} files, and for each file returns a list containing metadata and a \code{data.frame} of peptide-spectrum matches (PSMs). The resulting object is an R list whose elements correspond to individual input files.
+}
+\examples{
+demo_dir <- system.file("extdata", package = "Aerith")
+re <- readSips(demo_dir)
+head(re[[1]]$PSM)
 }

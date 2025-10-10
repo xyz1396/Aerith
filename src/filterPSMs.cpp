@@ -7,7 +7,9 @@ using namespace Rcpp;
 //' @param sipPath a full path with .sip files in it
 //' @param ftPath a full path with .ft files in it
 //' @param topN store top N PSMs of each scan of one .FT file
-//' @return a dataframe of unique PSMs and whether it is decoy sequence
+//' @examples
+//' demo_dir <- system.file("extdata", package = "Aerith")
+//' head(getUnfilteredPSMs(demo_dir, demo_dir, 10))
 //' @export
 // [[Rcpp::export]]
 DataFrame getUnfilteredPSMs(String sipPath, String ftPath, size_t topN)

@@ -17,3 +17,6 @@ numeric, a score of this intensity match
 \description{
 scoreIntensityByCrossEntropy
 }
+\examples{
+scoreIntensityByCE(c(10.0, 20.0, 30.0), c(9.5, 21.0, 28.0))
+}

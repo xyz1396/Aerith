@@ -15,3 +15,7 @@ a dataframe of unique peptides and whether it is decoy sequence
 \description{
 getUnfilteredPeptides
 }
+\examples{
+demo_dir <- system.file("extdata", package = "Aerith")
+head(getUnfilteredPeptides(demo_dir))
+}

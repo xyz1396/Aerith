@@ -127,8 +127,8 @@ void cfgParser::writeFile(const string &folderPath)
     fs::path path{folderPath};
     if (!fs::exists(path))
     {
-        cout << path.string() << "Not exists" << endl;
-        cout << "Creat" << path.string() << endl;
+        cout << path.string() << " Not exists" << endl;
+        cout << "Creat " << path.string() << endl;
         fs::create_directories(path);
     }
     path /= newFileName + ".cfg";

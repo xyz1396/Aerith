@@ -4,6 +4,13 @@
 
 using namespace Rcpp;
 
+//' rankify numeric vector via ftFileWriter
+//' @param a A numeric vector whose values will be rank-transformed.
+//' @return A numeric vector containing the ranks of the input values.
+//' @examples
+//' demo_vec <- c(12.5, 3.2, 7.7, 3.2)
+//' rankyfify(demo_vec)
+//' @export
 // [[Rcpp::export]]
 NumericVector rankyfify(NumericVector a) {
     ftFileWriter writer;

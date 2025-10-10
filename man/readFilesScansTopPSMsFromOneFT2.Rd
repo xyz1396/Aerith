@@ -20,5 +20,7 @@ a dataframe of top N PSMs
 readFilesScansTopPSMsFromOneFT2 read each scan's top PSMs from multiple .sip files of one .FT2 file
 }
 \examples{
-top3 <-  readFilesScansTopPSMsFromOneFT2(".", ".*demo1.*", 3)
+demo_dir <- system.file("extdata", package = "Aerith")
+re <- readFilesScansTopPSMsFromOneFT2(demo_dir, ".*demo.*", 3)
+head(re)
 }

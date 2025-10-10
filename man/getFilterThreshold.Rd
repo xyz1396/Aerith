@@ -17,3 +17,7 @@ a dataframe about filter threshold and FDR results
 \description{
 getFilterThreshold
 }
+\examples{
+demo_dir <- system.file("extdata", package = "Aerith")
+getFilterThreshold(demo_dir, 0.01)
+}

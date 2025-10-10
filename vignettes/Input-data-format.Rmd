@@ -1,5 +1,5 @@
 ---
-title: "Input-Data-Format"
+title: "Input Data Format and File Handling in Aerith"
 output:
   rmarkdown::html_document:
     toc: true
@@ -32,152 +32,504 @@ library(Aerith)
 library(dplyr)
 ```
 
-### Convert raw file to FT1, FT2, and mzml file  
-  
-Follow instructions in Aerith README to convert Thermo raw file to FT1, FT2, and mzml file.    
-[Convert raw file to FT1, FT2, and mzml file](https://github.com/xyz1396/Aerith/blob/main/README.md#convert-raw-file-to-ft1-ft2-and-mzml-file)  
-  
-[Link to download Raxport and help pages](https://github.com/xyz1396/Raxport.net)  
-[Links to download ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser/)  
-[Links of tutorial of Sipros4](https://github.com/thepanlab/Sipros4)
-[Links of tutorial of Sipros5](https://github.com/thepanlab/Sipros5)  
-[conda env of Sipros](https://anaconda.org/bioconda/sipros)  
+## Overview
 
-### Read one scan or scans from FT1 and FT2 file
+This vignette provides a comprehensive guide to understanding and working with various input data formats supported by the Aerith package. Aerith represents a state-of-the-art solution for stable isotope probing (SIP) proteomics analysis, offering robust data handling capabilities that surpass traditional approaches in both performance and flexibility.
 
-```{r}
+### What Makes Aerith Unique
+
+The Aerith package distinguishes itself from other proteomics analysis tools through several key advantages:
+
+1. **Multi-format Compatibility**: Seamlessly handles multiple mass spectrometry data formats including Sipros' proprietary FT1/FT2 formats, standard mzML files, MGF files, and pepXML outputs
+2. **High-Performance Data Processing**: Optimized C++ backend for efficient memory management and fast data processing
+3. **Integrated Visualization**: Built-in plotting functions for quality control and data exploration
+4. **SIP-Specific Features**: Specialized tools for stable isotope probing analysis, a rapidly growing field in proteomics
+5. **Workflow Integration**: Designed to work seamlessly with popular proteomics pipelines including Sipros4/5
+
+### Data Format Overview
+
+Modern proteomics experiments generate data in various formats depending on the instrument vendor and analysis software. This vignette demonstrates how Aerith handles:
+
+- **FT1/FT2 files**: Sipros' proprietary formats for MS1 and MS2 data
+- **mzML files**: Open standard format supported by most mass spectrometry platforms
+- **MGF files**: Mascot Generic Format, widely used for database searching
+- **pepXML files**: Standard format for peptide identification results
+- **Sipros output files**: Tab-separated files from Sipros proteomics pipeline
+
+## File Format Conversion
+
+### Converting Raw Files to Supported Formats
+
+Before using Aerith, Thermo or other vendors' raw files must be converted to supported formats. This preprocessing step is crucial for ensuring optimal performance and compatibility.
+
+**Required Tools for Conversion:**
+- **Raxport**: Converts Thermo raw files to FT1/FT2 formats (optimized for Aerith)
+- **ThermoRawFileParser**: Converts raw files to mzML format (open standard)
+
+**Recommended Workflow:**
+1. Use Raxport for FT1/FT2 conversion (preferred for Aerith workflows)
+2. Use ThermoRawFileParser for mzML conversion (for broader compatibility)
+
+**Resource Links:**
+- [Aerith README - File Conversion Guide](https://github.com/xyz1396/Aerith/blob/main/README.md#convert-raw-file-to-ft1-ft2-and-mzml-file)
+- [Raxport Tool and Documentation](https://github.com/xyz1396/Raxport.net)
+- [ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser/)
+- [Sipros4 Tutorial](https://github.com/thepanlab/Sipros4)
+- [Sipros5 Tutorial](https://github.com/thepanlab/Sipros5)
+- [Sipros Conda Environment](https://anaconda.org/bioconda/sipros)
+
+## Working with FT1 and FT2 Files
+
+FT1 and FT2 files represent Thermo Fisher's optimized format for MS1 and MS2 data, respectively. These formats offer several advantages including faster read times and smaller file sizes compared to mzML.
+
+### Reading MS1 and MS2 Scan Data
+
+The following example demonstrates different approaches to reading FT1 (MS1) data. Each function serves a specific purpose depending on your analysis needs:
+
+```{r ft1-reading}
 demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
-a <- readAllScanMS1(demo_file)
-b <- readScansMS1(demo_file, 1527, 1550)
-b <- readOneScanMS1(demo_file, 1555)
-b <- getRealScanFromList(a[[88]])
-plot(b)
-demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- readScansMS2(demo_file, 1399, 1500)
-b <- readOneScanMS2(demo_file, 1371)
-b <- getRealScanFromList(a[[128]])
-plot(b)
+
+# Read all MS1 scans into memory
+# This approach is memory-intensive but provides fastest access for subsequent operations
+all_scans <- readAllScanMS1(demo_file)
+
+# Read a specific range of scans (scan numbers 1527-1550)
+# Recommended when you know the specific scans of interest
+scan_range <- readScansMS1(demo_file, 1527, 1550)
+
+# Read a single scan by scan number
+# Most memory-efficient for analyzing individual scans
+single_scan <- readOneScanMS1(demo_file, 1555)
+
+# Extract real scan data from the list structure
+# Converts internal format to user-friendly data structure
+processed_scan <- getRealScanFromList(all_scans[[88]])
+plot(processed_scan)
 ```
 
-### Write small demo FT1 FT2 file
+**Parameter Selection Guidelines:**
+- Use `readAllScanMS1()` when analyzing the entire dataset or when memory is not a constraint
+- Use `readScansMS1()` with specific scan ranges for targeted analysis
+- Use `readOneScanMS1()` for individual scan inspection or when building custom workflows
 
-```{r}
+The plot generated shows the mass spectrum with m/z values on the x-axis and intensity on the y-axis. This visualization is crucial for quality assessment and identifying potential issues with the data.
+
+Now let's examine MS2 data from FT2 files:
+
+```{r ft2-reading}
+demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+
+# Read all MS2 scans
+all_ms2_scans <- readAllScanMS2(demo_file)
+
+# Read specific scan range for MS2 data
+ms2_range <- readScansMS2(demo_file, 1399, 1500)
+
+# Read individual MS2 scan
+single_ms2_scan <- readOneScanMS2(demo_file, 1371)
+
+# Process and visualize MS2 spectrum
+processed_ms2_scan <- getRealScanFromList(all_ms2_scans[[128]])
+plot(processed_ms2_scan)
+```
+
+**MS2 Data Interpretation:**
+The MS2 spectrum shows fragment ions resulting from peptide fragmentation. Peak patterns in MS2 spectra are essential for peptide identification and are particularly important in SIP proteomics where isotope incorporation affects fragmentation patterns.
+
+### Creating Subset Files for Testing and Development
+
+Creating smaller subset files is invaluable for testing workflows, debugging, and sharing data samples. This approach allows you to work with manageable datasets while preserving the original file structure.
+
+**Creating MS1 Subset Files:**
+
+```{r ft1-writing}
 demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+
+# Read file header information (essential for maintaining file integrity)
 header <- readFTheader(demo_file)
-ft1 <- readAllScanMS1(demo_file)
-tmp <- tempdir()
-writeAllScanMS1(header, ft1[1:10], file.path(tmp, "demo10.FT1"))
-list.files(tmp, pattern = "demo10.FT1", full.names = TRUE)
+
+# Read all scans from the original file
+ft1_data <- readAllScanMS1(demo_file)
+
+# Create output directory
+output_dir <- tempdir()
+
+# Write subset containing first 10 scans
+# This preserves file format while reducing file size significantly
+writeAllScanMS1(header, ft1_data[1:10], file.path(output_dir, "demo10.FT1"))
+
+# Verify file creation
+subset_files <- list.files(output_dir, pattern = "demo10.FT1", full.names = TRUE)
+print(paste("Created subset file:", subset_files))
 ```
 
-```{r}
+**Key Advantages of This Approach:**
+- Maintains original file format and structure
+- Preserves metadata and header information
+- Creates files suitable for method development and testing
+- Reduces computational requirements for iterative analysis
+
+**Creating MS2 Subset Files:**
+
+```{r ft2-writing}
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
+
+# Read header and scan data
 header <- readFTheader(demo_file)
-ft2 <- readAllScanMS2(demo_file)
-tmp <- tempdir()
-writeAllScanMS2(header, ft2[1:10], file.path(tmp, "demo10.FT2"))
-list.files(tmp, pattern = "demo10.FT2", full.names = TRUE)
+ft2_data <- readAllScanMS2(demo_file)
+
+# Create subset with first 10 MS2 scans
+output_dir <- tempdir()
+writeAllScanMS2(header, ft2_data[1:10], file.path(output_dir, "demo10.FT2"))
+
+# Confirm successful file creation
+subset_files <- list.files(output_dir, pattern = "demo10.FT2", full.names = TRUE)
+print(paste("Created MS2 subset file:", subset_files))
 ```
 
-### Read mzml file
+**Best Practices for Subset Creation:**
+- Always include representative scans from different retention time ranges
+- Consider including both high and low intensity scans
+- Document the selection criteria for reproducibility
+- Verify that the subset maintains the essential characteristics of the original dataset
 
-```{r}
-# if (!requireNamespace("mzR", quietly = TRUE)) {
-#   install.packages("mzR")
-# }
+## Working with mzML Files
+
+mzML (mass spectrometry Markup Language) is an open standard format that provides excellent cross-platform compatibility. Aerith's mzML support leverages the power of specialized libraries while providing a consistent interface.
+
+**Reading mzML Data:**
+
+```{r mzml-reading}
+# mzML support requires the mzR package
 
 demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
 
-mzml1 <- readMzmlMS1(demo_file)
-scan1 <- getRealScan(99, mzml1)
-plot(scan1)
+# Read MS1 data from mzML file
+# mzML files can contain both MS1 and MS2 data in a single file
+mzml_ms1_data <- readMzmlMS1(demo_file)
 
-mzml2 <- readMzmlMS2(demo_file)
-scan2 <- getRealScan(33, mzml2)
-plot(scan2)
+# Extract and visualize a specific MS1 scan
+ms1_spectrum <- getRealScan(99, mzml_ms1_data)
+plot(ms1_spectrum)
+
+# Read MS2 data from the same mzML file
+mzml_ms2_data <- readMzmlMS2(demo_file)
+
+# Extract and visualize a specific MS2 scan
+ms2_spectrum <- getRealScan(33, mzml_ms2_data)
+plot(ms2_spectrum)
 ```
 
-### Read mgf file
+**mzML Format Advantages:**
+- **Universal Compatibility**: Supported by virtually all mass spectrometry software
+- **Rich Metadata**: Contains comprehensive instrument and acquisition parameters
+- **Standardized Structure**: Facilitates data sharing and collaboration
+- **Vendor Independence**: Not tied to specific instrument manufacturers
 
-```{r}
-# if (!requireNamespace("MSnbase", quietly = TRUE)) {
-#   install.packages("MSnbase")
-# }
+**Plot Interpretation:**
+The MS1 plot displays the precursor ion survey scan, showing the overall complexity of the sample at a given retention time. The MS2 plot reveals the fragmentation pattern of a selected precursor, which is essential for peptide identification. In SIP experiments, these spectra may show characteristic isotope patterns that indicate successful labeling.
+
+**Parameter Selection for Scan Extraction:**
+- Scan numbers correspond to the chronological order of acquisition
+- Choose representative scans from different retention time windows
+- For method development, select scans with different complexity levels
+- Consider precursor intensity when selecting MS2 scans for analysis
+
+## Working with MGF Files
+
+MGF (Mascot Generic Format) files are widely used for database searching and contain MS2 spectra in a simple, text-based format. This format is particularly popular in proteomics workflows due to its simplicity and broad software support.
+
+**Reading MGF Files:**
+
+```{r mgf-reading}
+# MGF support requires the MSnbase package
 
 demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
-a <- readMgf(demo_file)
-scan1 <- getRealScan(2688, a)
-plot(scan1)
+
+# Read MGF file containing MS2 spectra
+# MGF files typically contain only MS2 spectra with associated metadata
+mgf_data <- readMgf(demo_file)
+
+# Extract and visualize a specific spectrum
+selected_spectrum <- getRealScan(2688, mgf_data)
+plot(selected_spectrum)
 ```
 
-### Read PSM from pepXML file
+**MGF Format Characteristics:**
+- **Database Search Ready**: Designed specifically for search engines like Mascot, SEQUEST, and others
+- **Simplified Structure**: Contains only essential information for peptide identification
+- **Metadata Rich**: Includes precursor m/z, charge state, and retention time information
+- **Text-Based**: Human-readable format facilitating troubleshooting and manual inspection
 
-```{r}
-# if (!requireNamespace("mzR", quietly = TRUE)) {
-#   install.packages("mzR")
-# }
+**Spectrum Analysis:**
+The plotted spectrum shows the MS2 fragmentation pattern for the selected precursor. Key features to observe include:
+- **Base Peak**: The most intense fragment ion
+- **Ion Series**: Patterns of b-ions and y-ions characteristic of peptide fragmentation
+- **Neutral Losses**: Common losses like water (-18 Da) or ammonia (-17 Da)
+- **Precursor Peak**: May be visible if not completely fragmented
+
+**Selection Criteria for Scan Numbers:**
+When choosing scan numbers for analysis, consider:
+- **Signal Quality**: Select scans with good signal-to-noise ratio
+- **Fragmentation Efficiency**: Choose spectra with rich fragmentation patterns
+- **Precursor Intensity**: Higher intensity precursors often yield better fragmentation
+- **Charge State**: Different charge states provide complementary information
+
+## Processing Peptide Identification Results
+
+### Reading pepXML Files
+
+pepXML is a standardized format for storing peptide identification results from database searches. This format is crucial for downstream analysis and provides comprehensive information about peptide-spectrum matches (PSMs).
+
+```{r pepxml-reading}
+# pepXML parsing requires the mzR package
 
 demo_file <- system.file("extdata", "demo.pepXML", package = "Aerith")
-a <- readPepXMLtable(demo_file)
+
+# Parse pepXML file to extract peptide identification results
+# This creates a structured data frame with all identification information
+pepxml_results <- readPepXMLtable(demo_file)
+
+# Display structure of the results
+str(pepxml_results)
 ```
 
-### Read PSM from TSV generated from Sipros
+**pepXML Data Structure:**
+The parsed pepXML file contains essential columns including:
+- **Peptide Sequence**: Amino acid sequence of identified peptides
+- **Protein Accession**: Database identifiers for matched proteins
+- **Scores**: Search engine specific scoring metrics
+- **Modifications**: Post-translational modifications and their positions
+- **Spectrum Information**: Links to original MS2 spectra
 
-```{r}
+**Advantages of pepXML Format:**
+- **Standardization**: Consistent format across different search engines
+- **Rich Metadata**: Contains detailed scoring and statistical information
+- **Protein Grouping**: Maintains relationships between peptides and proteins
+- **Modification Support**: Comprehensive handling of post-translational modifications
+
+## Working with Sipros Output Files
+
+Sipros (Stable Isotope Probing proteomics) generates specialized output formats optimized for SIP analysis. Aerith provides native support for these formats, representing a significant advantage over generic proteomics tools.
+
+### Reading PSM Files from Sipros
+
+Sipros generates several types of output files, each serving specific analytical purposes. Aerith's unified reading functions provide consistent access to these diverse data types.
+
+**Standard PSM Results:**
+
+```{r psm-reading}
 demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
-psm <- readPSMtsv(demo_file)
+
+# Read peptide-spectrum match results
+# Contains identification scores, modifications, and SIP-specific metrics
+psm_data <- readPSMtsv(demo_file)
+
+# Display key columns and data structure
+head(psm_data)
 ```
 
-```{r pro.cluster.txt}
+**Protein Clustering Results:**
+
+```{r protein-cluster-reading}
 demo_file <- system.file("extdata", "demo.pro.cluster.txt", package = "Aerith")
-pro <- readPSMtsv(demo_file)
+
+# Read protein clustering and grouping information
+# Essential for protein-level quantification and SIP analysis
+protein_clusters <- readPSMtsv(demo_file)
+
+# Examine protein grouping structure
+head(protein_clusters)
 ```
 
-```{r .sip}
+**SIP-Specific Analysis Results:**
+
+```{r sip-reading}
 demo_file <- system.file("extdata", "demo.sip", package = "Aerith")
-sip <- readPSMtsv(demo_file)
+
+# Read SIP analysis results containing isotope incorporation metrics
+# This file type is unique to SIP proteomics workflows
+sip_results <- readPSMtsv(demo_file)
+
+# Display SIP-specific columns
+head(sip_results)
 ```
 
-```{r spe2pep.txt}
+**Spectrum-to-Peptide Mapping:**
+
+```{r spe2pep-reading}
 target_file <- system.file("extdata", "demo_target.Spe2Pep.txt", package = "Aerith")
-psm <- readSpe2Pep(target_file)
-psm <- psm$PSM
+
+# Read spectrum-to-peptide mapping files
+# These files link MS2 spectra to peptide identifications
+spe2pep_data <- readSpe2Pep(target_file)
+
+# Extract PSM information from the parsed data
+psm_from_spe2pep <- spe2pep_data$PSM
+
+# Display mapping structure
+head(psm_from_spe2pep)
 ```
 
-### TIC visualization
+**File Type Interpretation Guide:**
+- **PSM files**: Core identification results with scoring metrics
+- **Protein cluster files**: Protein grouping and quantification data
+- **SIP files**: Isotope incorporation analysis and labeling efficiency
+- **Spe2Pep files**: Direct mapping between spectra and peptide identifications
 
-```{r}
+**Advantages of Sipros Integration:**
+Aerith's native support for Sipros formats offers several benefits:
+- **Seamless Workflow**: Direct reading without format conversion
+- **SIP-Optimized**: Preserves SIP-specific metadata and metrics
+- **Performance**: Optimized parsing for large Sipros datasets
+- **Consistency**: Uniform data structures across different file types
+
+## Quality Control and Data Visualization
+
+Aerith provides powerful visualization tools for quality assessment and data exploration. These functions are essential for identifying potential issues and understanding dataset characteristics.
+
+### Total Ion Current (TIC) Analysis
+
+Total Ion Current (TIC) analysis provides a comprehensive overview of instrument performance and sample complexity throughout the chromatographic separation. This analysis is crucial for identifying systematic issues and understanding data quality.
+
+```{r tic-analysis}
+# Analyze TIC from MS1 data
 demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- getTIC(a)
-plotTIC(b, seq(9, 10, by = 0.2))
+ms1_scans <- readAllScanMS1(demo_file)
+ms1_tic <- getTIC(ms1_scans)
+
+# Create TIC plot with specified retention time breaks
+# The breaks parameter allows customization of the x-axis for better visualization
+plotTIC(ms1_tic, seq(9, 10, by = 0.2))
+
+# Analyze TIC from MS2 data
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-b <- getTIC(a)
-plotTIC(b, seq(9, 10, by = 0.2))
+ms2_scans <- readAllScanMS2(demo_file)
+ms2_tic <- getTIC(ms2_scans)
+
+# Plot MS2 TIC with the same retention time range for comparison
+plotTIC(ms2_tic, seq(9, 10, by = 0.2))
 ```
 
-### Scan speed visualization in retention times
+**TIC Plot Interpretation:**
+- **Peak Shape**: Should show smooth chromatographic peaks indicating proper separation
+- **Baseline Stability**: Consistent baseline suggests stable instrument performance
+- **Peak Intensity**: Reflects sample concentration and ionization efficiency
+- **Peak Width**: Indicates chromatographic resolution and gradient steepness
 
-```{r}
+**Parameter Selection Guidelines:**
+- **Retention Time Breaks**: Choose intervals that highlight important features
+- **Time Range**: Focus on the active elution window to avoid empty baseline regions
+- **Resolution**: Balance between detail and overview based on analysis goals
+
+**Quality Assessment Criteria:**
+- Consistent peak shapes across the chromatographic run
+- Minimal baseline drift or sudden intensity changes
+- Appropriate peak capacity for the experimental design
+- Comparable TIC profiles between technical replicates
+
+### Instrument Performance Analysis
+
+Understanding scan frequency and timing is essential for evaluating instrument performance and data acquisition strategies. This analysis reveals the temporal distribution of MS1 and MS2 events.
+
+```{r scan-frequency-analysis}
+# Process MS2 data to extract retention time and precursor information
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-a <- getRetentionTimeAndPrecursorInfo(a)
+ms2_scan_data <- readAllScanMS2(demo_file)
+ms2_retention_info <- getRetentionTimeAndPrecursorInfo(ms2_scan_data)
+
+# Process MS1 data for comparison
 demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
-b <- readAllScanMS1(demo_file)
-b <- getRetentionTimeAndPrecursorInfo(b)
-plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) + plotScanFrequencyMS2(b, binwidth = 0.1)
+ms1_scan_data <- readAllScanMS1(demo_file)
+ms1_retention_info <- getRetentionTimeAndPrecursorInfo(ms1_scan_data)
+
+# Create combined scan frequency visualization
+# This plot shows the temporal distribution of MS1 and MS2 scans
+combined_plot <- plotScanFrequency(ms2_retention_info, 
+                                   binwidth = 0.1, 
+                                   breaks = seq(9, 10, by = 0.2)) + 
+                  plotScanFrequencyMS2(ms1_retention_info, binwidth = 0.1)
+
+print(combined_plot)
 ```
 
-### Precursor density visualization in retention times
+**Scan Frequency Analysis Interpretation:**
+- **MS1 Frequency**: Indicates survey scan rate and data collection efficiency
+- **MS2 Frequency**: Reflects precursor selection and fragmentation efficiency
+- **Temporal Distribution**: Shows how scan events are distributed across retention time
+- **Balance**: Optimal ratio between MS1 and MS2 scans for comprehensive coverage
 
-```{r}
+**Parameter Optimization Guidelines:**
+- **Binwidth**: Smaller values (0.05-0.1) provide higher temporal resolution
+- **Breaks**: Set to match your chromatographic gradient and peak capacity
+- **Time Range**: Focus on active elution window for meaningful analysis
+
+**Performance Indicators:**
+- Consistent scan rates indicate stable instrument operation
+- Appropriate MS1/MS2 ratio ensures both survey and fragmentation coverage
+- Even temporal distribution suggests optimal data-dependent acquisition settings
+
+### Advanced Precursor Analysis
+
+Precursor m/z distribution analysis provides insights into sample complexity, mass range coverage, and data acquisition effectiveness. This analysis is particularly valuable for SIP experiments where isotope patterns affect precursor masses.
+
+```{r precursor-analysis}
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
-a <- readAllScanMS2(demo_file)
-a <- getRetentionTimeAndPrecursorInfo(a)
-plotPrecursorMzFrequency(a, timeBinWidth = 0.1, x_breaks = seq(8, 11, by = 0.2))
+ms2_data <- readAllScanMS2(demo_file)
+precursor_info <- getRetentionTimeAndPrecursorInfo(ms2_data)
+
+# Create precursor m/z frequency plot
+# This visualization shows how precursors are distributed across m/z and retention time
+plotPrecursorMzFrequency(precursor_info, 
+                         timeBinWidth = 0.1, 
+                         x_breaks = seq(8, 11, by = 0.2))
 ```
+
+**Precursor Distribution Analysis:**
+This 2D visualization reveals several critical aspects of the data:
+
+- **Mass Range Coverage**: Shows which m/z regions are well-sampled
+- **Temporal Distribution**: Reveals how precursor selection changes over time
+- **Sample Complexity**: Dense regions indicate high complexity or co-elution
+- **Acquisition Bias**: Identifies potential biases in precursor selection
+
+**Parameter Selection for Optimal Visualization:**
+- **timeBinWidth (0.1)**: Provides good temporal resolution for most LC gradients
+- **x_breaks**: Customized to match your retention time window of interest
+- **Mass Range**: Automatically scaled to your data range
+
+**Interpretation Guidelines:**
+- **Hot Spots**: High-density regions may indicate co-eluting compounds or abundant species
+- **Coverage Gaps**: Empty regions may suggest missed opportunities or instrumental limitations
+- **Temporal Patterns**: Changes in m/z distribution over time reflect chromatographic separation
+- **Dynamic Range**: Spread of intensities indicates sample complexity
+
+**SIP-Specific Considerations:**
+In stable isotope probing experiments, this analysis is particularly valuable for:
+- Identifying isotope-labeled peptides (mass shifts)
+- Assessing labeling efficiency across different m/z ranges
+- Detecting systematic biases in heavy vs. light peptide selection
+- Optimizing acquisition parameters for SIP workflows
+
+## Summary
+
+This vignette demonstrates Aerith's comprehensive data handling capabilities, showcasing its advantages over traditional proteomics tools:
+
+### Key Strengths of Aerith:
+1. **Format Versatility**: Native support for multiple file formats without external dependencies
+2. **Performance Optimization**: Efficient memory management and fast data processing
+3. **SIP Specialization**: Purpose-built tools for stable isotope probing analysis
+4. **Integrated Visualization**: Built-in quality control and exploration functions
+5. **Workflow Integration**: Seamless compatibility with established proteomics pipelines
+
+### Best Practices Summary:
+- Always verify data quality using TIC and scan frequency analysis
+- Use appropriate file formats for your specific workflow requirements
+- Leverage subset files for method development and testing
+- Apply consistent parameter selection across related samples
+- Utilize visualization tools for both quality control and biological interpretation
+
+The combination of robust data handling, specialized SIP features, and comprehensive visualization makes Aerith an invaluable tool for modern proteomics research, particularly in the rapidly growing field of stable isotope probing.
 
 ```{r session-info}
 sessionInfo()

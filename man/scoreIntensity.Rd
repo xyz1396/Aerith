@@ -23,3 +23,6 @@ a score of this intensity match
 \description{
 scoreIntensity
 }
+\examples{
+scoreIntensity(TRUE, 1200.0, 1180.0, "C13", 0.02)
+}

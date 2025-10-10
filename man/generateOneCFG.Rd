@@ -25,3 +25,10 @@ a bool value if generate succeed or not
 \description{
 generateOneCFG
 }
+\examples{
+cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
+tmp <- tempdir()
+tmp <- file.path(tmp, "configs")
+generateOneCFG(cfg, tmp, "N", 50, 0, 2)
+list.files(tmp, full.names = TRUE)
+}

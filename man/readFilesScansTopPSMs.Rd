@@ -2,15 +2,26 @@
 % Please edit documentation in R/RcppExports.R
 \name{readFilesScansTopPSMs}
 \alias{readFilesScansTopPSMs}
-\title{readFilesScansTopPSMs read each scan's top PSMs from multiple .sip files}
+\title{readFilesScansTopPSMs}
 \usage{
 readFilesScansTopPSMs(workingPath, topN)
 }
 \arguments{
-\item{workingPath}{a full path with .sip files in it}
+\item{workingPath}{Character vector of length one giving the directory that contains \code{.sip} files.}
 
-\item{topN}{store top N PSMs of each scan of one .FT file}
+\item{topN}{Integer specifying how many top-ranked PSMs per scan to retain for each \code{.sip} file.}
+}
+\value{
+An R \code{data.frame} with one row per retained PSM and the columns \code{fileNames}, \code{scanNumbers}, \code{parentCharges}, \code{measuredParentMasses}, \code{calculatedParentMasses}, \code{searchNames}, \code{scores}, \code{identifiedPeptides}, \code{originalPeptides}, and \code{proteinNames}.
 }
 \description{
-readFilesScansTopPSMs read each scan's top PSMs from multiple .sip files
+Aggregate the top-ranked peptide-spectrum matches (PSMs) from each scan across all \code{.sip} files found in a directory.
+}
+\details{
+This helper constructs an internal \code{sipFileReader}, loads every \code{.sip} file located in the supplied path, and extracts the best \code{topN} PSMs per scan. The result is returned as a single \code{data.frame} with file identifiers, scan numbers, charge states, mass measurements, scores, peptide assignments, and protein annotations.
+}
+\examples{
+demo_dir <- system.file("extdata", package = "Aerith")
+re <- readFilesScansTopPSMs(demo_dir, 10)
+head(re)
 }

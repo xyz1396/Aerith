@@ -1,5 +1,5 @@
 ---
-title: "Score-function-test-of-PSM"
+title: "Score function test of PSM"
 output:
   rmarkdown::html_document:
     toc: true
@@ -33,7 +33,20 @@ library(ggplot2)
 library(tidyr)
 ```
 
+The Aerith package delivers isotope-aware peptide-spectrum matching (PSM) scoring that keeps pace with modern stable isotope probing (SIP) workflows. This vignette walks through two representative scenarios—an unlabeled peptide and a peptide labeled at roughly 50% $^{13}$C—to illustrate how Aerith quantifies evidence for isotopic incorporation. Each section begins with the experimental context, introduces the relevant Aerith functions, and explains how to interpret the resulting scores for method development or routine quality control.
+
+## Overview of scoring functions
+
+Aerith exposes multiple scoring strategies that capture complementary information:
+
+- **`scorePSM()`** evaluates observed spectra against theoretical expectations across a user-specified isotopic abundance grid by (`WDP`) function in Sipros.
+- **`annotatePSM()`** returns cross-correlation (`XcorrScore`) and multivariate hypergeometric (`MVHscore`) metrics after annotating fragment ions.
+
+These scores are designed to support threshold selection and benchmarking against state-of-the-art SIP-aware search engines. The following sections demonstrate how to configure their key parameters and interpret the resulting trends.
+
 ### Unlabeled PSM at 1.07% ^13^C 
+
+We begin with an Aerith example file representing an effectively unlabeled spectrum. The goal is to confirm that Aerith reports maximal scores near natural-abundance $^{13}$C levels.
 
 ```{r}
 demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
@@ -43,8 +56,9 @@ pep <- "HSQVFSTAEDNQSAVTIHVLQGER"
 pep2 <- "[HSQVFSTAEDNQSAVTIHVLQGER]"
 ```
 
+The `readOneScanMS2()` and `getRealScanFromList()` helpers retrieve the centroided fragment spectrum for scan 107728. Throughout this vignette, peptide sequences are provided both as plain strings (`pep`) for annotation and with bracketed notation (`pep2`) for scoring functions that expect capped termini.
+
 ```{r}
-# isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
 isoCenter <- scan2$isolationWindowCenterMZ
 anno <- annotatePSM(
   scan1@spectra$MZ, scan1@spectra$Prob,
@@ -72,6 +86,14 @@ scores <- t(scores)
 scores <- cbind(WDPscores, scores)
 ```
 
+Here we scan the full 0–100% $^{13}$C grid to understand score dynamics. Key arguments are:
+
+- `isoCenter`: the isolation window center in $m/z$, sourced from instrument metadata or PSMs file to anchor precursor annotation.
+- `prob`: the hypothesized $^{13}$C proportion. The fixed value (0.0107) approximates natural abundance for `annotatePSM()`, while the loop explores alternative hypotheses.
+- `parentCharge`: drawn from `scan1@charges` to ensure theoretical spectra match the observed charge state.
+
+`annotatePSM()` produces both cross-correlation and MVH scores, while `scorePSM()` returns the weighted dot product (WDP) score. Evaluating all three allows users to pick thresholds aligned with their downstream filtering strategy.
+
 ```{r}
 scores_df <- as.data.frame(scores)
 scores_df$abundance <- 0:100
@@ -84,25 +106,29 @@ scores_long <- scores_df %>%
 
 # Create a publication-quality plot
 ggplot(scores_long, aes(x = abundance, y = score_value)) +
-  geom_line() +                            # Line plot to show trends
-  facet_wrap(~ score_type, scales = "free_y") +  # Separate panels for each score with free y-scales
+  geom_line() +
+  facet_wrap(~ score_type, scales = "free_y") +
   labs(x = expression(paste(~ {}^{13}, "C %")),
        y = "Score",
        title = expression(paste("Scores Across", ~ {}^{13}, "C %"))) + 
-  theme_minimal() +                        # Minimal theme as a base
+  theme_minimal() +
   theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Centered, bold title
-    axis.title = element_text(size = 14),       # Larger axis titles
-    axis.text = element_text(size = 12),        # Readable axis text
-    strip.text = element_text(size = 12, face = "bold"),  # Bold facet labels
-    panel.grid.minor = element_blank(),         # Remove minor grid lines
-    panel.background = element_rect(fill = "white", colour = "black")  # White background, black border
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 12, face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white", colour = "black")
   )
 ```
+
+The resulting faceted plot summarizes how each score reacts to varying $^{13}$C abundance assumptions. For this near-unlabeled spectrum, all metrics peak close to natural abundance, confirming the absence of substantial label incorporation. The free $y$-scales highlight the relative sensitivity of each metric without forcing a shared dynamic range.
 
 ### Labeled PSM at 50% ^13^C 
 
 #### Annotate B and Y ion fragments
+
+We now investigate a spectrum from the Aerith labeled dataset, expecting scores to favor higher $^{13}$C proportions consistent with experimental labeling.
 
 ```{r}
 demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
@@ -114,8 +140,9 @@ pep2 <- "[HYAHVDCPGHADYVK]"
 pct <- 0.52
 ```
 
+The full scan list is loaded with `readAllScanMS2()` so we can reference scan 2596 explicitly. 
+
 ```{r}
-# isoCenter <- psm1$MeasuredParentMass/psm1$ParentCharge + 1.007276
 isoCenter <- scan2$isolationWindowCenterMZ
 WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   return(scorePSM(scan1@spectra$MZ,
@@ -137,6 +164,8 @@ scores <- t(scores)
 scores <- cbind(WDPscores, scores)
 ```
 
+As before, we iterate across the full probability grid to visualize the likelihood landscape. Practitioners may narrow the grid around anticipated labeling levels (for example, 30–70%) to accelerate large-scale studies, but the full sweep is informative when benchmarking instrument performance or validating new sample types.
+
 ```{r}
 scores_df <- as.data.frame(scores)
 scores_df$abundance <- 0:100
@@ -149,21 +178,34 @@ scores_long <- scores_df %>%
 
 # Create a publication-quality plot
 ggplot(scores_long, aes(x = abundance, y = score_value)) +
-  geom_line() +                            # Line plot to show trends
-  facet_wrap(~ score_type, scales = "free_y") +  # Separate panels for each score with free y-scales
+  geom_line() +
+  facet_wrap(~ score_type, scales = "free_y") +
   labs(x = expression(paste(~ {}^{13}, "C %")),
        y = "Score",
        title = expression(paste("Scores Across", ~ {}^{13}, "C %"))) + 
-  theme_minimal() +                        # Minimal theme as a base
+  theme_minimal() +
   theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Centered, bold title
-    axis.title = element_text(size = 14),       # Larger axis titles
-    axis.text = element_text(size = 12),        # Readable axis text
-    strip.text = element_text(size = 12, face = "bold"),  # Bold facet labels
-    panel.grid.minor = element_blank(),         # Remove minor grid lines
-    panel.background = element_rect(fill = "white", colour = "black")  # White background, black border
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 12, face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white", colour = "black")
   )
 ```
+
+In this labeled scenario, each score exhibits a clear maximum near 50% abundance, mirroring the known experimental condition. Divergence among the score shapes highlights how cross-correlation and hypergeometric statistics can provide complementary evidence; Aerith lets analysts combine or prioritize these metrics depending on downstream classification needs.
+
+### Guidance on parameter selection and interpretation
+
+- **Isolation window (`isoCenter`)**: always source from spectrum metadata to avoid systematic shifts in the theoretical isotope envelope.
+- **Probability grid**: dense grids (e.g., 0–1% steps) aid exploratory analyses and method validation, while coarser grids reduce compute cost during high-throughput processing. Align step size with the expected precision of labeling efficiency estimates.
+- **Score evaluation**: identify the probability that maximizes each metric. Consistent peaks across WDP, Xcorr, and MVH suggest robust assignment. Discrepancies can indicate spectrum quality issues or mixed precursor populations.
+- **Thresholding**: use empirical distributions of these scores across known target and decoy sets to set decision thresholds, leveraging Aerith's compatibility with Percolator and other state-of-the-art post-processors.
+
+### Why Aerith stands out
+
+Aerith integrates isotope-aware scoring, fragment annotation, and downstream export utilities within a single R-native workflow. Compared with generic proteomics search engines, Aerith explicitly models SIP isotope envelopes, offers fine-grained control over labeling hypotheses, and interoperates with modern statistical rescoring pipelines. This alignment with current SIP best practices ensures that researchers can bridge method development and routine analysis without leaving the R ecosystem.
 
 ```{r session-info}
 sessionInfo()

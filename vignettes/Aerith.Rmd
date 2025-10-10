@@ -32,8 +32,8 @@ its utility for precise annotation and manual validation in proteomic and metabo
 
 Stable isotope probing (SIP) is indeed a powerful technique for tracing the fate of metabolic labels incorporated 
 into cells, offering insights into substrate assimilation and associated metabolic pathways.
-In a poetic sense, the journey of these isotopic labels through biological systems mirrors Aerith Gainsborough’s 
-fate—merging into the Lifestream of Planet Gaia. Just as Aerith’s essence becomes part of the planet’s life force, 
+In a poetic sense, the journey of these isotopic labels through biological systems mirrors Aerith Gainsborough's 
+fate—merging into the Lifestream of Planet Gaia. Just as Aerith's essence becomes part of the planet's life force, 
 isotopic tracers become part of the biological and geochemical narratives we seek to understand.
 Beyond biology, isotopes serve as cosmic storytellers—used to unravel the history of planets, stars, and the universe 
 itself through the analysis of fossils, meteorites, and interstellar matter. These isotope-based approaches,

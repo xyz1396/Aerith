@@ -1,5 +1,5 @@
 ---
-title: "Theoretic-spectra-generation-of-SIP-labeled-peptide"
+title: "Theoretic spectra generation of SIP-labeled peptide"
 output:
   rmarkdown::html_document:
     toc: true
@@ -28,21 +28,28 @@ library(Aerith)
 library(ggplot2)
 ```
 
+## Overview
+
+Stable isotope probing (SIP) experiments benefit from reliable theoretical spectra to interpret precursor and fragment ions. This vignette walks through the Aerith workflow for generating SIP-aware peptide spectra, emphasizing how each function supports isotope-resolved analysis. We start with unlabeled peptides and progress to labeled scenarios, outlining key parameters, interpretation tips, and best practices. Aerith integrates binomial-based isotope modeling, fragment intensity estimation, and visualization in a single toolkit, aligning with current SIP proteomics methodologies that rely on high accuracy precursor modeling and fragment annotation.
+
 ### Unlabeled Spectra 
+
+For unlabeled peptides, Aerith estimates precursor isotope distributions, calculates neutral masses, and visualizes theoretical spectra that reflect expected instrument observations.
 
 #### Get precursor mass
 
+The `precursor_peak_calculator` function returns the isotopic distribution for a peptide sequence, while `calPepAtomCount` reports elemental composition derived from the amino acid content. The `calPepPrecursorMass` function uses a binomial model to estimate the precursor monoisotopic mass given a target isotope and its natural abundance. The sequence parameter accepts standard one-letter amino acid codes, and the isotope argument takes values such as `"C13"` or `"N15"`. Adjust the abundance parameter to match experimental labeling levels; use natural abundance (for example 0.0107 for carbon) when no enrichment is applied.
+
 ```{r}
-# calculates the isotopic distribution of a peptide
 a <- precursor_peak_calculator("PEPTIDECCCC")
 head(a, 5)
-# calculates the element atom composition of peptide
 calPepAtomCount("PEPTIDECCCC")
-# estimate precursor mass by binomial distribution
 calPepPrecursorMass("PEPTIDECCCC", "C13", 0.0107)
 ```
 
 #### Plot precursor's theoretical spectra
+
+`getPrecursorSpectra` constructs theoretical mass spectra for a peptide across specified charge states. The `charges` argument accepts individual values or integer ranges, enabling quick comparison of charge state envelopes. Interpreting the plot helps assess isotope spacing and relative intensities, which should coincide with observed MS1 signals when the peptide is unlabeled.
 
 ```{r}
 a <- getPrecursorSpectra("PEPTIDE", 2)
@@ -51,15 +58,20 @@ a <- getPrecursorSpectra("PEPTIDE", 1:2)
 plot(a)
 ```
 
+The resulting plots show the theoretical mass-to-charge distribution for the provided sequence. A narrow spacing with consistent intensity decay indicates a well-resolved isotope cluster typical for low charge state precursors.
+
 #### Get peptide fragments' mass
 
+`BYion_peak_calculator_DIY` enumerates b/y fragment ions for the peptide, incorporating isotope substitution probabilities. Provide the desired isotope label and its enrichment probability to tailor the output to experimental conditions. For unlabeled peptides, set the abundance to the natural isotope frequency to obtain expected fragment masses.
+
 ```{r}
-# get Mass
 df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.0107)
 head(df, 5)
 ```
 
 #### Plot peptide fragments' theoretical spectra
+
+`getSipBYionSpectra` generates labeled or unlabeled fragment spectra, while `plotSipBYionLabel` annotates fragment peaks. The charge state range controls which fragments appear, and the isotope count parameter governs the number of labeled atoms considered. Use higher charge states when analyzing fragmentation data collected in higher energy dissociation experiments.
 
 ```{r}
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 2)
@@ -73,17 +85,23 @@ a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.0107, 1:2, 2:3)
 plot(a) + plotSipBYionLabel(a)
 ```
 
+These plots highlight how isotope incorporation alters fragment mass distributions. Observe the position and intensity changes when varying isotope counts to anticipate how labeled fragments manifest in MS/MS spectra.
+
 ### Labeled Spectra 
+
+SIP experiments enrich specific isotopes within peptides, shifting precursor and fragment masses. Aerith accommodates enrichment levels from low to complete labeling, helping quantify incorporation levels and differentiate labeled populations.
 
 #### Get precursor mass
 
+`precursor_peak_calculator_DIY` accepts user-defined isotope abundances, making it suitable for labeled designs. When combined with `calPepPrecursorMass`, users can contrast natural abundance and enriched scenarios. Selecting the isotope (`Atom`) and enrichment (`Prob`) parameters should reflect experimental labeling; for example, set `Prob` close to 1 for near-complete enrichment or match pulse-labeling levels (e.g., 0.55) for partial incorporation.
+
 ```{r}
-# calculates the isotopic distribution of a peptide
 a <- precursor_peak_calculator_DIY("PEPTIDECCCC", "N15", 0.55)
 head(a, 5)
-# estimate precursor mass by binomial distribution
 calPepPrecursorMass("PEPTIDECCCC", "C13", 0.55)
 ```
+
+The following calls illustrate how precursor mass estimates respond to different isotope species and enrichment levels. Interpret shifts in the resulting masses to gauge the labeling effect and to set accurate extraction windows when processing LC-MS/MS data.
 
 ```{r}
 calPepAtomCount("PEPTIDECCCC")
@@ -117,6 +135,8 @@ df$Mass[which.max(df$Prob)]
 
 #### Plot precursor's theoretical spectra
 
+`getSipPrecursorSpectra` visualizes isotope envelopes under enrichment. Analyze how peak intensities redistribute as the enrichment fraction increases. Wider distributions or shifted apex masses signify successful labeling, enabling downstream quantitative comparisons.
+
 ```{r}
 a <- getSipPrecursorSpectra("PEPTIDE", "C13", 0.55, 2)
 plot(a) + scale_x_continuous(breaks = seq(400, 420, by = 1)) + geom_linerange(linewidth = 0.2)
@@ -124,10 +144,13 @@ a <- getSipPrecursorSpectra("PEPTIDE", "C13", 0.55, 1:2)
 plot(a)
 ```
 
+Expect the labeled spectra to shift toward higher m/z values relative to the unlabeled counterpart. Monitoring this displacement assists in verifying labeling efficiency across charge states.
+
 #### Get peptide fragments' mass
 
+When labeling impacts fragmentation, use `BYion_peak_calculator_DIY` with enriched probabilities to determine the dominant fragment masses. Filtering on `Kind` enables investigation of particular ion series, which is useful when tracking diagnostic fragment transitions.
+
 ```{r}
-# get Mass
 df <- BYion_peak_calculator_DIY("PEPTIDE", "C13", 0.55)
 head(df, 5)
 ```
@@ -155,6 +178,8 @@ df$Mass[which.max(df$Prob)]
 
 #### Plot peptide fragments' theoretical spectra
 
+The fragment spectra for labeled peptides reveal how isotope incorporation propagates across fragment ions. Examine the annotations produced by `plotSipBYionLabel` to confirm which ion series carry the label and to identify shifts that support peptide identification and quantification.
+
 ```{r}
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 2)
 plot(a) + plotSipBYionLabel(a)
@@ -166,6 +191,8 @@ plot(a) + plotSipBYionLabel(a)
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.55, 1:2, 2:3)
 plot(a) + plotSipBYionLabel(a)
 ```
+
+Through these visualizations, Aerith showcases its advantage in modeling SIP-specific fragmentation patterns in line with current state-of-the-art approaches that couple theoretical spectra with high-resolution MS/MS data analysis.
 
 ```{r session-info}
 sessionInfo()

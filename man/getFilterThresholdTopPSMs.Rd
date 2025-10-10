@@ -19,3 +19,9 @@ a dataframe about filter threshold and FDR results
 \description{
 getFilterThresholdTopPSMs get filter threshold of top PSMs of each scan from multiple .sip file
 }
+\examples{
+demo_dir <- system.file("extdata", package = "Aerith")
+re <- getFilterThresholdTopPSMs(demo_dir, 0.01, 3)
+re$threshold
+head(re$topPSMs)
+}

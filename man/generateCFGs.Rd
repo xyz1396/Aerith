@@ -19,3 +19,10 @@ a bool value if generate succeed or not
 \description{
 generateCFGs
 }
+\examples{
+cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
+tmp <- tempdir()
+tmp <- file.path(tmp, "configs")
+generateCFGs(cfg, tmp, "N")
+list.files(tmp, full.names = TRUE)
+}

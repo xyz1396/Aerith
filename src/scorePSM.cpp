@@ -363,6 +363,8 @@ public:
 //' @param Atom "C13" or "N15"
 //' @param Prob its SIP abundance (0.0~1.0)
 //' @return a score of this intensity match
+//' @examples
+//' scoreIntensity(TRUE, 1200.0, 1180.0, "C13", 0.02)
 //' @export
 // [[Rcpp::export]]
 double scoreIntensity(const bool observed, const double realIntensity, const double expectedIntensity,
@@ -381,6 +383,8 @@ double scoreIntensity(const bool observed, const double realIntensity, const dou
 //' @param expectedIntensity expected intensityreal
 //' @param observedIntensity observed intensity in MS2 scan
 //' @return numeric, a score of this intensity match
+//' @examples
+//' scoreIntensityByCE(c(10.0, 20.0, 30.0), c(9.5, 21.0, 28.0))
 //' @export
 // [[Rcpp::export]]
 double scoreIntensityByCE(const NumericVector &expectedIntensity, const NumericVector &observedIntensity)
@@ -534,7 +538,7 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
     return re;
 }
 
-//' scorePSMold old function of scoreWeightSumHighMS2
+//' scorePSMsimple Score a PSM without isotopic envelope shape modeling
 //' @param realMZ mz vector in MS2 scan
 //' @param realIntensity intensity vector in MS2 scan
 //' @param realCharge charge vector in MS2 scan
@@ -542,9 +546,20 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
 //' @param Atom "C13" or "N15"
 //' @param Prob its SIP abundance (0.0~1.0)
 //' @return a score of this PSM
+//' @examples
+//' demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
+//' scan1 <- readOneScanMS2(ftFile = demo_file, scanNumber = 107728)
+//' score <- scorePSMsimple(
+//'   scan1$peaks$mz,
+//'   scan1$peaks$intensity,
+//'   scan1$peaks$charge,
+//'   "[HSQVFSTAEDNQSAVTIHVLQGER]",
+//'   "C13",
+//'   0.0107
+//' )
 //' @export
 // [[Rcpp::export]]
-double scorePSMold(const NumericVector &realMZ, const NumericVector &realIntensity,
+double scorePSMsimple(const NumericVector &realMZ, const NumericVector &realIntensity,
                    const NumericVector &realCharge, const String &pepSeq, const String &Atom, double Prob)
 {
     // read default config

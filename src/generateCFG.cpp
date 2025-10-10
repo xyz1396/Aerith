@@ -10,6 +10,12 @@ using namespace Rcpp;
 //' @param center a integer of mass window center
 //' @param width a integer of mass half window width
 //' @return a bool value if generate succeed or not
+//' @examples
+//' cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
+//' tmp <- tempdir()
+//' tmp <- file.path(tmp, "configs")
+//' generateOneCFG(cfg, tmp, "N", 50, 0, 2)
+//' list.files(tmp, full.names = TRUE)
 //' @export
 // [[Rcpp::export]]
 bool generateOneCFG(String cfgPath, String outPath, String element,
@@ -36,6 +42,12 @@ bool generateOneCFG(String cfgPath, String outPath, String element,
 //' @param outPath a full path for .cfg file output
 //' @param element a string of element name, "N" for example
 //' @return a bool value if generate succeed or not
+//' @examples
+//' cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
+//' tmp <- tempdir()
+//' tmp <- file.path(tmp, "configs")
+//' generateCFGs(cfg, tmp, "N")
+//' list.files(tmp, full.names = TRUE)
 //' @export
 // [[Rcpp::export]]
 bool generateCFGs(String cfgPath, String outPath, String element)

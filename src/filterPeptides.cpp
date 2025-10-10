@@ -6,6 +6,9 @@ using namespace Rcpp;
 //' getUnfilteredPeptides
 //' @param workingPath a full path with .sip files in it
 //' @return a dataframe of unique peptides and whether it is decoy sequence
+//' @examples
+//' demo_dir <- system.file("extdata", package = "Aerith")
+//' head(getUnfilteredPeptides(demo_dir))
 //' @export
 // [[Rcpp::export]]
 DataFrame getUnfilteredPeptides(CharacterVector workingPath)
@@ -37,6 +40,9 @@ DataFrame getUnfilteredPeptides(CharacterVector workingPath)
 //' @param workingPath a full path with .sip files in it
 //' @param OverallThreshold FDR thredhold of peptides
 //' @return a dataframe about filter threshold and FDR results
+//' @examples
+//' demo_dir <- system.file("extdata", package = "Aerith")
+//' getFilterThreshold(demo_dir, 0.01)
 //' @export
 // [[Rcpp::export]]
 DataFrame getFilterThreshold(CharacterVector workingPath, NumericVector OverallThreshold)
@@ -62,6 +68,11 @@ DataFrame getFilterThreshold(CharacterVector workingPath, NumericVector OverallT
 //' @param OverallThreshold FDR thredhold of peptides
 //' @param topN store top N PSMs of each scan of one .FT file
 //' @return a dataframe about filter threshold and FDR results
+//' @examples
+//' demo_dir <- system.file("extdata", package = "Aerith")
+//' re <- getFilterThresholdTopPSMs(demo_dir, 0.01, 3)
+//' re$threshold
+//' head(re$topPSMs)
 //' @export
 // [[Rcpp::export]]
 List getFilterThresholdTopPSMs(CharacterVector workingPath, NumericVector OverallThreshold, size_t topN)

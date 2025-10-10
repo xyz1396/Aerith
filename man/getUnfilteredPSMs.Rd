@@ -13,9 +13,10 @@ getUnfilteredPSMs(sipPath, ftPath, topN)
 
 \item{topN}{store top N PSMs of each scan of one .FT file}
 }
-\value{
-a dataframe of unique PSMs and whether it is decoy sequence
-}
 \description{
 getUnfilteredPSMs
+}
+\examples{
+demo_dir <- system.file("extdata", package = "Aerith")
+head(getUnfilteredPSMs(demo_dir, demo_dir, 10))
 }

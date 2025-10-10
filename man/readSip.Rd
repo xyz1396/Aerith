@@ -7,8 +7,19 @@
 readSip(sipFile)
 }
 \arguments{
-\item{sipFile}{a .sip file's full path}
+\item{sipFile}{A character vector of length one containing the full path to a .sip file.}
+}
+\value{
+An R list with file-level metadata (\code{fileName}, \code{scanType}, \code{searchName}, \code{scoringFunction}) and a \code{PSM} data frame containing scan numbers, charges, masses, scores, ranks, peptides, and protein names.
 }
 \description{
-readSip
+Read a single .sip file and convert its peptide-spectrum matches (PSMs) into an R list.
+}
+\details{
+The reader parses the provided .sip file and returns metadata together with a data.frame of PSM-level attributes.
+}
+\examples{
+demo_file <- system.file("extdata", "demo.sip", package = "Aerith")
+re <- readSip(demo_file)
+head(re$PSM)
 }

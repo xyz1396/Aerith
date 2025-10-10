@@ -7,13 +7,10 @@
 #'
 #' @examples
 #' # mzR can be installed from bioconductor
-#' library(mzR)
+#' # library(mzR)
 #' demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
 #' a <- readMzmlMS1(demo_file)
 readMzmlMS1 <- function(ms) {
-  if (!requireNamespace("mzR", quietly = TRUE)) {
-    stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
-  }
   ms <- mzR::openMSfile(ms)
   meta <- mzR::header(ms)
   meta <- meta[meta$msLevel == 1, ]
@@ -53,13 +50,10 @@ readMzmlMS1 <- function(ms) {
 #'
 #' @examples
 #' # mzR can be installed from bioconductor
-#' library(mzR)
+#' # library(mzR)
 #' demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
 #' a <- readMzmlMS2(demo_file)
 readMzmlMS2 <- function(ms) {
-  if (!requireNamespace("mzR", quietly = TRUE)) {
-    stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
-  }
   ms <- mzR::openMSfile(ms)
   meta <- mzR::header(ms)
   meta <- meta[meta$msLevel == 2, ]
@@ -114,13 +108,10 @@ readMzmlMS2 <- function(ms) {
 #'
 #' @examples
 #' # MSnbase can be installed from bioconductor
-#' library(MSnbase)
+#' # library(MSnbase)
 #' demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
 #' a <- readMgf(demo_file)
 readMgf <- function(mgf) {
-  if (!requireNamespace("MSnbase", quietly = TRUE)) {
-    stop("The 'MSnbase' package is required but not installed. Please install it using Bioconductor.")
-}
   spectra <- MSnbase::readMgfData(mgf)
   scanNumbers <- MSnbase::fData(spectra)$SCANS
   scans <- lapply(seq_along(spectra), function(i) {
@@ -169,13 +160,10 @@ readPSMtsv <- function(tsv) {
 #'
 #' @examples
 #' # mzR can be installed from bioconductor
-#' library(mzR)
+#' # library(mzR)
 #' demo_file <- system.file("extdata", "demo.pepXML", package = "Aerith")
 #' a <- readPepXMLtable(demo_file)
 readPepXMLtable <- function(pepXML) {
-  if (!requireNamespace("mzR", quietly = TRUE)) {
-    stop("The 'mzR' package is required but not installed. Please install it using Bioconductor.")
-  }
   pepXML <- mzR::openIDfile(pepXML)
   psm <- mzR::psms(pepXML)
   scores <- mzR::score(pepXML)

@@ -9,6 +9,7 @@
 #include <map>
 #include <stdlib.h>
 #include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include "isotopologue.h"
 #include <limits>

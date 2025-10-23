@@ -117,7 +117,7 @@ List readAllScanMS1(const String ftFile)
 {
     ftFileReader reader(ftFile);
     if (reader.isEmpty)
-        return 0;
+        return List();
     reader.readAllScan();
     List scanList(reader.Scans.size());
     CharacterVector scanNumbers(reader.Scans.size());
@@ -160,7 +160,7 @@ List readScansMS2(const String ftFile, const size_t startScanNumber, const size_
     ftFileReader reader(ftFile);
     // avoid empty scanList crash
     if (reader.isEmpty)
-        return 0;
+        return List();
     reader.readScans(startScanNumber, endScanNumber);
     List scanList(reader.Scans.size());
     Scan *mScan;

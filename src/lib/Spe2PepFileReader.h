@@ -11,6 +11,7 @@
 #include <omp.h>
 #endif
 #include <algorithm>
+#include <sstream>
 #include "sipPSM.h"
 namespace fs = std::filesystem;
 

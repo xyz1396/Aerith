@@ -309,7 +309,6 @@ double PSMfeatureExtractor::getMS2IsotopicAbundance(
     }
     pct = pct.substr(0, pct.size() - 3);
     double pct_num = std::stod(pct);
-    pct_num = pct_num;
     return pct_num;
 }
 

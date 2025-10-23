@@ -57,6 +57,7 @@ public:
 	Scan currentScan;
 	std::vector<Scan> Scans;
 	std::vector<std::string> tokens;
+	std::vector<char> streamBuffer;
 	ftFileReader();
 	ftFileReader(std::string file);
 	~ftFileReader();

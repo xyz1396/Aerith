@@ -44,8 +44,8 @@ ftFileReader::ftFileReader(std::string file) : ftFileName(file)
 		else
 		{ // Set the buffer size to 2mb
 			const int bufsize = 1024 * 1024 * 2;
-			char buf[bufsize];
-			ftFileStream.rdbuf()->pubsetbuf(buf, bufsize);
+            streamBuffer.resize(bufsize);
+            ftFileStream.rdbuf()->pubsetbuf(streamBuffer.data(), streamBuffer.size());
 		}
 	}
 	else

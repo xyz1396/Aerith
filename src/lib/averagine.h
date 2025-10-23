@@ -2,6 +2,7 @@
 #include "proNovoConfig.h"
 #include <numeric>
 #include <functional>
+#include <array>
 
 class averagine
 {

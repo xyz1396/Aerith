@@ -561,18 +561,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // scorePSMsimple
-double scorePSMsimple(const NumericVector& realMZ, const NumericVector& realIntensity, const NumericVector& realCharge, const String& pepSeq, const String& Atom, double Prob);
-RcppExport SEXP _Aerith_scorePSMsimple(SEXP realMZSEXP, SEXP realIntensitySEXP, SEXP realChargeSEXP, SEXP pepSeqSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
+double scorePSMsimple(const NumericVector& realMZ, const NumericVector& realIntensity, const NumericVector& realCharge, int parentCharge, const String& pepSeq, const String& Atom, double Prob);
+RcppExport SEXP _Aerith_scorePSMsimple(SEXP realMZSEXP, SEXP realIntensitySEXP, SEXP realChargeSEXP, SEXP parentChargeSEXP, SEXP pepSeqSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const NumericVector& >::type realMZ(realMZSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type realIntensity(realIntensitySEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type realCharge(realChargeSEXP);
+    Rcpp::traits::input_parameter< int >::type parentCharge(parentChargeSEXP);
     Rcpp::traits::input_parameter< const String& >::type pepSeq(pepSeqSEXP);
     Rcpp::traits::input_parameter< const String& >::type Atom(AtomSEXP);
     Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
-    rcpp_result_gen = Rcpp::wrap(scorePSMsimple(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob));
+    rcpp_result_gen = Rcpp::wrap(scorePSMsimple(realMZ, realIntensity, realCharge, parentCharge, pepSeq, Atom, Prob));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -672,7 +673,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_scoreIntensityByCE", (DL_FUNC) &_Aerith_scoreIntensityByCE, 2},
     {"_Aerith_scorePSM", (DL_FUNC) &_Aerith_scorePSM, 7},
     {"_Aerith_annotatePSM", (DL_FUNC) &_Aerith_annotatePSM, 10},
-    {"_Aerith_scorePSMsimple", (DL_FUNC) &_Aerith_scorePSMsimple, 6},
+    {"_Aerith_scorePSMsimple", (DL_FUNC) &_Aerith_scorePSMsimple, 7},
     {"_Aerith_rankyfify", (DL_FUNC) &_Aerith_rankyfify, 1},
     {"_Aerith_denoiseOneMS2ScanHasCharge", (DL_FUNC) &_Aerith_denoiseOneMS2ScanHasCharge, 4},
     {"_Aerith_writeAllScanMS1", (DL_FUNC) &_Aerith_writeAllScanMS1, 3},

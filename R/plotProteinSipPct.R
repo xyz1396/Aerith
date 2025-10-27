@@ -203,6 +203,7 @@ plotProSipPct <- function(proPath) {
 #' @import stringr
 #' @import ggplot2
 #' @importFrom scales log_breaks
+#' @return A ggplot2 object representing the hexbin plot.
 #' @export
 plotFilteredPCTIntensitySummary <- function(psms_dir = "psms/", output_file = "decoy_filtered_PCT_and_intensity_summary_by_file.pdf",
     width = 16, height = 12) {
@@ -250,6 +251,7 @@ plotFilteredPCTIntensitySummary <- function(psms_dir = "psms/", output_file = "d
 #' @import stringr
 #' @import ggplot2
 #' @importFrom scales log_breaks
+#' @return A ggplot2 object representing the hexbin plot.
 #' @export
 plotSIPfilteredPCTIntensityBySample <- function(psm_file = "SIP_filtered_psms.tsv",
                                              output_file = "SIP_filtered_PCT_and_intensity_summary_by_sample.pdf",

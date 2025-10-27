@@ -19,7 +19,7 @@ for the peaks. Default is 0.0001.}
 the abundance of C13 to 0.5 and adjust the abundance of C12 accordingly.}
 }
 \value{
-A data frame containing the calculated isotope peaks mass and their abundances.
+data.frame A data frame containing the calculated isotope peaks mass and their abundances.
 }
 \description{
 This function calculates the isotope peaks for a given chemical formula using

@@ -4,7 +4,15 @@
 \alias{scorePSMsimple}
 \title{scorePSMsimple Score a PSM without isotopic envelope shape modeling}
 \usage{
-scorePSMsimple(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
+scorePSMsimple(
+  realMZ,
+  realIntensity,
+  realCharge,
+  parentCharge,
+  pepSeq,
+  Atom,
+  Prob
+)
 }
 \arguments{
 \item{realMZ}{mz vector in MS2 scan}
@@ -32,6 +40,7 @@ score <- scorePSMsimple(
   scan1$peaks$mz,
   scan1$peaks$intensity,
   scan1$peaks$charge,
+  2,
   "[HSQVFSTAEDNQSAVTIHVLQGER]",
   "C13",
   0.0107

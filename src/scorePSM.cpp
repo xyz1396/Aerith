@@ -553,6 +553,7 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
 //'   scan1$peaks$mz,
 //'   scan1$peaks$intensity,
 //'   scan1$peaks$charge,
+//'   2,
 //'   "[HSQVFSTAEDNQSAVTIHVLQGER]",
 //'   "C13",
 //'   0.0107
@@ -560,7 +561,7 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
 //' @export
 // [[Rcpp::export]]
 double scorePSMsimple(const NumericVector &realMZ, const NumericVector &realIntensity,
-                   const NumericVector &realCharge, const String &pepSeq, const String &Atom, double Prob)
+                   const NumericVector &realCharge, int parentCharge, const String &pepSeq, const String &Atom, double Prob)
 {
     // read default config
     string config = get_extdata();
@@ -583,6 +584,7 @@ double scorePSMsimple(const NumericVector &realMZ, const NumericVector &realInte
     myScan.vdIntensity = as<vector<double>>(realIntensity);
     myScan.vdMZ = as<vector<double>>(realMZ);
     myScan.viCharge = as<vector<int>>(realCharge);
+    myScan.iParentChargeState = parentCharge;
     myScan.preprocess();
     myScan.scoreWeightSumHighMS2(&myPep);
     return myScan.vpWeightSumTopPeptides[0]->dScore;

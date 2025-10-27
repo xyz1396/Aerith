@@ -699,13 +699,14 @@ annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom
 #'   scan1$peaks$mz,
 #'   scan1$peaks$intensity,
 #'   scan1$peaks$charge,
+#'   2,
 #'   "[HSQVFSTAEDNQSAVTIHVLQGER]",
 #'   "C13",
 #'   0.0107
 #' )
 #' @export
-scorePSMsimple <- function(realMZ, realIntensity, realCharge, pepSeq, Atom, Prob) {
-    .Call(`_Aerith_scorePSMsimple`, realMZ, realIntensity, realCharge, pepSeq, Atom, Prob)
+scorePSMsimple <- function(realMZ, realIntensity, realCharge, parentCharge, pepSeq, Atom, Prob) {
+    .Call(`_Aerith_scorePSMsimple`, realMZ, realIntensity, realCharge, parentCharge, pepSeq, Atom, Prob)
 }
 
 #' rankify numeric vector via ftFileWriter

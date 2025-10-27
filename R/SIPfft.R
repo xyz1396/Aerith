@@ -57,7 +57,7 @@ cal_isotope_abundance_fft <- function(element_array, N_width) {
 #' @param ... Additional arguments passed to the function. For example C13=0.5 will change
 #' the abundance of C13 to 0.5 and adjust the abundance of C12 accordingly.
 #'
-#' @return A data frame containing the calculated isotope peaks mass and their abundances.
+#' @return data.frame A data frame containing the calculated isotope peaks mass and their abundances.
 #'
 #' @examples
 #' # Example usage:

@@ -20,6 +20,9 @@ plotSIPfilteredPCTIntensityBySample(
 
 \item{height}{Height of the output PDF (default: 12).}
 }
+\value{
+A ggplot2 object representing the hexbin plot.
+}
 \description{
 This function reads a SIP filtered PSM file, processes the data, and generates a hexbin plot
 of log2 precursor intensity vs. MS1 isotopic abundances, faceted by each input file.

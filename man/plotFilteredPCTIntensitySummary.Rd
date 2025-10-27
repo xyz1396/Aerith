@@ -20,6 +20,9 @@ plotFilteredPCTIntensitySummary(
 
 \item{height}{Height of the output PDF (default: 12).}
 }
+\value{
+A ggplot2 object representing the hexbin plot.
+}
 \description{
 This function reads all filtered PSM files in from output directory of Sipros 5, combines them, filters for labeled PSMs,
 extracts file names, computes log2 intensities, and generates a hexbin plot faceted by each input file.

@@ -58,7 +58,7 @@ List denoiseOneMS2ScanHasCharge(List scanList, float window, float step,
 //' @param header a list of FT file header
 //' @param scansList a list of scans for output
 //' @param ftFile a ft1 file's output path
-//' @return void
+//' @return TRUE if the file was written successfully, FALSE otherwise
 //' @examples
 //' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
 //' header <- readFTheader(demo_file)
@@ -102,7 +102,7 @@ bool writeAllScanMS1(List header, List scansList, const String &ftFile) {
 //' @param header a list of FT file header
 //' @param scansList a list of scans for output
 //' @param ftFile a ft2 file's output path
-//' @return void
+//' @return TRUE if the file was written successfully, FALSE otherwise
 //' @examples
 //' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 //' header <- readFTheader(demo_file)

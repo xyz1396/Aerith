@@ -14,7 +14,7 @@ writeAllScanMS1(header, scansList, ftFile)
 \item{ftFile}{a ft1 file's output path}
 }
 \value{
-void
+TRUE if the file was written successfully, FALSE otherwise
 }
 \description{
 write all MS1 scans has charge

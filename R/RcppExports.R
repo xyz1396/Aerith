@@ -75,7 +75,7 @@ extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFile
 #' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
 #' @param doProteinInference out put protein inference format or only PSM format
 #' @param fileName output path of the percolator tsv file
-#' @return NULL
+#' @return NULL (invisibly).
 #' @examples
 #' tmp <- tempdir()
 #' target_dir <- file.path(tmp, "target")
@@ -744,7 +744,7 @@ denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
 #' @param header a list of FT file header
 #' @param scansList a list of scans for output
 #' @param ftFile a ft1 file's output path
-#' @return void
+#' @return TRUE if the file was written successfully, FALSE otherwise
 #' @examples
 #' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
 #' header <- readFTheader(demo_file)
@@ -761,7 +761,7 @@ writeAllScanMS1 <- function(header, scansList, ftFile) {
 #' @param header a list of FT file header
 #' @param scansList a list of scans for output
 #' @param ftFile a ft2 file's output path
-#' @return void
+#' @return TRUE if the file was written successfully, FALSE otherwise
 #' @examples
 #' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 #' header <- readFTheader(demo_file)

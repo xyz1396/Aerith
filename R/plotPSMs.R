@@ -44,6 +44,7 @@ getRealScansWithCharges <- function(ft, scanNumbers) {
 #' @param pepSeqs Character vector of peptide sequence of PSMs
 #' @param proNames Character vector of protein name of PSMs
 #' @param path Output path of pdf. Default is "."
+#' @return PDF files saved in the specified path
 #'
 #' @export
 #'

@@ -3,24 +3,36 @@
 \docType{class}
 \name{AAspectra-class}
 \alias{AAspectra-class}
-\title{AAspectra S4 object}
+\title{AAspectra S4 class for annotated mass spectra}
 \description{
-This class is unified data structure for spectra plotting.
-The data.frame of spectra consists of columns of "Mass", "Prob"
-"Kind", "Charge", and "MZ".
+Unified container storing theoretical or observed spectra,
+their charge states, and the associated peptide or compound identifier.
+}
+\details{
+Instances of this class are typically created by helper constructors
+like \code{getPrecursorSpectra()}, \code{getSipPrecursorSpectra()}, or converted from
+raw scans with \code{getRealScan()}. The class underpins downstream plotting and
+annotation methods.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{spectra}}{data.frame for ion peaks}
+\item{\code{spectra}}{A \code{\link{data.frame}} with columns such as \code{Mass}, \code{MZ}, \code{Prob},
+\code{Kind}, and \code{Charge}, holding peaks and metadata.}
 
-\item{\code{charges}}{numeric vector for precursor charge}
+\item{\code{charges}}{Numeric vector of precursor charge states carried
+alongside \code{spectra}.}
 
-\item{\code{AAstr}}{characters for amino acid sequence or compound name}
+\item{\code{AAstr}}{Character string containing the peptide sequence or compound
+label used to generate the spectrum.}
 }}
 
 \examples{
 AAstr <- "KHRIP"
 spectra <- getPrecursorSpectra(AAstr, 1:2)
 class(spectra)
+}
+\seealso{
+\code{\link[=getPrecursorSpectra]{getPrecursorSpectra()}}, \code{\link[=getSipPrecursorSpectra]{getSipPrecursorSpectra()}},
+\code{\link[=getSipBYionSpectra]{getSipBYionSpectra()}}, \link{plot,AAspectra,missing-method}
 }

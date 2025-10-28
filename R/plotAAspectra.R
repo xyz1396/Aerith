@@ -1,11 +1,18 @@
-#' AAspectra S4 object
-#' @slot spectra data.frame for ion peaks
-#' @slot charges numeric vector for precursor charge
-#' @slot AAstr characters for amino acid sequence or compound name
-#' @description
-#' This class is unified data structure for spectra plotting.
-#' The data.frame of spectra consists of columns of "Mass", "Prob"
-#' "Kind", "Charge", and "MZ".
+#' @title AAspectra S4 class for annotated mass spectra
+#' @description Unified container storing theoretical or observed spectra,
+#'   their charge states, and the associated peptide or compound identifier.
+#' @slot spectra A [`data.frame`] with columns such as `Mass`, `MZ`, `Prob`,
+#'   `Kind`, and `Charge`, holding peaks and metadata.
+#' @slot charges Numeric vector of precursor charge states carried
+#'   alongside `spectra`.
+#' @slot AAstr Character string containing the peptide sequence or compound
+#'   label used to generate the spectrum.
+#' @details Instances of this class are typically created by helper constructors
+#'   like `getPrecursorSpectra()`, `getSipPrecursorSpectra()`, or converted from
+#'   raw scans with `getRealScan()`. The class underpins downstream plotting and
+#'   annotation methods.
+#' @seealso [getPrecursorSpectra()], [getSipPrecursorSpectra()],
+#'   [getSipBYionSpectra()], [plot,AAspectra,missing-method]
 #' @export
 #' @examples
 #' AAstr <- "KHRIP"

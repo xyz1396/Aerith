@@ -38,6 +38,9 @@ plotPSMs(
 
 \item{path}{Output path of pdf. Default is "."}
 }
+\value{
+PDF files saved in the specified path
+}
 \description{
 plot PSMs from FT2 files and PSM results
 }

@@ -284,6 +284,7 @@ List extractPSMfeaturesTargetAndDecoy(String targetPath, String decoyPath, int t
 //' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
 //' @param doProteinInference out put protein inference format or only PSM format
 //' @param fileName output path of the percolator tsv file
+//' @return NULL
 //' @examples
 //' tmp <- tempdir()
 //' target_dir <- file.path(tmp, "target")

@@ -21,6 +21,8 @@ scorePSMsimple(
 
 \item{realCharge}{charge vector in MS2 scan}
 
+\item{parentCharge}{precursor charge, 2 for example}
+
 \item{pepSeq}{a string of peptide}
 
 \item{Atom}{"C13" or "N15"}

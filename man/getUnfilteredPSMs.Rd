@@ -13,6 +13,9 @@ getUnfilteredPSMs(sipPath, ftPath, topN)
 
 \item{topN}{store top N PSMs of each scan of one .FT file}
 }
+\value{
+data.frame of PSMs
+}
 \description{
 getUnfilteredPSMs
 }

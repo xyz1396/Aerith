@@ -75,6 +75,7 @@ extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFile
 #' @param ThreadNumber read ThreadNumber of FT file at the same time, it will increase ram usage
 #' @param doProteinInference out put protein inference format or only PSM format
 #' @param fileName output path of the percolator tsv file
+#' @return NULL
 #' @examples
 #' tmp <- tempdir()
 #' target_dir <- file.path(tmp, "target")
@@ -103,6 +104,7 @@ extractPSMfeaturesTargetAndDecoytoPercolatorPin <- function(targetPath, decoyPat
 #' @param sipPath a full path with .sip files in it
 #' @param ftPath a full path with .ft files in it
 #' @param topN store top N PSMs of each scan of one .FT file
+#' @return data.frame of PSMs
 #' @examples
 #' demo_dir <- system.file("extdata", package = "Aerith")
 #' head(getUnfilteredPSMs(demo_dir, demo_dir, 10))
@@ -688,6 +690,7 @@ annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom
 #' @param realMZ mz vector in MS2 scan
 #' @param realIntensity intensity vector in MS2 scan
 #' @param realCharge charge vector in MS2 scan
+#' @param parentCharge precursor charge, 2 for example
 #' @param pepSeq a string of peptide
 #' @param Atom "C13" or "N15"
 #' @param Prob its SIP abundance (0.0~1.0)

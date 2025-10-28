@@ -7,6 +7,7 @@ using namespace Rcpp;
 //' @param sipPath a full path with .sip files in it
 //' @param ftPath a full path with .ft files in it
 //' @param topN store top N PSMs of each scan of one .FT file
+//' @return data.frame of PSMs
 //' @examples
 //' demo_dir <- system.file("extdata", package = "Aerith")
 //' head(getUnfilteredPSMs(demo_dir, demo_dir, 10))

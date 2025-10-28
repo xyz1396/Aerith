@@ -30,6 +30,9 @@ extractPSMfeaturesTargetAndDecoytoPercolatorPin(
 
 \item{fileName}{output path of the percolator tsv file}
 }
+\value{
+NULL (invisibly).
+}
 \description{
 extractPSMfeaturesTargetAndDecoytoPercolatorPin extract featueres of top PSMs from target and decoy .Spe2Pep.txt files
 to pecorlator pin format

@@ -14,7 +14,7 @@ writeAllScanMS2(header, scansList, ftFile)
 \item{ftFile}{a ft2 file's output path}
 }
 \value{
-void
+TRUE if the file was written successfully, FALSE otherwise
 }
 \description{
 write all MS2 scans has charge

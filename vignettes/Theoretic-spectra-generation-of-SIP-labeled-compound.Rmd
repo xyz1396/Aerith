@@ -13,9 +13,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 10
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10
 )
 ```
 
@@ -51,7 +51,10 @@ Before we run the code, note the main arguments you can adjust:
 ```{r}
 iso1 <- cal_isotope_numbers_SIP("C6H11O6")
 plotMolecularIsotopes(iso1) +
-  ggtitle(expression(C[6]*H[11]*O[6]^"-"~1.07*"% "*{}^{13}*C))
+    ggtitle(expression(C[6] * H[11] * O[6]^"-" ~ 1.07 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 The first plot establishes the baseline: a near-natural abundance distribution for deprotonated glucose. Peaks close to $m/z$ shifts of one neutron reflect the low natural $^{13}$C content. Use this as a reference when evaluating experimental control samples.
@@ -59,7 +62,10 @@ The first plot establishes the baseline: a near-natural abundance distribution f
 ```{r}
 iso2 <- cal_isotope_numbers_SIP("C6H11O6", num_simulations = 50000, C13 = 0.5)
 plotMolecularIsotopes(iso2) +
-  ggtitle(expression(C[6]*H[11]*O[6]^"-"~50*"% "*{}^{13}*C))
+    ggtitle(expression(C[6] * H[11] * O[6]^"-" ~ 50 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 Here we increase the simulation depth to 50,000 for a smoother signal and set the $^{13}$C enrichment to 50%. The resulting spectrum shows pronounced heavier isotopologues, illustrating how increasing enrichment shifts intensity towards higher $m/z$. When benchmarking wet-lab labeling protocols, compare observed spectra against this simulated target to estimate incorporation efficiency and identify incomplete labeling.
@@ -77,7 +83,10 @@ Key parameters to consider:
 ```{r}
 iso1 <- cal_isotope_peaks_fft("C6H12O6Na")
 plotMolecularFFTisotopes(iso1) +
-  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~1.07*"% "*{}^{13}*C))
+    ggtitle(expression(C[6] * H[12] * O[6] * Na^"+" ~ 1.07 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 This visualization showcases the sodium-adducted glucose ion under natural abundance. Because the FFT method skips fine structure, peaks appear as discrete sticks at integer neutron offsets—ideal for fast charge-state annotation or predicting centroided spectra in DDA workflows.
@@ -85,7 +94,10 @@ This visualization showcases the sodium-adducted glucose ion under natural abund
 ```{r}
 iso2 <- cal_isotope_peaks_fft("C6H12O6Na", N_width = 200, min_abundance = 0.001, C13 = 0.5)
 plotMolecularFFTisotopes(iso2) +
-  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~50*"% "*{}^{13}*C))
+    ggtitle(expression(C[6] * H[12] * O[6] * Na^"+" ~ 50 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 Adjusting `N_width` to 200 ensures heavier isotopologues remain within the FFT window, while a `min_abundance` of 0.001 filters noise-like contributions. The resulting shift towards heavier peaks mirrors the Monte Carlo outcome, confirming that both approaches agree on the macroscopic trend despite different underlying assumptions. Use this configuration when screening candidate metabolites or peptides for downstream targeted acquisition.
@@ -93,7 +105,10 @@ Adjusting `N_width` to 200 ensures heavier isotopologues remain within the FFT w
 ```{r}
 iso1 <- cal_isotope_peaks_fft("C6H11O6")
 plotMolecularFFTisotopes(iso1) +
-  ggtitle(expression(C[6]*H[11]*O[6]^"-"~1.07*"% "*{}^{13}*C))
+    ggtitle(expression(C[6] * H[11] * O[6]^"-" ~ 1.07 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 The deprotonated glucose FFT spectrum closely matches the Monte Carlo baseline in peak ordering, validating the approximation for monoisotopic-focused analyses.
@@ -101,7 +116,10 @@ The deprotonated glucose FFT spectrum closely matches the Monte Carlo baseline i
 ```{r}
 iso2 <- cal_isotope_peaks_fft("C6H11O6", N_width = 200, min_abundance = 0.001, C13 = 0.5)
 plotMolecularFFTisotopes(iso2) +
-  ggtitle(expression(C[6]*H[11]*O[6]^"-"~50*"% "*{}^{13}*C))
+    ggtitle(expression(C[6] * H[11] * O[6]^"-" ~ 50 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 Under elevated $^{13}$C incorporation, heavier peaks again dominate. Comparing this output with experimental spectra quickly reveals whether the labeling strategy achieved the intended enrichment.

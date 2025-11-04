@@ -82,12 +82,12 @@ cal_isotope_peaks_fft <- function(formula, N_width = 100, min_abundance = 0.0001
             }
         } else {
             warning(
-            sprintf(
-                "Unsupported isotope: %s will be ignored.",
-                toString(param)
-            ),
-            call. = FALSE
-        )
+                sprintf(
+                    "Unsupported isotope: %s will be ignored.",
+                    toString(param)
+                ),
+                call. = FALSE
+            )
         }
     }
 
@@ -114,7 +114,7 @@ cal_isotope_peaks_fft <- function(formula, N_width = 100, min_abundance = 0.0001
 #' @param yshift A numeric value representing the vertical shift applied to the plot for better visualization of the abundance close to 0. Default is -1.
 #' @param peakWidth A numeric value representing the width of the peaks in the plot. Default is 0.5.
 #' @param textSize A numeric value representing the size of the text in the plot.
-#' 
+#'
 #' @return A ggplot object of molecular isotopes without fine structure by FFT algorithm
 #' @export
 #'
@@ -140,26 +140,26 @@ plotMolecularFFTisotopes <- function(isotope_numbers, charge = 1, minProb = 0.00
     p <- p + ggplot2::geom_linerange(linewidth = peakWidth)
     p <- p + ggplot2::scale_x_continuous(breaks = seq(min(spectra$MZ) - 1, max(spectra$MZ) + 1, by = 1))
     p <- p + ggplot2::scale_y_continuous(breaks = seq(0, 100, by = 10))
-    p<- p + ggplot2::theme(
+    p <- p + ggplot2::theme(
         panel.grid = ggplot2::element_blank(),
         panel.background = ggplot2::element_blank(),
         legend.key = ggplot2::element_blank(),
         panel.border = ggplot2::element_rect(
-          fill = NA,
-          color = "grey10",
-          linetype = 1,
-          linewidth = 0.5
+            fill = NA,
+            color = "grey10",
+            linetype = 1,
+            linewidth = 0.5
         ),
         text = ggplot2::element_text(size = textSize)
-      ) +
-      ggplot2::xlab("M/Z") +
-      ggplot2::ylab("Intensity") +
-      ggplot2::guides(color = ggplot2::guide_legend(
-        override.aes =
-          list(
-            linewidth = 5, fill =
-              NA
-          )
-      ))
+    ) +
+        ggplot2::xlab("M/Z") +
+        ggplot2::ylab("Intensity") +
+        ggplot2::guides(color = ggplot2::guide_legend(
+            override.aes =
+                list(
+                    linewidth = 5, fill =
+                        NA
+                )
+        ))
     return(p)
 }

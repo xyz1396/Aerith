@@ -13,9 +13,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 10
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10
 )
 ```
 
@@ -445,10 +445,11 @@ ms1_retention_info <- getRetentionTimeAndPrecursorInfo(ms1_scan_data)
 
 # Create combined scan frequency visualization
 # This plot shows the temporal distribution of MS1 and MS2 scans
-combined_plot <- plotScanFrequency(ms2_retention_info, 
-                                   binwidth = 0.1, 
-                                   breaks = seq(9, 10, by = 0.2)) + 
-                  plotScanFrequencyMS2(ms1_retention_info, binwidth = 0.1)
+combined_plot <- plotScanFrequency(ms2_retention_info,
+    binwidth = 0.1,
+    breaks = seq(9, 10, by = 0.2)
+) +
+    plotScanFrequencyMS2(ms1_retention_info, binwidth = 0.1)
 
 print(combined_plot)
 ```
@@ -480,9 +481,10 @@ precursor_info <- getRetentionTimeAndPrecursorInfo(ms2_data)
 
 # Create precursor m/z frequency plot
 # This visualization shows how precursors are distributed across m/z and retention time
-plotPrecursorMzFrequency(precursor_info, 
-                         timeBinWidth = 0.1, 
-                         x_breaks = seq(8, 11, by = 0.2))
+plotPrecursorMzFrequency(precursor_info,
+    timeBinWidth = 0.1,
+    x_breaks = seq(8, 11, by = 0.2)
+)
 ```
 
 **Precursor Distribution Analysis:**

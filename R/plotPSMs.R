@@ -7,12 +7,12 @@
 #' @export
 #'
 #' @examples
-#' scanNumbers <- c("2596","8182")
+#' scanNumbers <- c("2596", "8182")
 #' demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 #' ft2 <- readAllScanMS2(demo_file)
 #' realScans <- getRealScans(ft2, scanNumbers)
 getRealScans <- function(ft, scanNumbers) {
-  return(lapply(scanNumbers, getRealScan, ft = ft))
+    return(lapply(scanNumbers, getRealScan, ft = ft))
 }
 
 #' get real scans with real charges and raw intensities from scans list of one ft file
@@ -24,12 +24,12 @@ getRealScans <- function(ft, scanNumbers) {
 #' @export
 #'
 #' @examples
-#' scanNumbers <- c("2596","8182")
+#' scanNumbers <- c("2596", "8182")
 #' demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 #' ft2 <- readAllScanMS2(demo_file)
 #' realScans <- getRealScansWithCharges(ft2, scanNumbers)
 getRealScansWithCharges <- function(ft, scanNumbers) {
-  return(lapply(scanNumbers, getRealScanWithCharge, ft = ft))
+    return(lapply(scanNumbers, getRealScanWithCharge, ft = ft))
 }
 
 #' plot PSMs from FT2 files and PSM results
@@ -52,8 +52,8 @@ getRealScansWithCharges <- function(ft, scanNumbers) {
 #' element <- "C13"
 #' demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
 #' psm <- readPSMtsv(demo_file)
-#' psm <- psm[psm$Filename=="Pan_052322_X13.FT2", ]
-#' psm <- psm[psm$ScanNumber %in% c("4068","2596","8182"), ]
+#' psm <- psm[psm$Filename == "Pan_052322_X13.FT2", ]
+#' psm <- psm[psm$ScanNumber %in% c("4068", "2596", "8182"), ]
 #' demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 #' ft2 <- readAllScanMS2(demo_file)
 #' ftFileNames <- psm$Filename
@@ -64,56 +64,60 @@ getRealScansWithCharges <- function(ft, scanNumbers) {
 #' pep <- stringr::str_sub(pep, 2, -2)
 #' pct <- psm$SearchName
 #' pct <- as.numeric(stringr::str_sub(
-#'  stringr::str_split(pct, "_", simplify = TRUE)[, 2], 1, -4)) / 100 / 1000
+#'     stringr::str_split(pct, "_", simplify = TRUE)[, 2], 1, -4
+#' )) / 100 / 1000
 #' realScans <- getRealScans(ft2, scanNumbers)
 #' tmp <- tempdir()
 #' plotPSMs(
-#'   realScans,
-#'   charges,
-#'   element,
-#'   pct,
-#'   BYcharge = 1:2,
-#'   ftFileNames,
-#'   scanNumbers,
-#'   pep,
-#'   proNames,
-#'   path = tmp
+#'     realScans,
+#'     charges,
+#'     element,
+#'     pct,
+#'     BYcharge = 1:2,
+#'     ftFileNames,
+#'     scanNumbers,
+#'     pep,
+#'     proNames,
+#'     path = tmp
 #' )
 #' list.files(tmp, pattern = ".pdf", full.names = TRUE)
 #'
 plotPSMs <-
-  function(realScans,
-           charges,
-           Atom = "C13",
-           Probs,
-           BYcharge = c(1, 2),
-           ftFileNames,
-           scanNumbers,
-           pepSeqs,
-           proNames,
-           path = ".") {
-    for (i in seq_along(realScans)) {
-      BY <-
-        getSipBYionSpectra(pepSeqs[i], Atom, Probs[i], BYcharge, charges[i])
-      plot(BY) + plotRealScan(realScans[[i]]) + plotSipBYionLabel(BY)
-      safe_proName <- gsub("[\\/:*?\"<>|{}]", "_", proNames[i])
-      safe_pepSeq <- gsub("[\\/:*?\"<>|{}]", "_", pepSeqs[i])
-      path2 <- file.path(
-        path,
-        paste(
-          ftFileNames[i],
-          i,
-          charges[i],
-          scanNumbers[i],
-          safe_pepSeq,
-          safe_proName,
-          Probs[i],
-          ".pdf",
-          sep = "_"
-        ))
-      path2 <- normalizePath(path2, mustWork = FALSE)
-      ggplot2::ggsave(filename = path2,
-        width = 25,
-        height = 7)
+    function(realScans,
+             charges,
+             Atom = "C13",
+             Probs,
+             BYcharge = c(1, 2),
+             ftFileNames,
+             scanNumbers,
+             pepSeqs,
+             proNames,
+             path = ".") {
+        for (i in seq_along(realScans)) {
+            BY <-
+                getSipBYionSpectra(pepSeqs[i], Atom, Probs[i], BYcharge, charges[i])
+            plot(BY) + plotRealScan(realScans[[i]]) + plotSipBYionLabel(BY)
+            safe_proName <- gsub("[\\/:*?\"<>|{}]", "_", proNames[i])
+            safe_pepSeq <- gsub("[\\/:*?\"<>|{}]", "_", pepSeqs[i])
+            path2 <- file.path(
+                path,
+                paste(
+                    ftFileNames[i],
+                    i,
+                    charges[i],
+                    scanNumbers[i],
+                    safe_pepSeq,
+                    safe_proName,
+                    Probs[i],
+                    ".pdf",
+                    sep = "_"
+                )
+            )
+            path2 <- normalizePath(path2, mustWork = FALSE)
+            ggplot2::ggsave(
+                filename = path2,
+                width = 25,
+                height = 7
+            )
+        }
     }
-  }

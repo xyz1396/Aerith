@@ -25,8 +25,8 @@ S4 plot method producing a ggplot2 spectrum for an AAspectra object.
 \examples{
 a <- getPrecursorSpectra("KHRIP", 2)
 plot(a) +
-  ggplot2::scale_x_continuous(breaks = seq(324, 329, by = 0.5)) +
-  ggplot2::geom_linerange(linewidth = 0.2)
+    ggplot2::scale_x_continuous(breaks = seq(324, 329, by = 0.5)) +
+    ggplot2::geom_linerange(linewidth = 0.2)
 }
 \seealso{
 AAspectra

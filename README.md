@@ -6,7 +6,9 @@ Aerith is an R package that provides interfaces to read and write mass spectrum 
 ![Abstract](./inst/png/AerithAbstract.png)
 
 ### Citation
-
+  
+Xiong, Yi, Ryan S. Mueller, Shichao Feng, Xuan Guo, and Chongle Pan. "Aerith: Visualization and Annotation of Isotopic Enrichment Patterns of Peptides and Metabolites with Stable Isotope Labeling from Proteomics and Metabolomics." Analytical Chemistry (2025).
+  
 Xiong, Yi, Ryan S. Mueller, Shichao Feng, Xuan Guo, and Chongle Pan. "Proteomic stable isotope probing with an upgraded Sipros algorithm for improved identification and quantification of isotopically labeled proteins." Microbiome 12 (2024).
 
 ### Install
@@ -92,39 +94,51 @@ plotTIC(tic)
 ```{r eval=FALSE}
 header <- readFTheader("input data format/ft/Pan_062822_X1iso5.FT1")
 ft1 <- readAllScanMS1("input data format/ft/Pan_062822_X1iso5.FT1")
-writeAllScanMS1(header,ft1[1:100],"input data format/demo.FT1")
+writeAllScanMS1(header, ft1[1:100], "input data format/demo.FT1")
 ```
 
 ```{r eval=FALSE}
 header <- readFTheader("input data format/ft/Pan_062822_X1iso5.FT2")
 ft2 <- readAllScanMS2("input data format/ft/Pan_062822_X1iso5.FT2")
-writeAllScanMS2(header,ft2[1:100],"input data format/demo.FT2")
+writeAllScanMS2(header, ft2[1:100], "input data format/demo.FT2")
 ```
 
 ### Theoretic spectra generation of SIP labeled compound
 
 ```{r}
 # natural abundance of (M-H)- of glucose
-iso1<- cal_isotope_numbers_SIP("C6H11O6")
-plotMolecularIsotopes(iso1) + 
-  ggtitle(expression(C[6]*H[11]*O[6]^"-"~1.07*"% "*{}^{13}*C))
+iso1 <- cal_isotope_numbers_SIP("C6H11O6")
+plotMolecularIsotopes(iso1) +
+    ggtitle(expression(C[6] * H[11] * O[6]^"-" ~ 1.07 * "% " *
+        {}^{
+            13
+        } * C))
 # adjusted abundance in SIP
-iso2<- cal_isotope_numbers_SIP("C6H11O6", num_simulations = 50000, C13 = 0.5)
-plotMolecularIsotopes(iso2) + 
-  ggtitle(expression(C[6]*H[11]*O[6]^"-"~50*"% "*{}^{13}*C))
+iso2 <- cal_isotope_numbers_SIP("C6H11O6", num_simulations = 50000, C13 = 0.5)
+plotMolecularIsotopes(iso2) +
+    ggtitle(expression(C[6] * H[11] * O[6]^"-" ~ 50 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 ![Peak](./inst/png/glucoseNaMC.png)
 
 ```{r}
 # natural abundance of (M+Na)⁺ of glucose
-iso1<- cal_isotope_peaks_fft("C6H12O6Na")
-plotMolecularFFTisotopes(iso1) + 
-  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~1.07*"% "*{}^{13}*C))
+iso1 <- cal_isotope_peaks_fft("C6H12O6Na")
+plotMolecularFFTisotopes(iso1) +
+    ggtitle(expression(C[6] * H[12] * O[6] * Na^"+" ~ 1.07 * "% " *
+        {}^{
+            13
+        } * C))
 # adjusted abundance in SIP
-iso2<- cal_isotope_peaks_fft("C6H12O6Na", N_width = 200, min_abundance = 0.001, C13 = 0.5)
-plotMolecularFFTisotopes(iso2) + 
-  ggtitle(expression(C[6]*H[12]*O[6]*Na^"+"~50*"% "*{}^{13}*C))
+iso2 <- cal_isotope_peaks_fft("C6H12O6Na", N_width = 200, min_abundance = 0.001, C13 = 0.5)
+plotMolecularFFTisotopes(iso2) +
+    ggtitle(expression(C[6] * H[12] * O[6] * Na^"+" ~ 50 * "% " *
+        {}^{
+            13
+        } * C))
 ```
 
 ![Peak](./inst/png/glucoseNaFFT.png)
@@ -167,10 +181,10 @@ scan1 <- getRealScanFromList(scan1)
 ```{r}
 isoCenter <- psm1$MeasuredParentMass / psm1$ParentCharge + 1.007276
 anno <- annotatePSM(
-  scan1@spectra$MZ, scan1@spectra$Prob,
-  scan1@spectra$Charge,
-  pep, 1:2, "C13",
-  pct, isoCenter, 5.0
+    scan1@spectra$MZ, scan1@spectra$Prob,
+    scan1@spectra$Charge,
+    pep, 1:2, "C13",
+    pct, isoCenter, 5.0
 )
 head(anno$ExpectedBYions[anno$ExpectedBYions$residuePositions != -1, ])
 residuePos <- anno$ExpectedBYions$residuePositions[anno$ExpectedBYions$matchedIndices != -1]
@@ -178,10 +192,10 @@ table(residuePos)
 # let the color be repeatable
 set.seed(9527)
 plotPSMannotation(
-  observedSpect = scan1,
-  pep = pep, Atom = "C13", Prob = pct,
-  charges = c(1, 2), isoCenter = isoCenter,
-  isoWidth = 5, ifRemoveNotFoundIon = T
+    observedSpect = scan1,
+    pep = pep, Atom = "C13", Prob = pct,
+    charges = c(1, 2), isoCenter = isoCenter,
+    isoWidth = 5, ifRemoveNotFoundIon = T
 )
 ```
 

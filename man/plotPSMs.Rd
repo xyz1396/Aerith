@@ -48,8 +48,8 @@ plot PSMs from FT2 files and PSM results
 element <- "C13"
 demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
 psm <- readPSMtsv(demo_file)
-psm <- psm[psm$Filename=="Pan_052322_X13.FT2", ]
-psm <- psm[psm$ScanNumber \%in\% c("4068","2596","8182"), ]
+psm <- psm[psm$Filename == "Pan_052322_X13.FT2", ]
+psm <- psm[psm$ScanNumber \%in\% c("4068", "2596", "8182"), ]
 demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 ft2 <- readAllScanMS2(demo_file)
 ftFileNames <- psm$Filename
@@ -60,20 +60,21 @@ pep <- psm$OriginalPeptide
 pep <- stringr::str_sub(pep, 2, -2)
 pct <- psm$SearchName
 pct <- as.numeric(stringr::str_sub(
- stringr::str_split(pct, "_", simplify = TRUE)[, 2], 1, -4)) / 100 / 1000
+    stringr::str_split(pct, "_", simplify = TRUE)[, 2], 1, -4
+)) / 100 / 1000
 realScans <- getRealScans(ft2, scanNumbers)
 tmp <- tempdir()
 plotPSMs(
-  realScans,
-  charges,
-  element,
-  pct,
-  BYcharge = 1:2,
-  ftFileNames,
-  scanNumbers,
-  pep,
-  proNames,
-  path = tmp
+    realScans,
+    charges,
+    element,
+    pct,
+    BYcharge = 1:2,
+    ftFileNames,
+    scanNumbers,
+    pep,
+    proNames,
+    path = tmp
 )
 list.files(tmp, pattern = ".pdf", full.names = TRUE)
 

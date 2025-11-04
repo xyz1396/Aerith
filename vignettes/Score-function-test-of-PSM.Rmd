@@ -13,9 +13,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 10
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10
 )
 ```
 
@@ -63,26 +63,26 @@ The `readOneScanMS2()` and `getRealScanFromList()` helpers retrieve the centroid
 ```{r}
 isoCenter <- scan2$isolationWindowCenterMZ
 anno <- annotatePSM(
-  spectra$MZ, spectra$Prob,
-  spectra$Charge,
-  pep, 1:2, "C13",
-  0.0107, isoCenter, 5.0, TRUE
-)
-WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
-  return(scorePSM(spectra$MZ,
-    realIntensity = spectra$Prob,
-    realCharge = spectra$Charge, parentCharge = charges[1],
-    pepSeq = pep2, Atom = "C13", Prob = prob
-  ))
-})
-scores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
-  anno <- annotatePSM(
     spectra$MZ, spectra$Prob,
     spectra$Charge,
     pep, 1:2, "C13",
-    prob, isoCenter, 4.0, TRUE
-  )
-  return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
+    0.0107, isoCenter, 5.0, TRUE
+)
+WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
+    return(scorePSM(spectra$MZ,
+        realIntensity = spectra$Prob,
+        realCharge = spectra$Charge, parentCharge = charges[1],
+        pepSeq = pep2, Atom = "C13", Prob = prob
+    ))
+})
+scores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
+    anno <- annotatePSM(
+        spectra$MZ, spectra$Prob,
+        spectra$Charge,
+        pep, 1:2, "C13",
+        prob, isoCenter, 4.0, TRUE
+    )
+    return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
 })
 scores <- t(scores)
 scores <- cbind(WDPscores, scores)
@@ -101,27 +101,35 @@ scores_df <- as.data.frame(scores)
 scores_df$abundance <- 0:100
 
 # Reshape the data to long format for faceting
-scores_long <- scores_df %>% 
-  pivot_longer(cols = c(WDPscores, XcorrScore, MVHscore), 
-               names_to = "score_type", 
-               values_to = "score_value")
+scores_long <- scores_df %>%
+    pivot_longer(
+        cols = c(WDPscores, XcorrScore, MVHscore),
+        names_to = "score_type",
+        values_to = "score_value"
+    )
 
 # Create a publication-quality plot
 ggplot(scores_long, aes(x = abundance, y = score_value)) +
-  geom_line() +
-  facet_wrap(~ score_type, scales = "free_y") +
-  labs(x = expression(paste(~ {}^{13}, "C %")),
-       y = "Score",
-       title = expression(paste("Scores Across", ~ {}^{13}, "C %"))) + 
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    strip.text = element_text(size = 12, face = "bold"),
-    panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "white", colour = "black")
-  )
+    geom_line() +
+    facet_wrap(~score_type, scales = "free_y") +
+    labs(
+        x = expression(paste(~ {}^{
+            13
+        }, "C %")),
+        y = "Score",
+        title = expression(paste("Scores Across", ~ {}^{
+            13
+        }, "C %"))
+    ) +
+    theme_minimal() +
+    theme(
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12, face = "bold"),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white", colour = "black")
+    )
 ```
 
 The resulting faceted plot summarizes how each score reacts to varying $^{13}$C abundance assumptions. For this near-unlabeled spectrum, all metrics peak close to natural abundance, confirming the absence of substantial label incorporation. The free $y$-scales highlight the relative sensitivity of each metric without forcing a shared dynamic range.
@@ -149,20 +157,20 @@ The full scan list is loaded with `readAllScanMS2()` so we can reference scan 25
 ```{r}
 isoCenter <- scan2$isolationWindowCenterMZ
 WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
-  return(scorePSM(spectra$MZ,
-    realIntensity = spectra$Prob,
-    realCharge = spectra$Charge, parentCharge = charges[1],
-    pepSeq = pep2, Atom = "C13", Prob = prob
-  ))
+    return(scorePSM(spectra$MZ,
+        realIntensity = spectra$Prob,
+        realCharge = spectra$Charge, parentCharge = charges[1],
+        pepSeq = pep2, Atom = "C13", Prob = prob
+    ))
 })
 scores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
-  anno <- annotatePSM(
-    spectra$MZ, spectra$Prob,
-    spectra$Charge,
-    pep, 1:2, "C13",
-    prob, isoCenter, 4.0, TRUE
-  )
-  return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
+    anno <- annotatePSM(
+        spectra$MZ, spectra$Prob,
+        spectra$Charge,
+        pep, 1:2, "C13",
+        prob, isoCenter, 4.0, TRUE
+    )
+    return(c(XcorrScore = anno$XcorrScore, MVHscore = anno$MVHscore))
 })
 scores <- t(scores)
 scores <- cbind(WDPscores, scores)
@@ -175,27 +183,35 @@ scores_df <- as.data.frame(scores)
 scores_df$abundance <- 0:100
 
 # Reshape the data to long format for faceting
-scores_long <- scores_df %>% 
-  pivot_longer(cols = c(WDPscores, XcorrScore, MVHscore), 
-               names_to = "score_type", 
-               values_to = "score_value")
+scores_long <- scores_df %>%
+    pivot_longer(
+        cols = c(WDPscores, XcorrScore, MVHscore),
+        names_to = "score_type",
+        values_to = "score_value"
+    )
 
 # Create a publication-quality plot
 ggplot(scores_long, aes(x = abundance, y = score_value)) +
-  geom_line() +
-  facet_wrap(~ score_type, scales = "free_y") +
-  labs(x = expression(paste(~ {}^{13}, "C %")),
-       y = "Score",
-       title = expression(paste("Scores Across", ~ {}^{13}, "C %"))) + 
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    strip.text = element_text(size = 12, face = "bold"),
-    panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "white", colour = "black")
-  )
+    geom_line() +
+    facet_wrap(~score_type, scales = "free_y") +
+    labs(
+        x = expression(paste(~ {}^{
+            13
+        }, "C %")),
+        y = "Score",
+        title = expression(paste("Scores Across", ~ {}^{
+            13
+        }, "C %"))
+    ) +
+    theme_minimal() +
+    theme(
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12, face = "bold"),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white", colour = "black")
+    )
 ```
 
 In this labeled scenario, each score exhibits a clear maximum near 50% abundance, mirroring the known experimental condition. Divergence among the score shapes highlights how cross-correlation and hypergeometric statistics can provide complementary evidence; Aerith lets analysts combine or prioritize these metrics depending on downstream classification needs.

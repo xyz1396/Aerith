@@ -18,7 +18,7 @@ List of AAspectra objects of real scans
 get real scans with real charges and raw intensities from scans list of one ft file
 }
 \examples{
-scanNumbers <- c("2596","8182")
+scanNumbers <- c("2596", "8182")
 demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 ft2 <- readAllScanMS2(demo_file)
 realScans <- getRealScansWithCharges(ft2, scanNumbers)

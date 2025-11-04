@@ -13,9 +13,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 12
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 12
 )
 ```
 
@@ -68,10 +68,10 @@ The first step in PSM validation involves annotating observed MS2 peaks with the
 demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
 scan1 <- readOneScanMS2(ftFile = demo_file, 107728)
 anno <- annotatePSM(
-  scan1$peaks$mz, scan1$peaks$intensity,
-  scan1$peaks$charge,
-  "HSQVFSTAEDNQSAVTIHVLQGER", 1:2, "C13",
-  0.0107, scan1$isolationWindowCenterMZ, 4.0
+    scan1$peaks$mz, scan1$peaks$intensity,
+    scan1$peaks$charge,
+    "HSQVFSTAEDNQSAVTIHVLQGER", 1:2, "C13",
+    0.0107, scan1$isolationWindowCenterMZ, 4.0
 )
 head(anno$ExpectedBYions[anno$ExpectedBYions$matchedIndices != -1, ])
 residuePos <- anno$ExpectedBYions$residuePositions[anno$ExpectedBYions$matchedIndices != -1]
@@ -99,10 +99,10 @@ The visualization of annotated PSMs provides immediate visual validation of the 
 ```{r}
 set.seed(9527)
 p <- plotPSMannotation(
-  observedSpect = getRealScanFromList(scan1),
-  pep = "HSQVFSTAEDNQSAVTIHVLQGER", Atom = "C13", Prob = 0.01,
-  charges = 1:2, isoCenter = 886.65, isoWidth = 4.0,
-  ifRemoveNotFoundIon = TRUE
+    observedSpect = getRealScanFromList(scan1),
+    pep = "HSQVFSTAEDNQSAVTIHVLQGER", Atom = "C13", Prob = 0.01,
+    charges = 1:2, isoCenter = 886.65, isoWidth = 4.0,
+    ifRemoveNotFoundIon = TRUE
 )
 p
 ```
@@ -174,10 +174,10 @@ slot(precursorScan1, "spectra") <- slot(precursorScan1, "spectra")[xlimit, ]
 slot(precursorScan1, "spectra")$Kind <- "Observed"
 maxInt <- max(slot(precursorScan1, "spectra")$Prob)
 slot(precursorScan1, "spectra")$Prob <- slot(precursorScan1, "spectra")$Prob / maxInt * 100
-p<-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
-  scale_x_continuous(breaks = seq(880, 890, by = 1)) + 
-  theme(legend.title = element_blank()) + 
-  scale_color_manual(values = c("#E7872B","#F3082F"))
+p <- plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
+    scale_x_continuous(breaks = seq(880, 890, by = 1)) +
+    theme(legend.title = element_blank()) +
+    scale_color_manual(values = c("#E7872B", "#F3082F"))
 p
 ```
 
@@ -218,10 +218,10 @@ Analyzing fragment ions from heavily labeled peptides presents unique challenges
 demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 scan1 <- readAllScanMS2(ftFile = demo_file)[["2596"]]
 anno <- annotatePSM(
-  scan1$peaks$mz, scan1$peaks$intensity,
-  scan1$peaks$charge,
-  "HYAHVDCPGHADYVK", 1:2, "C13",
-  0.52, scan1$isolationWindowCenterMZ, 5.0
+    scan1$peaks$mz, scan1$peaks$intensity,
+    scan1$peaks$charge,
+    "HYAHVDCPGHADYVK", 1:2, "C13",
+    0.52, scan1$isolationWindowCenterMZ, 5.0
 )
 head(anno$ExpectedBYions[anno$ExpectedBYions$matchedIndices != -1, ])
 residuePos <- anno$ExpectedBYions$residuePositions[anno$ExpectedBYions$matchedIndices != -1]
@@ -257,10 +257,10 @@ The visualization of heavily labeled PSMs reveals the dramatic effects of isotop
 ```{r}
 set.seed(9527)
 p <- plotPSMannotation(
-  observedSpect = getRealScanFromList(scan1),
-  pep = "HYAHVDCPGHADYVK", Atom = "C13", Prob = 0.52,
-  charges = 1:2, isoCenter = scan1$isolationWindowCenterMZ, isoWidth = 5.0,
-  ifRemoveNotFoundIon = TRUE
+    observedSpect = getRealScanFromList(scan1),
+    pep = "HYAHVDCPGHADYVK", Atom = "C13", Prob = 0.52,
+    charges = 1:2, isoCenter = scan1$isolationWindowCenterMZ, isoWidth = 5.0,
+    ifRemoveNotFoundIon = TRUE
 )
 p
 ```
@@ -349,10 +349,10 @@ slot(precursorScan1, "spectra") <- slot(precursorScan1, "spectra")[xlimit, ]
 slot(precursorScan1, "spectra")$Kind <- "Observed"
 maxInt <- max(slot(precursorScan1, "spectra")$Prob)
 slot(precursorScan1, "spectra")$Prob <- slot(precursorScan1, "spectra")$Prob / maxInt * 100
-p<-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
-  scale_x_continuous(breaks = seq(590, 620, by = 5)) + 
-  theme(legend.title = element_blank()) + 
-  scale_color_manual(values = c("#E7872B","#F3082F"))
+p <- plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
+    scale_x_continuous(breaks = seq(590, 620, by = 5)) +
+    theme(legend.title = element_blank()) +
+    scale_color_manual(values = c("#E7872B", "#F3082F"))
 p
 ```
 
@@ -404,8 +404,8 @@ The batch processing functionality demonstrates Aerith's scalability and practic
 element <- "C13"
 demo_file <- system.file("extdata", "demo.psm.txt", package = "Aerith")
 psm <- readPSMtsv(demo_file)
-psm <- psm[psm$Filename=="Pan_052322_X13.FT2", ]
-psm <- psm[psm$ScanNumber %in% c("4068","2596","8182"), ]
+psm <- psm[psm$Filename == "Pan_052322_X13.FT2", ]
+psm <- psm[psm$ScanNumber %in% c("4068", "2596", "8182"), ]
 demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith")
 ft2 <- readAllScanMS2(demo_file)
 ftFileNames <- psm$Filename
@@ -416,20 +416,21 @@ pep <- psm$OriginalPeptide
 pep <- stringr::str_sub(pep, 2, -2)
 pct <- psm$SearchName
 pct <- as.numeric(stringr::str_sub(
-  stringr::str_split(pct, "_", simplify = TRUE)[, 2], 1, -4)) / 100 / 1000
+    stringr::str_split(pct, "_", simplify = TRUE)[, 2], 1, -4
+)) / 100 / 1000
 realScans <- getRealScans(ft2, scanNumbers)
 tmp <- tempdir()
 plotPSMs(
-  realScans,
-  charges,
-  element,
-  pct,
-  BYcharge = 1:2,
-  ftFileNames,
-  scanNumbers,
-  pep,
-  proNames,
-  path = tmp
+    realScans,
+    charges,
+    element,
+    pct,
+    BYcharge = 1:2,
+    ftFileNames,
+    scanNumbers,
+    pep,
+    proNames,
+    path = tmp
 )
 list.files(tmp, pattern = ".pdf", full.names = TRUE)
 ```

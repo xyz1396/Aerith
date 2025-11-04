@@ -52,6 +52,8 @@ We begin with an Aerith example file representing an effectively unlabeled spect
 demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
 scan2 <- readOneScanMS2(ftFile = demo_file, 107728)
 scan1 <- getRealScanFromList(scan2)
+spectra <- slot(scan1, "spectra")
+charges <- slot(scan1, "charges")
 pep <- "HSQVFSTAEDNQSAVTIHVLQGER"
 pep2 <- "[HSQVFSTAEDNQSAVTIHVLQGER]"
 ```
@@ -61,22 +63,22 @@ The `readOneScanMS2()` and `getRealScanFromList()` helpers retrieve the centroid
 ```{r}
 isoCenter <- scan2$isolationWindowCenterMZ
 anno <- annotatePSM(
-  scan1@spectra$MZ, scan1@spectra$Prob,
-  scan1@spectra$Charge,
+  spectra$MZ, spectra$Prob,
+  spectra$Charge,
   pep, 1:2, "C13",
   0.0107, isoCenter, 5.0, TRUE
 )
 WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
-  return(scorePSM(scan1@spectra$MZ,
-    realIntensity = scan1@spectra$Prob,
-    realCharge = scan1@spectra$Charge, parentCharge = scan1@charges[1],
+  return(scorePSM(spectra$MZ,
+    realIntensity = spectra$Prob,
+    realCharge = spectra$Charge, parentCharge = charges[1],
     pepSeq = pep2, Atom = "C13", Prob = prob
   ))
 })
 scores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   anno <- annotatePSM(
-    scan1@spectra$MZ, scan1@spectra$Prob,
-    scan1@spectra$Charge,
+    spectra$MZ, spectra$Prob,
+    spectra$Charge,
     pep, 1:2, "C13",
     prob, isoCenter, 4.0, TRUE
   )
@@ -135,6 +137,8 @@ demo_file <- system.file("extdata", "X13_4068_2596_8182.FT2", package = "Aerith"
 ft2 <- readAllScanMS2(demo_file)
 scan2 <- ft2[["2596"]]
 scan1 <- getRealScanFromList(scan2)
+spectra <- slot(scan1, "spectra")
+charges <- slot(scan1, "charges")
 pep <- "HYAHVDCPGHADYVK"
 pep2 <- "[HYAHVDCPGHADYVK]"
 pct <- 0.52
@@ -145,16 +149,16 @@ The full scan list is loaded with `readAllScanMS2()` so we can reference scan 25
 ```{r}
 isoCenter <- scan2$isolationWindowCenterMZ
 WDPscores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
-  return(scorePSM(scan1@spectra$MZ,
-    realIntensity = scan1@spectra$Prob,
-    realCharge = scan1@spectra$Charge, parentCharge = scan1@charges[1],
+  return(scorePSM(spectra$MZ,
+    realIntensity = spectra$Prob,
+    realCharge = spectra$Charge, parentCharge = charges[1],
     pepSeq = pep2, Atom = "C13", Prob = prob
   ))
 })
 scores <- sapply((0:100) / 100, simplify = TRUE, function(prob) {
   anno <- annotatePSM(
-    scan1@spectra$MZ, scan1@spectra$Prob,
-    scan1@spectra$Charge,
+    spectra$MZ, spectra$Prob,
+    spectra$Charge,
     pep, 1:2, "C13",
     prob, isoCenter, 4.0, TRUE
   )

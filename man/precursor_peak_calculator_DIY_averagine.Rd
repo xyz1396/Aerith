@@ -19,3 +19,7 @@ a list of DataFrames of spectra
 \description{
 Simple peak calculator of user defined isotopic distribution of one peptide by averagine
 }
+\examples{
+demoSpectra <- precursor_peak_calculator_DIY_averagine(c("PEPTIDE", "ACDEFGHIK"), "C13", 0.25)
+demoSpectra[[1]]
+}

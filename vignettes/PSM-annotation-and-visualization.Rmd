@@ -131,7 +131,7 @@ This analysis combines theoretical fragment ion predictions with observed spectr
 
 ```{r}
 a <- getSipBYionSpectra("HSQVFSTAEDNQSAVTIHVLQGER", "C13", 0.01, 1:2)
-a@spectra <- a@spectra[a@spectra$MZ < 2000, ]
+slot(a, "spectra") <- slot(a, "spectra")[slot(a, "spectra")$MZ < 2000, ]
 p <- plot(a)
 p <- p + plotSipBYionLabel(a)
 demo_file <- system.file("extdata", "107728.FT2", package = "Aerith")
@@ -168,12 +168,12 @@ precursorScan1 <- getRealScanFromList(ft1)
 
 pep <- "HSQVFSTAEDNQSAVTIHVLQGER"
 precursorSP <- getSipPrecursorSpectra(pep, Prob = 0.0107, charges = 3)
-precursorSP@spectra$Kind <- "Expected"
-xlimit <- precursorScan1@spectra$MZ > 880 & precursorScan1@spectra$MZ < 890
-precursorScan1@spectra <- precursorScan1@spectra[xlimit, ]
-precursorScan1@spectra$Kind <- "Observed"
-maxInt <- max(precursorScan1@spectra$Prob)
-precursorScan1@spectra$Prob <- precursorScan1@spectra$Prob / maxInt * 100
+slot(precursorSP, "spectra")$Kind <- "Expected"
+xlimit <- slot(precursorScan1, "spectra")$MZ > 880 & slot(precursorScan1, "spectra")$MZ < 890
+slot(precursorScan1, "spectra") <- slot(precursorScan1, "spectra")[xlimit, ]
+slot(precursorScan1, "spectra")$Kind <- "Observed"
+maxInt <- max(slot(precursorScan1, "spectra")$Prob)
+slot(precursorScan1, "spectra")$Prob <- slot(precursorScan1, "spectra")$Prob / maxInt * 100
 p<-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
   scale_x_continuous(breaks = seq(880, 890, by = 1)) + 
   theme(legend.title = element_blank()) + 
@@ -343,12 +343,12 @@ precursorScan1 <- getRealScanFromList(ft1)
 
 pep <- "HYAHVDCPGHADYVK"
 precursorSP <- getSipPrecursorSpectra(pep, Prob = 0.5, charges = 3)
-precursorSP@spectra$Kind <- "Expected"
-xlimit <- precursorScan1@spectra$MZ > 590 & precursorScan1@spectra$MZ < 620
-precursorScan1@spectra <- precursorScan1@spectra[xlimit, ]
-precursorScan1@spectra$Kind <- "Observed"
-maxInt <- max(precursorScan1@spectra$Prob)
-precursorScan1@spectra$Prob <- precursorScan1@spectra$Prob / maxInt * 100
+slot(precursorSP, "spectra")$Kind <- "Expected"
+xlimit <- slot(precursorScan1, "spectra")$MZ > 590 & slot(precursorScan1, "spectra")$MZ < 620
+slot(precursorScan1, "spectra") <- slot(precursorScan1, "spectra")[xlimit, ]
+slot(precursorScan1, "spectra")$Kind <- "Observed"
+maxInt <- max(slot(precursorScan1, "spectra")$Prob)
+slot(precursorScan1, "spectra")$Prob <- slot(precursorScan1, "spectra")$Prob / maxInt * 100
 p<-plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth = 0.3) +
   scale_x_continuous(breaks = seq(590, 620, by = 5)) + 
   theme(legend.title = element_blank()) + 

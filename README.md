@@ -13,10 +13,13 @@ Xiong, Yi, Ryan S. Mueller, Shichao Feng, Xuan Guo, and Chongle Pan. "Proteomic 
 
 You can download the source package in release to install or install from github directly by following code in R.
 
-```r
+```{r}
 library(devtools)
 install_github("xyz1396/Aerith")
 library(Aerith)
+library(dplyr)
+library(stringr)
+library(ggplot2)
 ```
 
 ### Tutorial
@@ -38,12 +41,13 @@ mkdir rmd
 mkdir "rmd/input data format"
 cd "rmd/input data format"
 wget https://github.com/xyz1396/Raxport.net/releases/download/Raxport5.02/Raxport
+# on windows download https://github.com/xyz1396/Raxport.net/releases/download/Raxport5.03/Raxport.exe
 chmod +x Raxport
 wget https://github.com/compomics/ThermoRawFileParser/releases/download/v1.4.5/ThermoRawFileParser1.4.5.zip
 unzip ThermoRawFileParser1.4.5.zip -d ThermoRawFileParser
 mkdir raw ft mzml mgf
-conda create -n sipros4 -c bioconda -c conda-forge sipros
-# for using mono in this conda env
+conda create -n sipros4 bioconda::sipros=4.02
+# for using mono in this conda env on linux
 conda activate sipros4
 # Download raw file with 1% 13C
 wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/Pan_062822_X1iso5.raw -P raw
@@ -56,6 +60,7 @@ wget ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2024/06/PXD041414/pct1.psm.txt
 # convert raw to mzml file
 mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -o mzml
 mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -f 0 -o mgf
+# on windows just using ThermoRawFileParser/ThermoRawFileParser.exe
 ```
 
 ### Read and write Mass spectrum scan
@@ -63,11 +68,12 @@ mono ThermoRawFileParser/ThermoRawFileParser.exe -d raw -f 0 -o mgf
 #### Read all scans from FT1 and FT2 file
 
 ```{r eval=FALSE}
-ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
+setwd("rmd")
+ft2 <- readAllScanMS2("input data format/ft/Pan_062822_X1iso5.FT2")
 ft2 <- getRealScan(10487, ft2)
 plot(ft2)
 
-ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
+ft1 <- readAllScanMS1("input data format/ft/Pan_062822_X1iso5.FT1")
 tic <- getTIC(ft1)
 ft1 <- getRealScan(10430, ft1)
 plot(ft1)
@@ -84,15 +90,15 @@ plotTIC(tic)
 #### Write small demo FT1 FT2 file
 
 ```{r eval=FALSE}
-header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
-ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
-writeAllScanMS1(header,ft1[1:100],"../rmd/input data format/demo.FT1")
+header <- readFTheader("input data format/ft/Pan_062822_X1iso5.FT1")
+ft1 <- readAllScanMS1("input data format/ft/Pan_062822_X1iso5.FT1")
+writeAllScanMS1(header,ft1[1:100],"input data format/demo.FT1")
 ```
 
 ```{r eval=FALSE}
-header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
-ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
-writeAllScanMS2(header,ft2[1:100],"../rmd/input data format/demo.FT2")
+header <- readFTheader("input data format/ft/Pan_062822_X1iso5.FT2")
+ft2 <- readAllScanMS2("input data format/ft/Pan_062822_X1iso5.FT2")
+writeAllScanMS2(header,ft2[1:100],"input data format/demo.FT2")
 ```
 
 ### Theoretic spectra generation of SIP labeled compound
@@ -127,7 +133,7 @@ plotMolecularFFTisotopes(iso2) +
 
 #### Precursor
 
-```r
+```{r}
 a <- getSipPrecursorSpectra("KHRIPCDRK", "C13", 0.25, 2)
 plot(a)
 ```
@@ -136,7 +142,7 @@ plot(a)
 
 #### B Y ions
 
-```r
+```{r}
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.25, 1:2, 2)
 plot(a)
 ```
@@ -146,7 +152,7 @@ plot(a)
 ### PSM visualization
 
 ```{r}
-psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
+psm <- readPSMtsv("input data format/pct50.psm.txt")
 psm <- arrange(psm, desc(Score))
 # use the same peptide as 1% 13C chunk
 psm1 <- psm[4, ]
@@ -154,7 +160,7 @@ pep <- psm1$OriginalPeptide
 pep <- str_sub(pep, 2, -2)
 pct <- psm1$SearchName
 pct <- as.numeric(str_sub(pct, 5, -4)) / 1000 / 100
-scan1 <- readOneScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2", psm1$ScanNumber)
+scan1 <- readOneScanMS2("input data format/ft/Pan_052322_X13.FT2", psm1$ScanNumber)
 scan1 <- getRealScanFromList(scan1)
 ```
 

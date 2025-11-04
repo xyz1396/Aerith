@@ -21,5 +21,5 @@ Convert one scan in scans with real charges and raw intensities from list of sca
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 a <- readAllScanMS2(demo_file)
 b <- getRealScanWithCharge(1388, a)
-head(b@spectra)
+head(slot(b, "spectra"))
 }

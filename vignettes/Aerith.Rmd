@@ -96,3 +96,7 @@ searches. This format contains specific attributes including:
 
 The `mzml` and `pepXML` formats are also supported through the `mzR` package, while `mgf` files can be parsed using the `MSnbase` package.
 The imported spectra and peptides can be converted to the `AAspectra` class.
+
+```{r session-info}
+sessionInfo()
+```

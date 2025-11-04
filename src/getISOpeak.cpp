@@ -293,6 +293,9 @@ NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector 
 //' @param Atom a CharacterVector C13 or N15
 //' @param Prob a NumericVector for its abundance
 //' @return a list of DataFrames of spectra
+//' @examples
+//' demoSpectra <- precursor_peak_calculator_DIY_averagine(c("PEPTIDE", "ACDEFGHIK"), "C13", 0.25)
+//' demoSpectra[[1]]
 //' @export
 // [[Rcpp::export]]
 List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,

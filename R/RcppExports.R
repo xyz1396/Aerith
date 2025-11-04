@@ -296,6 +296,9 @@ calPepNeutronMass <- function(AAstrs, Atom, Probs) {
 #' @param Atom a CharacterVector C13 or N15
 #' @param Prob a NumericVector for its abundance
 #' @return a list of DataFrames of spectra
+#' @examples
+#' demoSpectra <- precursor_peak_calculator_DIY_averagine(c("PEPTIDE", "ACDEFGHIK"), "C13", 0.25)
+#' demoSpectra[[1]]
 #' @export
 precursor_peak_calculator_DIY_averagine <- function(AAstrs, Atom, Prob) {
     .Call(`_Aerith_precursor_peak_calculator_DIY_averagine`, AAstrs, Atom, Prob)

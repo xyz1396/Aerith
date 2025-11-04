@@ -122,10 +122,10 @@ getSipPrecursorSpectra <-
 #' @examples
 #' # add precursor
 #' a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 2)
-#' tail(a@spectra)
+#' tail(slot(a, "spectra"))
 #' # not add precursor
 #' a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 0)
-#' tail(a@spectra)
+#' tail(slot(a, "spectra"))
 getSipBYionSpectra <-
   function(AAstr,
            Atom = "C13",
@@ -225,7 +225,7 @@ getRealScan <- function(scanNumber, ft) {
 #' demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 #' a <- readAllScanMS2(demo_file)
 #' b <- getRealScanWithCharge(1388, a)
-#' head(b@spectra)
+#' head(slot(b, "spectra"))
 getRealScanWithCharge <- function(scanNumber, ft) {
   scan <- ft[[paste0("", scanNumber)]]
   BYreal <- data.frame(

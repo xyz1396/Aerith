@@ -34,8 +34,8 @@ with labeled SIP abundance
 \examples{
 # add precursor
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 2)
-tail(a@spectra)
+tail(slot(a, "spectra"))
 # not add precursor
 a <- getSipBYionSpectra("KHRIPCDRK", "C13", 0.05, 1:2, 0)
-tail(a@spectra)
+tail(slot(a, "spectra"))
 }

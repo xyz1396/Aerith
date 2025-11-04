@@ -1,0 +1,17 @@
+citHeader("Please cite Aerith using both references below:")
+
+citEntry(
+    entry = "Article",
+    title = "Aerith: Visualization and Annotation of Isotopic Enrichment Patterns of Peptides and Metabolites with Stable Isotope Labeling from Proteomics and Metabolomics",
+    author = personList(
+        person("Yi", "Xiong"),
+        person("Ryan S.", "Mueller"),
+        person("Shichao", "Feng"),
+        person("Xuan", "Guo"),
+        person("Chongle", "Pan")
+    ),
+    journal = "Analytical Chemistry",
+    year = "2025",
+    doi = "10.1021/acs.analchem.5c03207",
+    textVersion = "Xiong Y, Mueller RS, Feng S, Guo X, Pan C (2025). “Aerith: Visualization and Annotation of Isotopic Enrichment Patterns of Peptides and Metabolites with Stable Isotope Labeling from Proteomics and Metabolomics.” Analytical Chemistry. doi:10.1021/acs.analchem.5c03207."
+)

@@ -213,14 +213,14 @@ demo_file <- system.file("extdata", "demo.mzML", package = "Aerith")
 mzml_ms1_data <- readMzmlMS1(demo_file)
 
 # Extract and visualize a specific MS1 scan
-ms1_spectrum <- getRealScan(99, mzml_ms1_data)
+ms1_spectrum <- getRealScan(16, mzml_ms1_data)
 plot(ms1_spectrum)
 
 # Read MS2 data from the same mzML file
 mzml_ms2_data <- readMzmlMS2(demo_file)
 
 # Extract and visualize a specific MS2 scan
-ms2_spectrum <- getRealScan(33, mzml_ms2_data)
+ms2_spectrum <- getRealScan(18, mzml_ms2_data)
 plot(ms2_spectrum)
 ```
 

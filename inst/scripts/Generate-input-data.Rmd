@@ -162,7 +162,7 @@ ms_data <- mzR::openMSfile("../rmd/input data format/mzml/Pan_052322_X13.mzML")
 header <- mzR::header(ms_data)
 scan_indices <- header$seqNum
 start_ix <- 10005
-selected_indices <- (start_ix + 1):(start_ix + 100)
+selected_indices <- (start_ix + 1):(start_ix + 20)
 peaks_list <- mzR::peaks(ms_data, selected_indices)
 selected_header <- header[selected_indices, ]
 selected_header$seqNum <- selected_header$seqNum - start_ix

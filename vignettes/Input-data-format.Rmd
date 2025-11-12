@@ -87,7 +87,9 @@ FT1 and FT2 files represent Thermo Fisher's optimized format for MS1 and MS2 dat
 The following example demonstrates different approaches to reading FT1 (MS1) data. Each function serves a specific purpose depending on your analysis needs:
 
 ```{r ft1-reading}
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
 
 # Read all MS1 scans into memory
 # This approach is memory-intensive but provides fastest access for subsequent operations
@@ -143,7 +145,9 @@ Creating smaller subset files is invaluable for testing workflows, debugging, an
 **Creating MS1 Subset Files:**
 
 ```{r ft1-writing}
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
 
 # Read file header information (essential for maintaining file integrity)
 header <- readFTheader(demo_file)
@@ -394,7 +398,9 @@ Total Ion Current (TIC) analysis provides a comprehensive overview of instrument
 
 ```{r tic-analysis}
 # Analyze TIC from MS1 data
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
 ms1_scans <- readAllScanMS1(demo_file)
 ms1_tic <- getTIC(ms1_scans)
 
@@ -439,7 +445,9 @@ ms2_scan_data <- readAllScanMS2(demo_file)
 ms2_retention_info <- getRetentionTimeAndPrecursorInfo(ms2_scan_data)
 
 # Process MS1 data for comparison
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
 ms1_scan_data <- readAllScanMS1(demo_file)
 ms1_retention_info <- getRetentionTimeAndPrecursorInfo(ms1_scan_data)
 

@@ -19,7 +19,9 @@ get retention time and precursor mass from scans list of ft file
 demo_file <- system.file("extdata", "demo.FT2", package = "Aerith")
 a <- readAllScanMS2(demo_file)
 b <- getRetentionTimeAndPrecursorInfo(a)
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
 a <- readAllScanMS1(demo_file)
 b <- getRetentionTimeAndPrecursorInfo(a)
 }

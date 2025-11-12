@@ -20,6 +20,8 @@ a list of MS1 scans with names of scan number
 read MS1 scans with scanNumber as index in a range
 }
 \examples{
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
 ft1 <- readScansMS1(demo_file, 1398, 1503)
 }

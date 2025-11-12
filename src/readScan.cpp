@@ -35,7 +35,9 @@ List readOneScanMS2(const String &ftFile, const size_t scanNumber) {
 //' @param scanNumber the scan at scanNumber
 //' @return a list of MS1 scan
 //' @examples
-//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+//' demo_file <- tempfile(fileext = ".FT1")
+//' writeLines(readRDS(rds), demo_file)
 //' ft1 <- readOneScanMS1(demo_file, 1588)
 //' @export
 // [[Rcpp::export]]

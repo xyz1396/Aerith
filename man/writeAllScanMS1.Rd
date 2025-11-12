@@ -20,7 +20,9 @@ TRUE if the file was written successfully, FALSE otherwise
 write all MS1 scans has charge
 }
 \examples{
-demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
 header <- readFTheader(demo_file)
 ft1 <- readAllScanMS1(demo_file)
 tmp <- tempdir()

@@ -13,9 +13,9 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.width = 10
+    collapse = TRUE,
+    comment = "#>",
+    fig.width = 10
 )
 ```
 
@@ -71,8 +71,8 @@ ft1 <- readScansMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1", 10430, 
 ft1 <- getRealScanFromList(ft1[[1]])
 plot(ft1)
 ft1 <- readScansMS1Vector(
-  "../rmd/input data format/ft/Pan_062822_X1iso5.FT1",
-  c(10444, 10469, 10485)
+    "../rmd/input data format/ft/Pan_062822_X1iso5.FT1",
+    c(10444, 10469, 10485)
 )
 ft1 <- getRealScanFromList(ft1[[1]])
 plot(ft1)
@@ -81,8 +81,8 @@ ft2 <- readScansMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2", 10487, 
 ft2 <- getRealScanFromList(ft2[[1]])
 plot(ft2)
 ft2 <- readScansMS2Vector(
-  "../rmd/input data format/ft/Pan_062822_X1iso5.FT2",
-  c(10488, 10490, 10493)
+    "../rmd/input data format/ft/Pan_062822_X1iso5.FT2",
+    c(10488, 10490, 10493)
 )
 ft2 <- getRealScanFromList(ft2[[1]])
 plot(ft2)
@@ -106,15 +106,24 @@ plot(ft1)
 header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
 ft1 <- readAllScanMS1("../rmd/input data format/ft/Pan_062822_X1iso5.FT1")
 a <- getRetentionTimeAndPrecursorInfo(ft1)
-a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
+a <- a[a$RetentionTime > 9 & a$RetentionTime < 10, ]
 writeAllScanMS1(header, ft1[as.character(a$ScanNumber)], "../rmd/input data format/demo.FT1")
 b <- readAllScanMS1("../rmd/input data format/demo.FT1")
+
+saveRDS(
+    readLines("../rmd/input data format/demo.FT1"),
+    "../rmd/input data format/demo.FT1.rds"
+)
+rds <- "../rmd/input data format/demo.FT1.rds"
+demo_file <- tempfile(fileext = ".FT1")
+writeLines(readRDS(rds), demo_file)
+b <- readAllScanMS1(demo_file)
 ```
 
 ```{r eval=FALSE}
 header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT1")
 ft1 <- readOneScanMS1("../rmd/input data format/ft/Pan_052322_X13.FT1", 2559)
-writeAllScanMS1(header, list("2559"=ft1), "../rmd/input data format/X13_2559.FT1")
+writeAllScanMS1(header, list("2559" = ft1), "../rmd/input data format/X13_2559.FT1")
 b <- readAllScanMS1("../rmd/input data format/X13_2559.FT1")
 ```
 
@@ -122,7 +131,7 @@ b <- readAllScanMS1("../rmd/input data format/X13_2559.FT1")
 header <- readFTheader("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
 ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_062822_X1iso5.FT2")
 a <- getRetentionTimeAndPrecursorInfo(ft2)
-a <- a[a$RetentionTime>9 & a$RetentionTime<10,]
+a <- a[a$RetentionTime > 9 & a$RetentionTime < 10, ]
 writeAllScanMS2(header, ft2[as.character(a$ScanNumber)], "../rmd/input data format/demo.FT2")
 b <- readAllScanMS2("../rmd/input data format/demo.FT2")
 ```
@@ -130,8 +139,10 @@ b <- readAllScanMS2("../rmd/input data format/demo.FT2")
 ```{r eval=FALSE, include=FALSE}
 header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT2")
 ft2 <- readAllScanMS2("../rmd/input data format/ft/Pan_052322_X13.FT2")
-writeAllScanMS2(header, ft2[c("4068","2596","8182")],
-                "../rmd/input data format/X13_4068_2596_8182.FT2")
+writeAllScanMS2(
+    header, ft2[c("4068", "2596", "8182")],
+    "../rmd/input data format/X13_4068_2596_8182.FT2"
+)
 a <- readAllScanMS2("../rmd/input data format/X13_4068_2596_8182.FT2")
 ```
 
@@ -160,9 +171,9 @@ selected_header$precursorScanNum <- selected_header$precursorScanNum - start_ix
 # first 5 ms2 scans' precursor is 9995, convert it to 10005
 selected_header$precursorScanNum[2:6] <- 1
 mzR::writeMSData(
-  peaks_list,
-  file = "../rmd/input data format/demo.mzML",
-  header = selected_header
+    peaks_list,
+    file = "../rmd/input data format/demo.mzML",
+    header = selected_header
 )
 mzR::close(ms_data)
 mzml1 <- readMzmlMS1("../rmd/input data format/demo.mzML")
@@ -233,11 +244,11 @@ psm <- readPSMtsv("../rmd/input data format/pct50.psm.txt")
 set.seed(9527)
 psm2 <- psm[sample(nrow(psm), 2000), ]
 write.table(psm2, "../rmd/input data format/demo.psm.txt",
-  sep = "\t", row.names = FALSE, quote = FALSE
+    sep = "\t", row.names = FALSE, quote = FALSE
 )
 
 # top 3 in demo in X13
-psm2 <- psm2[psm2$Filename=="Pan_052322_X13.FT2",]
+psm2 <- psm2[psm2$Filename == "Pan_052322_X13.FT2", ]
 psm2 <- arrange(psm2, desc(Score))
 # 4068 2596 8182
 psm2$"ScanNumber"[1:3]
@@ -252,7 +263,7 @@ pro <- pro[sample(nrow(pro), 2000), ]
 colnames(pro)[1] <- ""
 writeLines(header, "../rmd/input data format/demo.pro.cluster.txt")
 write.table(pro, "../rmd/input data format/demo.pro.cluster.txt",
-  sep = "\t", row.names = FALSE, quote = FALSE, append = T
+    sep = "\t", row.names = FALSE, quote = FALSE, append = T
 )
 # test
 pro <- readPSMtsv("../rmd/input data format/demo.pro.cluster.txt")
@@ -266,7 +277,7 @@ set.seed(9527)
 sip <- sip[sample(nrow(sip), 2000), ]
 writeLines(header, "../rmd/input data format/demo.sip")
 write.table(sip, "../rmd/input data format/demo.sip",
-  sep = "\t", row.names = FALSE, quote = FALSE, append = T
+    sep = "\t", row.names = FALSE, quote = FALSE, append = T
 )
 # test
 sip <- readPSMtsv("../rmd/input data format/demo.sip")
@@ -274,66 +285,66 @@ sip <- readPSMtsv("../rmd/input data format/demo.sip")
 
 ```{r spe2pep.txt, eval=FALSE, include=FALSE}
 parse_chunks <- function(filepath) {
-  lines <- readLines(filepath)
-  # Find the first '+', marking the start of data
-  start_idx <- which(startsWith(lines[seq_len(300)], "+"))[1]
-  if (is.na(start_idx)) stop("No data section found.")
-  header <- lines[1:(start_idx - 1)]
-  data_lines <- lines[start_idx:length(lines)]
-  
-  # Parse chunks: each '+' line and its following '*' lines
-  chunks <- list()
-  i <- 1
-  while (i <= length(data_lines)) {
-    if (startsWith(data_lines[i], "+")) {
-      chunk <- data_lines[i]
-      j <- i + 1
-      while (j <= length(data_lines) && startsWith(data_lines[j], "*")) {
-        chunk <- c(chunk, data_lines[j])
-        j <- j + 1
-      }
-      chunks[[length(chunks) + 1]] <- chunk
-      i <- j
-    } else {
-      i <- i + 1
+    lines <- readLines(filepath)
+    # Find the first '+', marking the start of data
+    start_idx <- which(startsWith(lines[seq_len(300)], "+"))[1]
+    if (is.na(start_idx)) stop("No data section found.")
+    header <- lines[1:(start_idx - 1)]
+    data_lines <- lines[start_idx:length(lines)]
+
+    # Parse chunks: each '+' line and its following '*' lines
+    chunks <- list()
+    i <- 1
+    while (i <= length(data_lines)) {
+        if (startsWith(data_lines[i], "+")) {
+            chunk <- data_lines[i]
+            j <- i + 1
+            while (j <= length(data_lines) && startsWith(data_lines[j], "*")) {
+                chunk <- c(chunk, data_lines[j])
+                j <- j + 1
+            }
+            chunks[[length(chunks) + 1]] <- chunk
+            i <- j
+        } else {
+            i <- i + 1
+        }
     }
-  }
-  return(list(header = header, chunks = chunks))
+    return(list(header = header, chunks = chunks))
 }
 
 subsample_and_write_chunks <- function(parsed, out_file, n = 50, seed = 42) {
-  header <- parsed$header
-  chunks <- parsed$chunks
-  set.seed(seed)
-  n_sub <- min(n, length(chunks) - 1)
-  selected <- sample(chunks[-1], n_sub)
-  writeLines(header, out_file)
-  con <- file(out_file, "a")
-  writeLines(chunks[[1]], con)
-  for (chunk in selected) {
-    writeLines(chunk, con)
-  }
-  close(con)
+    header <- parsed$header
+    chunks <- parsed$chunks
+    set.seed(seed)
+    n_sub <- min(n, length(chunks) - 1)
+    selected <- sample(chunks[-1], n_sub)
+    writeLines(header, out_file)
+    con <- file(out_file, "a")
+    writeLines(chunks[[1]], con)
+    for (chunk in selected) {
+        writeLines(chunk, con)
+    }
+    close(con)
 }
 
 write_chunks_continus <- function(parsed, out_file, start = 10000, len = 100) {
-  header <- parsed$header
-  chunks <- parsed$chunks
-  writeLines(header, out_file)
-  con <- file(out_file, "a")
-  # for annotation
-  writeLines(chunks[[1]], con)
-  start <- start + 1
-  for (i in seq(start, start + len - 1)) {
-    writeLines(chunks[[i]], con)
-  }
-  close(con)
+    header <- parsed$header
+    chunks <- parsed$chunks
+    writeLines(header, out_file)
+    con <- file(out_file, "a")
+    # for annotation
+    writeLines(chunks[[1]], con)
+    start <- start + 1
+    for (i in seq(start, start + len - 1)) {
+        writeLines(chunks[[i]], con)
+    }
+    close(con)
 }
 
 target <- parse_chunks("../rmd/input data format/X13target.Spe2Pep.txt")
 write_chunks_continus(
-  target,
-  "../rmd/input data format/demo_target.Spe2Pep.txt"
+    target,
+    "../rmd/input data format/demo_target.Spe2Pep.txt"
 )
 target <- readSpe2Pep("../rmd/input data format/demo_target.Spe2Pep.txt")
 range(target$PSM$precursorScanNumbers)
@@ -341,21 +352,23 @@ length(unique(target$PSM$scanNumbers))
 
 decoy <- parse_chunks("../rmd/input data format/X13decoy.Spe2Pep.txt")
 write_chunks_continus(
-  decoy,
-  "../rmd/input data format/demo_decoy.Spe2Pep.txt"
+    decoy,
+    "../rmd/input data format/demo_decoy.Spe2Pep.txt"
 )
 decoy <- readSpe2Pep("../rmd/input data format/demo_decoy.Spe2Pep.txt")
 range(decoy$PSM$precursorScanNumbers)
 
 header <- readFTheader("../rmd/input data format/ft/Pan_052322_X13.FT1")
 # precursor may exist in scans before precursor scan
-ms1 <- readScansMS1("../rmd/input data format/ft/Pan_052322_X13.FT1",
-                          12666, 12888)
+ms1 <- readScansMS1(
+    "../rmd/input data format/ft/Pan_052322_X13.FT1",
+    12666, 12888
+)
 writeAllScanMS1(header, ms1, "../rmd/input data format/demo_target_decoy.FT1")
 ms1 <- readAllScanMS1("../rmd/input data format/demo_target_decoy.FT1")
 file_content <- readLines("../rmd/input data format/demo_target_decoy.FT1")
 saveRDS(file_content, "../rmd/input data format/demo_target_decoy.FT1.rds")
-file_content<- readRDS("../rmd/input data format/demo_target_decoy.FT1.rds")
+file_content <- readRDS("../rmd/input data format/demo_target_decoy.FT1.rds")
 ```
 
 ### TIC visualization

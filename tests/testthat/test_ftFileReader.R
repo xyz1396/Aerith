@@ -1,7 +1,9 @@
 context("readScansMS1")
 
 test_that("readScansMS1 works", {
-    demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+    rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+    demo_file <- tempfile(fileext = ".FT1")
+    writeLines(readRDS(rds), demo_file)
     ft1 <- readOneScanMS1(demo_file, 1588)
     expect_true(nrow(ft1$peaks) > 8)
 })

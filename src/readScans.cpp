@@ -7,7 +7,9 @@ using namespace Rcpp;
 //' @param ftFile a ft1 file's full path
 //' @return a list of ft file header
 //' @examples
-//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+//' demo_file <- tempfile(fileext = ".FT1")
+//' writeLines(readRDS(rds), demo_file)
 //' header <- readFTheader(demo_file)
 //' @export
 // [[Rcpp::export]]
@@ -29,7 +31,9 @@ List readFTheader(String ftFile)
 //' @param endScanNumber read scans ending at this scanNumber
 //' @return a list of MS1 scans with names of scan number
 //' @examples
-//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+//' demo_file <- tempfile(fileext = ".FT1")
+//' writeLines(readRDS(rds), demo_file)
 //' ft1 <- readScansMS1(demo_file, 1398, 1503)
 //' @export
 // [[Rcpp::export]]
@@ -69,7 +73,9 @@ List readScansMS1(const String ftFile, const size_t startScanNumber, const size_
 //' @param scanNumbersVector a NumericVector of scan numbers
 //' @return A named list of MS1 scans with names of scan number. The names of the list correspond to the scan numbers.
 //' @examples
-//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+//' demo_file <- tempfile(fileext = ".FT1")
+//' writeLines(readRDS(rds), demo_file)
 //' ft1 <- readScansMS1Vector(demo_file, c(1398, 1503, 1508))
 //' @export
 // [[Rcpp::export]]
@@ -109,7 +115,9 @@ List readScansMS1Vector(const String ftFile, const NumericVector scanNumbersVect
 //' @param ftFile a ft1 file's full path
 //' @return a list of MS1 scans with names of scan number
 //' @examples
-//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+//' demo_file <- tempfile(fileext = ".FT1")
+//' writeLines(readRDS(rds), demo_file)
 //' ft1 <- readAllScanMS1(demo_file)
 //' @export
 // [[Rcpp::export]]

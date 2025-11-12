@@ -60,7 +60,9 @@ List denoiseOneMS2ScanHasCharge(List scanList, float window, float step,
 //' @param ftFile a ft1 file's output path
 //' @return TRUE if the file was written successfully, FALSE otherwise
 //' @examples
-//' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+//' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+//' demo_file <- tempfile(fileext = ".FT1")
+//' writeLines(readRDS(rds), demo_file)
 //' header <- readFTheader(demo_file)
 //' ft1 <- readAllScanMS1(demo_file)
 //' tmp <- tempdir()

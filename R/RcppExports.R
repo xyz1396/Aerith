@@ -336,7 +336,9 @@ readOneScanMS2 <- function(ftFile, scanNumber) {
 #' @param scanNumber the scan at scanNumber
 #' @return a list of MS1 scan
 #' @examples
-#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+#' demo_file <- tempfile(fileext = ".FT1")
+#' writeLines(readRDS(rds), demo_file)
 #' ft1 <- readOneScanMS1(demo_file, 1588)
 #' @export
 readOneScanMS1 <- function(ftFile, scanNumber) {
@@ -347,7 +349,9 @@ readOneScanMS1 <- function(ftFile, scanNumber) {
 #' @param ftFile a ft1 file's full path
 #' @return a list of ft file header
 #' @examples
-#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+#' demo_file <- tempfile(fileext = ".FT1")
+#' writeLines(readRDS(rds), demo_file)
 #' header <- readFTheader(demo_file)
 #' @export
 readFTheader <- function(ftFile) {
@@ -360,7 +364,9 @@ readFTheader <- function(ftFile) {
 #' @param endScanNumber read scans ending at this scanNumber
 #' @return a list of MS1 scans with names of scan number
 #' @examples
-#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+#' demo_file <- tempfile(fileext = ".FT1")
+#' writeLines(readRDS(rds), demo_file)
 #' ft1 <- readScansMS1(demo_file, 1398, 1503)
 #' @export
 readScansMS1 <- function(ftFile, startScanNumber, endScanNumber) {
@@ -372,7 +378,9 @@ readScansMS1 <- function(ftFile, startScanNumber, endScanNumber) {
 #' @param scanNumbersVector a NumericVector of scan numbers
 #' @return A named list of MS1 scans with names of scan number. The names of the list correspond to the scan numbers.
 #' @examples
-#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+#' demo_file <- tempfile(fileext = ".FT1")
+#' writeLines(readRDS(rds), demo_file)
 #' ft1 <- readScansMS1Vector(demo_file, c(1398, 1503, 1508))
 #' @export
 readScansMS1Vector <- function(ftFile, scanNumbersVector) {
@@ -383,7 +391,9 @@ readScansMS1Vector <- function(ftFile, scanNumbersVector) {
 #' @param ftFile a ft1 file's full path
 #' @return a list of MS1 scans with names of scan number
 #' @examples
-#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+#' demo_file <- tempfile(fileext = ".FT1")
+#' writeLines(readRDS(rds), demo_file)
 #' ft1 <- readAllScanMS1(demo_file)
 #' @export
 readAllScanMS1 <- function(ftFile) {
@@ -749,7 +759,9 @@ denoiseOneMS2ScanHasCharge <- function(scanList, window, step, threshold) {
 #' @param ftFile a ft1 file's output path
 #' @return TRUE if the file was written successfully, FALSE otherwise
 #' @examples
-#' demo_file <- system.file("extdata", "demo.FT1", package = "Aerith")
+#' rds <- system.file("extdata", "demo.FT1.rds", package = "Aerith")
+#' demo_file <- tempfile(fileext = ".FT1")
+#' writeLines(readRDS(rds), demo_file)
 #' header <- readFTheader(demo_file)
 #' ft1 <- readAllScanMS1(demo_file)
 #' tmp <- tempdir()

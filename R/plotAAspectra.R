@@ -480,3 +480,216 @@ plotPSMannotation <- function(observedSpect, pep, Atom, Prob, charges,
     }
     return(p)
 }
+
+#' plot precursor annotation
+#'
+#' @param observedSpect AAspectra object of precursor scan
+#' @param pep peptide sequence
+#' @param charge precursor charge in consideration
+#' @param Atom SIP labeled atom "13C" or "15N" for exmaple
+#' @param Prob its SIP abundance (0.0~1.0)
+#' @param isoCenter isolation window center. Defaults to the center of
+#'   `observedSpect` when `0`.
+#' @param isoWidth isolation window width. Defaults to the m/z span of
+#'   `observedSpect` when `0`.
+#' @param ifRemoveNotFoundIon set it FALSE as default
+#' @param ifShowPrecursorChargeAnnotation Logical. If TRUE, show precursor charge
+#'   annotation labels with ggrepel. Default TRUE.
+#' @param ifShowIsoCenter Logical. If TRUE, show `isoCenter` as a black dashed
+#'   vertical reference line. Default TRUE.
+#' @param ifShowIsoWindow Logical. If TRUE, show grey dashed vertical lines at
+#'   isolation window boundaries (`isoCenter ± isoWidth/2`). Default TRUE.
+#' @param ifAdjustSIPabundance Logical. If TRUE, estimate and re-fit SIP
+#'   abundance from initial precursor annotation. Default TRUE.
+#' @param breakSize Numeric multiplier for isolation window to compute x-axis
+#'   break step. Default is 1/5.
+#' @param linewidth Numeric width of peaks. Default 0.3.
+#' @return ggplot2 layer
+#' @export
+#'
+#' @examples
+#' realMZ <- c(
+#'   894.9413, 895.4429, 895.9444, 896.3896, 896.4448, 896.9463,
+#'   897.3890, 897.8896, 898.3930, 898.4734, 901.8851, 902.4465,
+#'   902.9483, 903.4498, 903.9504, 910.8968, 911.4449, 912.3784
+#' )
+#' realIntensity <- c(
+#'   16660537.0, 12344664.0, 6128400.5, 1448961.1, 1614148.1, 713238.8,
+#'   1999402.4, 1124157.4, 567865.2, 647140.8, 709644.2, 7805729.0,
+#'   8421993.0, 3200114.2, 1286055.5, 620246.8, 540861.6, 1079918.5
+#' )
+#' realCharge <- c(2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 0, 0, 2)
+#' scan <- list(
+#'   peaks = data.frame(
+#'     mz = realMZ,
+#'     intensity = realIntensity,
+#'     charge = realCharge
+#'   ),
+#'   precursorCharges = 2
+#' )
+#' observedSP <- getRealScanFromList(scan)
+#' p <- plotPrecursorAnnotation(
+#'   observedSpect = observedSP,
+#'   pep = "GITINTSHVEYDTPTR", charge = 2,
+#'   Atom = "C13", Prob = 0.01,
+#'   isoCenter = 902.4471, isoWidth = 5.0, xwidth = 20.0,
+#'   ifRemoveNotFoundIon = TRUE
+#' )
+#' p
+plotPrecursorAnnotation <- function(observedSpect, pep, charge,
+                                    Atom, Prob,
+                                    isoCenter = 0, isoWidth = 0, xwidth = 0,
+                                    ifRemoveNotFoundIon = FALSE,
+                                    ifShowPrecursorChargeAnnotation = TRUE,
+                                    ifShowIsoCenter = TRUE,
+                                    ifShowIsoWindow = TRUE,
+                                    ifAdjustSIPabundance = TRUE,
+                                    breakSize = 1 / 5,
+                                    linewidth = 0.3) {
+    original_xwidth <- xwidth
+    original_isoCenter <- isoCenter
+    observedMass <- observedSpect@spectra$Mass
+    if (isoCenter == 0) {
+        isoCenter <- mean(range(observedMass, na.rm = TRUE))
+    }
+    if (xwidth == 0) {
+        xwidth <- diff(range(observedMass, na.rm = TRUE))
+    }
+
+    anno <- annotatePrecursor(
+        observedSpect@spectra$Mass, observedSpect@spectra$Prob,
+        observedSpect@spectra$Charge,
+        pep, charge, Atom, Prob, isoCenter, xwidth
+    )
+    if (ifAdjustSIPabundance) {
+        message(paste(
+            "Before adjust", Atom, "abundance:",
+            round(Prob * 100, 4), "%"
+        ))
+        adjustedProb <- anno$ExpectedPrecursorIons$SIPabundances
+        adjustedProb <- adjustedProb[is.finite(adjustedProb) & adjustedProb > 0]
+        if (length(adjustedProb) > 0) {
+            adjustedProb <- stats::median(adjustedProb) / 100
+            message(paste(
+                "Adjust", Atom, "abundance:",
+                round(adjustedProb * 100, 4), "%"
+            ))
+            anno <- annotatePrecursor(
+                observedSpect@spectra$Mass, observedSpect@spectra$Prob,
+                observedSpect@spectra$Charge,
+                pep, charge, Atom, adjustedProb, isoCenter, xwidth
+            )
+        }
+    }
+
+    realPeaks <- anno$RealPeaks
+    colnames(realPeaks) <- c("MZ", "Prob", "Charge")
+    realPeaks$Prob <- realPeaks$Prob / max(realPeaks$Prob) * 100
+    realPeaks$Kind <- "Unmatched"
+    matchedIX <- anno$ExpectedPrecursorIons$
+        matchedIndices[anno$ExpectedPrecursorIons$matchedIndices != -1] + 1
+    realPeaks$Kind[matchedIX] <- "Matched"
+    observedSP <- new("AAspectra",
+        spectra = realPeaks,
+        charges = 1,
+        AAstr = pep
+    )
+
+    expectedSP <- data.frame(
+        Mass = anno$ExpectedPrecursorIons$mz,
+        MZ = anno$ExpectedPrecursorIons$mz,
+        Prob = anno$ExpectedPrecursorIons$intensity,
+        Charge = anno$ExpectedPrecursorIons$charge,
+        Kind = "Precursor"
+    )
+    if (ifRemoveNotFoundIon) {
+        expectedSP <- expectedSP[anno$ExpectedPrecursorIons$matchedIndices != -1, ]
+    }
+    expectedSP <- expectedSP[expectedSP$MZ < 2000, ]
+    expectedSP$Prob <- expectedSP$Prob / max(expectedSP$Prob) * 100
+    expectedSP <- new("AAspectra",
+        spectra = expectedSP,
+        charges = 1,
+        AAstr = pep
+    )
+
+    # Recalculate isoCenter and xwidth if they were originally 0, now considering both datasets
+    if (original_isoCenter == 0) {
+        allMZ <- c(observedSP@spectra$MZ, expectedSP@spectra$MZ)
+        isoCenter <- mean(range(allMZ, na.rm = TRUE))
+    }
+    if (original_xwidth == 0) {
+        allMZ <- c(observedSP@spectra$MZ, expectedSP@spectra$MZ)
+        xwidth <- diff(range(allMZ, na.rm = TRUE))
+    }
+
+    p <- plot(expectedSP, linewidth = linewidth)
+    if (ifShowIsoCenter && is.finite(isoCenter)) {
+        isoCenterLayer <- ggplot2::geom_vline(
+            xintercept = isoCenter,
+            linewidth = linewidth,
+            linetype = "dashed",
+            color = "black"
+        )
+        p$layers <- c(list(isoCenterLayer), p$layers)
+    }
+    if (ifShowIsoWindow && isoWidth > 0 && is.finite(isoCenter)) {
+        isoWindowLayers <- list(
+            ggplot2::geom_vline(
+                xintercept = isoCenter - isoWidth / 2,
+                linewidth = linewidth,
+                linetype = "dashed",
+                color = "#414040"
+            ),
+            ggplot2::geom_vline(
+                xintercept = isoCenter + isoWidth / 2,
+                linewidth = linewidth,
+                linetype = "dashed",
+                color = "#414040"
+            )
+        )
+        p$layers <- c(isoWindowLayers, p$layers)
+    }
+    if (ifShowPrecursorChargeAnnotation) {
+        p <- p + plotSipBYionLabel(expectedSP)
+    }
+    p <- p + ggplot2::guides(color = ggplot2::guide_legend(
+        override.aes = list(linewidth = 5, fill = NA)
+    ))
+    p <- p + plotRealScan(observedSP, linewidth = linewidth)
+    if (xwidth > 0) {
+        breakStep <- xwidth * breakSize
+        if (breakStep <= 0) {
+            breakStep <- xwidth / 2
+        }
+        xLimits <- c(isoCenter - xwidth / 2, isoCenter + xwidth / 2)
+        xMin <- xLimits[1]
+        xMax <- xLimits[2]
+        nLeft <- ceiling((isoCenter - xMin) / breakStep)
+        nRight <- ceiling((xMax - isoCenter) / breakStep)
+        breaks <- isoCenter + seq(-nLeft, nRight) * breakStep
+        # Add isolation window boundaries to breaks if shown
+        if (ifShowIsoWindow && isoWidth > 0 && is.finite(isoCenter)) {
+            breaks <- c(breaks, isoCenter - isoWidth / 2, isoCenter + isoWidth / 2)
+            breaks <- sort(unique(round(breaks, 4)))
+        }
+        # Keep breaks within plot limits so all requested breaks are visible
+        breaks <- breaks[breaks >= xLimits[1] & breaks <= xLimits[2]]
+        p <- p + ggplot2::scale_x_continuous(
+            breaks = breaks,
+            labels = function(x) sprintf("%.1f", x),
+            limits = xLimits
+        )
+    }
+    p <- p + ggplot2::scale_color_manual(
+        name = "Kind",
+        breaks = c("Precursor", "Matched", "Unmatched"),
+        values = c(
+            "Precursor" = "#1F78B4",
+            "Matched" = "red",
+            "Unmatched" = "grey"
+        )
+    )
+    return(p)
+}
+

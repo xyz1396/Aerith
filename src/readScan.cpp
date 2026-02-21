@@ -12,7 +12,8 @@ using namespace Rcpp;
 //' ft2 <- readOneScanMS2(demo_file, 1633)
 //' @export
 // [[Rcpp::export]]
-List readOneScanMS2(const String &ftFile, const size_t scanNumber) {
+List readOneScanMS2(const String &ftFile, const size_t scanNumber)
+{
     ftFileReader reader(ftFile);
     Scan mScan = reader.readOneScan(scanNumber);
     DataFrame peakDf = DataFrame::create(
@@ -26,6 +27,7 @@ List readOneScanMS2(const String &ftFile, const size_t scanNumber) {
         _["precursorCharge"] = mScan.precursorCharge,
         _["isolationWindowCenterMZ"] = mScan.isolationWindowCenterMZ,
         _["TIC"] = mScan.TIC, _["precursorCharges"] = mScan.precursorCharges,
+        _["scanType"] = mScan.scanType, _["scanFilter"] = mScan.scanFilter,
         _["precursorMZs"] = mScan.precursorMZs, _["peaks"] = std::move(peakDf));
     return mScanList;
 }
@@ -41,7 +43,8 @@ List readOneScanMS2(const String &ftFile, const size_t scanNumber) {
 //' ft1 <- readOneScanMS1(demo_file, 1588)
 //' @export
 // [[Rcpp::export]]
-List readOneScanMS1(const String &ftFile, const size_t scanNumber) {
+List readOneScanMS1(const String &ftFile, const size_t scanNumber)
+{
     ftFileReader reader(ftFile);
     Scan mScan = reader.readOneScan(scanNumber);
     DataFrame peakDf = DataFrame::create(
@@ -50,6 +53,9 @@ List readOneScanMS1(const String &ftFile, const size_t scanNumber) {
         _["signalToNoise"] = mScan.signalToNoise, _["charge"] = mScan.charge);
     List mScanList = List::create(Named("scanNumber") = mScan.scanNumber,
                                   _["retentionTime"] = mScan.retentionTime,
-                                  _["TIC"] = mScan.TIC, _["peaks"] = peakDf);
+                                  _["TIC"] = mScan.TIC,
+                                  _["scanType"] = mScan.scanType,
+                                  _["scanFilter"] = mScan.scanFilter,
+                                  _["peaks"] = peakDf);
     return mScanList;
 }

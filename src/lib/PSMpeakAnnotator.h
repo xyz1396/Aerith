@@ -12,10 +12,14 @@ class PSMpeakAnnotator
 public:
     enum ionKind
     {
+        // for fragment ions
         B,
         BisotopicPeak,
         Y,
-        YisotopicPeak
+        YisotopicPeak,
+        // for precursor ions
+        P,
+        PisotopicPeak
     };
     struct ionMatch
     {
@@ -35,6 +39,12 @@ public:
                     // charges of BY ions in consideration
                     const std::vector<int> &charges, const double isoCenter = 0, 
                     const double isoWidth = 0, const bool calScores = false);
+    // analyze precursor isotopic envelope
+    // realScan should be MS1 scan 
+    void analyzePrecursor(const std::string &peptide, Scan *realScan,
+                    const int charge, const double isoCenter = 0, 
+                    const double isoWidth = 0, const bool calScores = false
+    );
     double getScore();
     double getMatchedSpectraEntropyScore();
     std::vector<int> getMatchedIndices();
@@ -53,6 +63,8 @@ private:
     std::string peptide;
     averagine mAveragine = averagine();
     Scan *realScan;
+    double precursorBaseMass = 0.0;
+    int precursorSIPatomCount = 0;
     // unit is ppm
     double tolerancePPM = 10;
     double matchedSpectraEntropyScore = 0, Score = 0, MVHscore = 0, WDPscore = 0, XcorrScore = 0;
@@ -62,7 +74,7 @@ private:
     std::vector<double> expectedMZs, expectedIntensities;
     std::vector<int> expectedCharges;
     std::vector<ionKind> ionKinds;
-    // residue position of BY ions
+    // residue position of BY/P ions
     std::vector<int> residuePositions, matchedIndices;
     // SIP abundance from BY ion isotopic envelope by binomial distribution estimation
     std::vector<double> SIPabundances;
@@ -72,6 +84,7 @@ private:
 
     void generateTheoreticalSpectra(const std::string &peptide);
     void removePeaksInIsolationWindow(Scan *mScan, const double isoCenter, const double isoWidth);
+    void keepPeaksInIsolationWindow(Scan *mScan, const double isoCenter, const double isoWidth);
     size_t binarySearchPeak(const Scan *mScan, double Mz);
     void findIsotopicPeaks(const std::vector<double> &ionMasses,
                            const std::vector<double> &ionIntensities,

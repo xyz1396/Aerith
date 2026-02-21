@@ -22,6 +22,27 @@ void PSMpeakAnnotator::removePeaksInIsolationWindow(Scan *mScan, const double is
     }
 }
 
+void PSMpeakAnnotator::keepPeaksInIsolationWindow(Scan *mScan, const double isoCenter, const double isoWidth)
+{
+    const double lowerMz = isoCenter - isoWidth / 2.0;
+    const double upperMz = isoCenter + isoWidth / 2.0;
+    std::vector<size_t> positions;
+    positions.reserve(mScan->mz.size());
+    for (size_t i = 0; i < mScan->mz.size(); ++i)
+    {
+        if (mScan->mz[i] < lowerMz || mScan->mz[i] > upperMz)
+        {
+            positions.push_back(i);
+        }
+    }
+    for (auto it = positions.rbegin(); it != positions.rend(); ++it)
+    {
+        mScan->mz.erase(mScan->mz.begin() + *it);
+        mScan->intensity.erase(mScan->intensity.begin() + *it);
+        mScan->charge.erase(mScan->charge.begin() + *it);
+    }
+}
+
 void PSMpeakAnnotator::generateTheoreticalSpectra(const std::string &peptide)
 {
     std::string pepStr = "[" + peptide + "]";
@@ -138,8 +159,16 @@ void PSMpeakAnnotator::
     double highestPeakMZ = ionMZs[highestExpectedPeakIX];
     size_t highestObservedPeakIX = binarySearchPeak(mScan, highestPeakMZ);
     std::vector<double> ionCharges(ionMasses.size(), charge);
-    std::vector<ionKind> mIonKinds(ionMasses.size(),
-                                   (BYkind == B) ? BisotopicPeak : YisotopicPeak);
+    ionKind isotopicPeakKind = BisotopicPeak;
+    if (BYkind == Y)
+    {
+        isotopicPeakKind = YisotopicPeak;
+    }
+    else if (BYkind == P)
+    {
+        isotopicPeakKind = PisotopicPeak;
+    }
+    std::vector<ionKind> mIonKinds(ionMasses.size(), isotopicPeakKind);
     mIonKinds[highestExpectedPeakIX] = BYkind;
     std::vector<int> mPositions(ionMasses.size(), residuePosition);
     std::vector<int> mMatchedIndices(ionMasses.size(), -1);
@@ -206,10 +235,15 @@ void PSMpeakAnnotator::
             pct = calSIPabundancesOfBYion(mAveragine.BionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
                                         mAveragine.BionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
         }
-        else
+        else if (BYkind == Y)
         {
             pct = calSIPabundancesOfBYion(mAveragine.YionsBaseMasses[residuePosition - 1], mMatchedIndices, mScan,
                                         mAveragine.YionsAtomCounts[residuePosition - 1][mAveragine.SIPatomIX], charge);
+        }
+        else if (BYkind == P && precursorSIPatomCount > 0)
+        {
+            pct = calSIPabundancesOfBYion(precursorBaseMass, mMatchedIndices, mScan,
+                                          precursorSIPatomCount, charge);
         }
     }
     std::vector<double> pcts(mMatchedIndices.size(), -1);
@@ -230,7 +264,6 @@ void PSMpeakAnnotator::
 
 void PSMpeakAnnotator::matchIsotopicEnvelopes(Scan *mRealScan, const int charge)
 {
-    realScan = mRealScan;
     for (size_t i = 0; i < vvdBionMass.size(); i++)
     {
         findIsotopicPeaks(vvdBionMass[i], vvdBionProb[i], mRealScan, i + 1, charge, B);
@@ -529,6 +562,7 @@ void PSMpeakAnnotator::analyzePSM(const std::string &peptide, Scan *realScan,
                                   const std::vector<int> &charges,
                                   const double isoCenter, const double isoWidth, const bool calScores)
 {
+    this->realScan = realScan;
     if (isoCenter != 0 && isoWidth != 0)
         removePeaksInIsolationWindow(realScan, isoCenter, isoWidth);
     generateTheoreticalSpectra(peptide);
@@ -542,6 +576,26 @@ void PSMpeakAnnotator::analyzePSM(const std::string &peptide, Scan *realScan,
         calMVHscore();
         calWDPscore();
         calXcorrScore();
+        calMatchedSpectraEntropyScore();
+    }
+}
+
+void PSMpeakAnnotator::analyzePrecursor(const std::string &peptide, Scan *realScan,
+                                  const int charge, const double isoCenter, const double isoWidth, const bool calScores)
+{
+    this->realScan = realScan;
+    precursorBaseMass = mAveragine.calPrecursorBaseMass(peptide);
+    precursorSIPatomCount = mAveragine.pepAtomCounts[mAveragine.SIPatomIX];
+
+    if (isoCenter != 0 && isoWidth != 0)
+        keepPeaksInIsolationWindow(realScan, isoCenter, isoWidth);
+
+    IsotopeDistribution precursorIso;
+    ProNovoConfig::configIsotopologue.computeIsotopicDistribution(peptide, precursorIso);
+    findIsotopicPeaks(precursorIso.vMass, precursorIso.vProb, realScan, 1, charge, P);
+
+    if (calScores)
+    {
         calMatchedSpectraEntropyScore();
     }
 }

@@ -699,6 +699,40 @@ annotatePSM <- function(realMZ, realIntensity, realCharge, pepSeq, charges, Atom
     .Call(`_Aerith_annotatePSM`, realMZ, realIntensity, realCharge, pepSeq, charges, Atom, Prob, isoCenter, isoWidth, calScores)
 }
 
+#' annotatePrecursor
+#' @param realMZ mz vector in precursor scan
+#' @param realIntensity intensity vector in precursor scan
+#' @param realCharge charge vector in precursor scan
+#' @param pepSeq a string of peptide
+#' @param charge charge of precursor ion in consideration
+#' @param Atom "C13" or "N15"
+#' @param Prob its SIP abundance (0.0~1.0)
+#' @param isoCenter isolation window center, set it 0 as default if not filtering by isolation window
+#' @param isoWidth isolation window width, set it 0 as default if not filtering by isolation window
+#' @param calScores FALSE as default, calculate matched spectra entropy score or not
+#' @return a List about matched precursor isotopic peaks information
+#' @examples
+#' realMZ <- c(
+#'   894.9413, 895.4429, 895.9444, 896.3896, 896.4448, 896.9463,
+#'   897.3890, 897.8896, 898.3930, 898.4734, 901.8851, 902.4465,
+#'   902.9483, 903.4498, 903.9504, 910.8968, 911.4449, 912.3784
+#' )
+#' realIntensity <- c(
+#'   16660537.0, 12344664.0, 6128400.5, 1448961.1, 1614148.1, 713238.8,
+#'   1999402.4, 1124157.4, 567865.2, 647140.8, 709644.2, 7805729.0,
+#'   8421993.0, 3200114.2, 1286055.5, 620246.8, 540861.6, 1079918.5
+#' )
+#' realCharge <- c(2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 0, 0, 2)
+#' anno <- annotatePrecursor(
+#'   realMZ, realIntensity, realCharge,
+#'   "GITINTSHVEYDTPTR", 2, "C13",
+#'   0.01, 902.4471, 20, TRUE
+#' )
+#' @export
+annotatePrecursor <- function(realMZ, realIntensity, realCharge, pepSeq, charge, Atom, Prob, isoCenter = 0, isoWidth = 0, calScores = FALSE) {
+    .Call(`_Aerith_annotatePrecursor`, realMZ, realIntensity, realCharge, pepSeq, charge, Atom, Prob, isoCenter, isoWidth, calScores)
+}
+
 #' scorePSMsimple Score a PSM without isotopic envelope shape modeling
 #' @param realMZ mz vector in MS2 scan
 #' @param realIntensity intensity vector in MS2 scan

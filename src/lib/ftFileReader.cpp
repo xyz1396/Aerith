@@ -6,19 +6,24 @@ Scan::Scan() : scanNumber(0),
 			   precursorCharge(0),
 			   isolationWindowCenterMZ(0) {}
 
-Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC) : scanNumber(mScanNumber),
-																 retentionTime(mRetentionTime),
-																 TIC(mTIC),
-																 precursorScanNumber(0),
-																 precursorCharge(0),
-																 isolationWindowCenterMZ(0) {}
+Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC, std::string mScanType, std::string mScanFilter) : scanNumber(mScanNumber),
+																												 retentionTime(mRetentionTime),
+																												 TIC(mTIC),
+																												 scanType(mScanType),
+																												 scanFilter(mScanFilter),
+																												 precursorScanNumber(0),
+																												 precursorCharge(0),
+																												 isolationWindowCenterMZ(0) {}
 
-Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecursorScanNumber,
-		   int mPrecursorCharge, double mIsolationWindowCenterMZ,
+Scan::Scan(int mScanNumber, float mRetentionTime, double mTIC,
+		   std::string mScanType, std::string mScanFilter,
+		   int mPrecursorScanNumber, int mPrecursorCharge, double mIsolationWindowCenterMZ,
 		   std::vector<int> mPrecursorCharges,
 		   std::vector<double> mPrecursorMZs) : scanNumber(mScanNumber),
 												retentionTime(mRetentionTime),
 												TIC(mTIC),
+												scanType(mScanType),
+												scanFilter(mScanFilter),
 												precursorScanNumber(mPrecursorScanNumber),
 												precursorCharge(mPrecursorCharge),
 												isolationWindowCenterMZ(mIsolationWindowCenterMZ),
@@ -44,8 +49,8 @@ ftFileReader::ftFileReader(std::string file) : ftFileName(file)
 		else
 		{ // Set the buffer size to 2mb
 			const int bufsize = 1024 * 1024 * 2;
-            streamBuffer.resize(bufsize);
-            ftFileStream.rdbuf()->pubsetbuf(streamBuffer.data(), streamBuffer.size());
+			streamBuffer.resize(bufsize);
+			ftFileStream.rdbuf()->pubsetbuf(streamBuffer.data(), streamBuffer.size());
 		}
 	}
 	else
@@ -79,33 +84,51 @@ void ftFileReader::splitString(const std::string &mString)
 bool ftFileReader::detectPrecursorAndCharge()
 {
 	hasPrecursor = false;
-	getline(ftFileStream, currentLine);
-	while (currentLine[0] >= 'A' && currentLine[0] <= 'Z')
+	if (!getline(ftFileStream, currentLine))
+		return false;
+	while (!currentLine.empty() && currentLine[0] >= 'A' && currentLine[0] <= 'Z')
 	{
 		splitString(currentLine);
-		if (tokens[1] == "Instrument Model")
+		if (tokens.size() > 2 && tokens[1] == "Instrument Model")
 			instrument = tokens[2];
-		else if (tokens[1] == "ScanType")
+		else if (tokens.size() > 2 && tokens[1] == "ScanType")
 		{
 			scanType = tokens[2];
 		}
-		else if (tokens[1] == "ScanFilter")
+		else if (tokens.size() > 2 && tokens[1] == "ScanFilter")
 		{
 			scanFilter = tokens[2];
 		}
-		else if (tokens[1] == "ParentScanNumber")
+		else if (tokens.size() > 1 && tokens[1] == "ParentScanNumber")
 			hasPrecursor = true;
-		getline(ftFileStream, currentLine);
+		if (!getline(ftFileStream, currentLine))
+		{
+			currentLine.clear();
+			break;
+		}
 	}
-	// return to beginning of line of first peak
-	ftFileStream.seekg(0);
+
+	// Check first peak format from the line where header parsing stopped.
 	splitString(currentLine);
-	if (tokens.size() == 2)
+	size_t firstPeakTokenCount = tokens.size();
+
+	// Return to the beginning of file for normal scan parsing.
+	ftFileStream.clear();
+	ftFileStream.seekg(0, std::ios::beg);
+	if (!getline(ftFileStream, currentLine))
+		return false;
+	while (currentLine.empty() && getline(ftFileStream, currentLine))
+	{
+	}
+	if (currentLine.empty())
+		return false;
+
+	if (firstPeakTokenCount == 2)
 	{
 		hasCharge = false;
 		return true;
 	}
-	else if (tokens.size() == 6)
+	else if (firstPeakTokenCount == 6)
 	{
 		hasCharge = true;
 		return true;
@@ -119,34 +142,53 @@ bool ftFileReader::hasNextScan()
 	return !ftFileStream.eof();
 }
 
+bool ftFileReader::isNumber(const std::string &s)
+{
+	if (s.empty())
+		return false;
+	return (s[0] >= '0' && s[0] <= '9');
+}
+
 Scan ftFileReader::readScanNumberRentionTime()
 {
 	continueRead = true;
 	int mScanNumber = 0;
 	float mRetentionTime = 0;
 	double mTIC = 0;
+	std::string mScanType = "";
+	std::string mScanFilter = "";
 	while (continueRead)
 	{
 		splitString(currentLine);
-		if (tokens[0] != "I")
+		// Check if tokens[0] is a number (spectrum data), if so, stop reading metadata
+		if (isNumber(tokens[0]))
 		{
+			continueRead = false;
+		}
+		else
+		{
+			// Read metadata
 			if (tokens[0] == "S")
 			{
 				mScanNumber = stoi(tokens[1]);
 				mTIC = stod(tokens[2]);
 			}
-		}
-		else
-		{
-			continueRead = false;
-			mRetentionTime = stof(tokens[2]);
-			// read 3 more lines to the first peak
-			getline(ftFileStream, currentLine);
-			getline(ftFileStream, currentLine);
+			else if (tokens.size() > 2 && tokens[1] == "RetentionTime")
+			{
+				mRetentionTime = stof(tokens[2]);
+			}
+			else if (tokens.size() > 2 && tokens[1] == "ScanType")
+			{
+				mScanType = tokens[2];
+			}
+			else if (tokens.size() > 2 && tokens[1] == "ScanFilter")
+			{
+				mScanFilter = tokens[2];
+			}
 		}
 		getline(ftFileStream, currentLine);
 	}
-	return Scan(mScanNumber, mRetentionTime, mTIC);
+	return Scan(mScanNumber, mRetentionTime, mTIC, mScanType, mScanFilter);
 }
 
 int safe_stoi(const std::string &s)
@@ -167,44 +209,59 @@ Scan ftFileReader::readScanNumberRentionTimePrecursor()
 	continueRead = true;
 	int mScanNumber = 0;
 	double mIsolationWindowCenterMz = 0;
-	double mPrecursorCharge = 0;
+	int mPrecursorCharge = 0;
 	float mRetentionTime = 0;
 	double mTIC = 0;
+	std::string mScanType = "";
+	std::string mScanFilter = "";
 	int mPrecursorScanNumber = 0;
 	std::vector<int> mPrecursorCharges;
 	std::vector<double> mPrecursorMZs;
 	while (continueRead)
 	{
 		splitString(currentLine);
-		if (tokens[0] != "D")
-		{
-			if (tokens[0] == "S")
-			{
-				mScanNumber = stoi(tokens[1]);
-				mIsolationWindowCenterMz = stod(tokens[2]);
-				mTIC = stod(tokens[3]);
-			}
-			else if (tokens[0] == "Z")
-			{
-				mPrecursorCharge = stoi(tokens[1]);
-				// for DIA precursor and wide window DDA reading in isolation window
-				for (size_t i = 3; i + 1 < tokens.size(); i += 2)
-				{
-					mPrecursorCharges.push_back(stoi(tokens[i]));
-					mPrecursorMZs.push_back(stod(tokens[i + 1]));
-				}
-			}
-			else if (tokens[1] == "RetentionTime")
-				mRetentionTime = stof(tokens[2]);
-		}
-		else
+		// Stop when peak lins starts.
+		if (isNumber(tokens[0]))
 		{
 			continueRead = false;
+		}
+		else if (tokens[0] == "D" && tokens.size() > 2)
+		{
 			mPrecursorScanNumber = stoi(tokens[2]);
+		}
+		else if (tokens[0] == "S" && tokens.size() > 3)
+		{
+			mScanNumber = stoi(tokens[1]);
+			mIsolationWindowCenterMz = stod(tokens[2]);
+			mTIC = stod(tokens[3]);
+		}
+		else if (tokens[0] == "Z" && tokens.size() > 1)
+		{
+			mPrecursorCharge = stoi(tokens[1]);
+			// For DIA precursor and wide-window DDA, read isolation-window entries.
+			for (size_t i = 3; i + 1 < tokens.size(); i += 2)
+			{
+				mPrecursorCharges.push_back(stoi(tokens[i]));
+				mPrecursorMZs.push_back(stod(tokens[i + 1]));
+			}
+		}
+		else if (tokens.size() > 2 && tokens[1] == "RetentionTime")
+		{
+			mRetentionTime = stof(tokens[2]);
+		}
+		else if (tokens.size() > 2 && tokens[1] == "ScanType")
+		{
+			mScanType = tokens[2];
+		}
+		else if (tokens.size() > 2 && tokens[1] == "ScanFilter")
+		{
+			mScanFilter = tokens[2];
 		}
 		getline(ftFileStream, currentLine);
 	}
-	return Scan(mScanNumber, mRetentionTime, mTIC, mPrecursorScanNumber,
+
+	return Scan(mScanNumber, mRetentionTime, mTIC,
+				mScanType, mScanFilter, mPrecursorScanNumber,
 				mPrecursorCharge, mIsolationWindowCenterMz,
 				mPrecursorCharges, mPrecursorMZs);
 }
@@ -273,7 +330,7 @@ void ftFileReader::readNextScan()
 
 Scan ftFileReader::readOneScan(const size_t scanNumber)
 {
-	Scan emptyScan(0, 0, 0, 0, 0, 0, {}, {});
+	Scan emptyScan(0, 0.0f, 0.0, "", "", 0, 0, 0.0, std::vector<int>(), std::vector<double>());
 	if (!detectPrecursorAndCharge())
 	{
 		std::cout << "Cannot read the first scan" << std::endl;

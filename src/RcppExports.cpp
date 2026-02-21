@@ -560,6 +560,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// annotatePrecursor
+List annotatePrecursor(const NumericVector& realMZ, const NumericVector& realIntensity, const NumericVector& realCharge, const String& pepSeq, const int charge, const String& Atom, double Prob, const double isoCenter, const double isoWidth, const bool calScores);
+RcppExport SEXP _Aerith_annotatePrecursor(SEXP realMZSEXP, SEXP realIntensitySEXP, SEXP realChargeSEXP, SEXP pepSeqSEXP, SEXP chargeSEXP, SEXP AtomSEXP, SEXP ProbSEXP, SEXP isoCenterSEXP, SEXP isoWidthSEXP, SEXP calScoresSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type realMZ(realMZSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type realIntensity(realIntensitySEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type realCharge(realChargeSEXP);
+    Rcpp::traits::input_parameter< const String& >::type pepSeq(pepSeqSEXP);
+    Rcpp::traits::input_parameter< const int >::type charge(chargeSEXP);
+    Rcpp::traits::input_parameter< const String& >::type Atom(AtomSEXP);
+    Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
+    Rcpp::traits::input_parameter< const double >::type isoCenter(isoCenterSEXP);
+    Rcpp::traits::input_parameter< const double >::type isoWidth(isoWidthSEXP);
+    Rcpp::traits::input_parameter< const bool >::type calScores(calScoresSEXP);
+    rcpp_result_gen = Rcpp::wrap(annotatePrecursor(realMZ, realIntensity, realCharge, pepSeq, charge, Atom, Prob, isoCenter, isoWidth, calScores));
+    return rcpp_result_gen;
+END_RCPP
+}
 // scorePSMsimple
 double scorePSMsimple(const NumericVector& realMZ, const NumericVector& realIntensity, const NumericVector& realCharge, int parentCharge, const String& pepSeq, const String& Atom, double Prob);
 RcppExport SEXP _Aerith_scorePSMsimple(SEXP realMZSEXP, SEXP realIntensitySEXP, SEXP realChargeSEXP, SEXP parentChargeSEXP, SEXP pepSeqSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
@@ -673,6 +693,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_scoreIntensityByCE", (DL_FUNC) &_Aerith_scoreIntensityByCE, 2},
     {"_Aerith_scorePSM", (DL_FUNC) &_Aerith_scorePSM, 7},
     {"_Aerith_annotatePSM", (DL_FUNC) &_Aerith_annotatePSM, 10},
+    {"_Aerith_annotatePrecursor", (DL_FUNC) &_Aerith_annotatePrecursor, 10},
     {"_Aerith_scorePSMsimple", (DL_FUNC) &_Aerith_scorePSMsimple, 7},
     {"_Aerith_rankyfify", (DL_FUNC) &_Aerith_rankyfify, 1},
     {"_Aerith_denoiseOneMS2ScanHasCharge", (DL_FUNC) &_Aerith_denoiseOneMS2ScanHasCharge, 4},

@@ -13,6 +13,8 @@ struct alignas(64) Scan
 	size_t scanNumber;
 	float retentionTime;
 	double TIC;
+	std::string scanType;
+	std::string scanFilter;
 	std::vector<double> mz;
 	std::vector<double> mass;
 	std::vector<double> intensity;
@@ -32,10 +34,11 @@ struct alignas(64) Scan
 
 	Scan();
 	// for MS1 scans
-	Scan(int mScanNumber, float mRetentionTime, double mTIC);
+	Scan(int mScanNumber, float mRetentionTime, double mTIC, std::string mScanType, std::string mScanFilter);
 	// for MS2 scans
-	Scan(int mScanNumber, float mRetentionTime, double mTIC, int mPrecursorScanNumber,
-		int mPrecursorCharge, double mIsolationWindowCenterMZ, 
+	Scan(int mScanNumber, float mRetentionTime, double mTIC, 
+		std::string mScanType, std::string mScanFilter,
+		int mPrecursorScanNumber, int mPrecursorCharge, double mIsolationWindowCenterMZ, 
 		std::vector<int> mPrecursorCharges, std::vector<double> mPrecursorMZs);
 };
 
@@ -64,6 +67,7 @@ public:
 	void splitString(const std::string &mString);
 	bool detectPrecursorAndCharge();
 	bool hasNextScan();
+	bool isNumber(const std::string &s);
 	Scan readScanNumberRentionTime();
 	Scan readScanNumberRentionTimePrecursor();
 	void readPeakCharge();

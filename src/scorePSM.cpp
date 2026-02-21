@@ -463,6 +463,12 @@ std::vector<std::string> enumsToStrings(std::vector<PSMpeakAnnotator::ionKind> i
         case PSMpeakAnnotator::ionKind::YisotopicPeak:
             ionKindStrs[i] = "YisotopicPeak";
             break;
+        case PSMpeakAnnotator::ionKind::P:
+            ionKindStrs[i] = "P";
+            break;
+        case PSMpeakAnnotator::ionKind::PisotopicPeak:
+            ionKindStrs[i] = "PisotopicPeak";
+            break;
         default:
             ionKindStrs[i] = "UNKNOWN";
             break;
@@ -537,6 +543,77 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
                            _("Peptide") = pepSeq);
     return re;
 }
+
+//' annotatePrecursor
+//' @param realMZ mz vector in precursor scan
+//' @param realIntensity intensity vector in precursor scan
+//' @param realCharge charge vector in precursor scan
+//' @param pepSeq a string of peptide
+//' @param charge charge of precursor ion in consideration
+//' @param Atom "C13" or "N15"
+//' @param Prob its SIP abundance (0.0~1.0)
+//' @param isoCenter isolation window center, set it 0 as default if not filtering by isolation window
+//' @param isoWidth isolation window width, set it 0 as default if not filtering by isolation window
+//' @param calScores FALSE as default, calculate matched spectra entropy score or not
+//' @return a List about matched precursor isotopic peaks information
+//' @examples
+//' realMZ <- c(
+//'   894.9413, 895.4429, 895.9444, 896.3896, 896.4448, 896.9463,
+//'   897.3890, 897.8896, 898.3930, 898.4734, 901.8851, 902.4465,
+//'   902.9483, 903.4498, 903.9504, 910.8968, 911.4449, 912.3784
+//' )
+//' realIntensity <- c(
+//'   16660537.0, 12344664.0, 6128400.5, 1448961.1, 1614148.1, 713238.8,
+//'   1999402.4, 1124157.4, 567865.2, 647140.8, 709644.2, 7805729.0,
+//'   8421993.0, 3200114.2, 1286055.5, 620246.8, 540861.6, 1079918.5
+//' )
+//' realCharge <- c(2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 0, 0, 2)
+//' anno <- annotatePrecursor(
+//'   realMZ, realIntensity, realCharge,
+//'   "GITINTSHVEYDTPTR", 2, "C13",
+//'   0.01, 902.4471, 20, TRUE
+//' )
+//' @export
+// [[Rcpp::export]]
+List annotatePrecursor(const NumericVector &realMZ, const NumericVector &realIntensity,
+                       const NumericVector &realCharge, const String &pepSeq, const int charge,
+                       const String &Atom, double Prob,
+                       const double isoCenter = 0, const double isoWidth = 0, const bool calScores = false)
+{
+    string config = get_extdata();
+    ProNovoConfig::setFilename(config);
+    computeResidueMassIntensityAgain(Atom, Prob);
+    Scan mScan;
+    mScan.mz = as<vector<double>>(realMZ);
+    mScan.intensity = as<vector<double>>(realIntensity);
+    mScan.charge = as<vector<int>>(realCharge);
+    PSMpeakAnnotator mAnnotator(10);
+    if (mScan.mz.size() > 5 && mScan.intensity.size() > 5)
+        mAnnotator.analyzePrecursor(pepSeq, &mScan, charge, isoCenter, isoWidth, calScores);
+    else
+    {
+        Rcerr << "Too less peaks or empty Scan" << endl;
+        return List();
+    }
+    std::vector<std::string> ionKindStrs = enumsToStrings(mAnnotator.getIonKinds());
+    DataFrame ExpectedPrecursorIons = DataFrame::create(Named("mz") = mAnnotator.getExpectedMZs(),
+                                                        _("intensity") = mAnnotator.getExpectedIntensities(),
+                                                        _("charge") = mAnnotator.getExpectedCharges(),
+                                                        _("ionkind") = ionKindStrs,
+                                                        _("residuePositions") = mAnnotator.getResiduePositions(),
+                                                        _("matchedIndices") = mAnnotator.getMatchedIndices(),
+                                                        _("SIPabundances") = mAnnotator.getSIPabundances());
+    DataFrame realPeaks = DataFrame::create(Named("mz") = mScan.mz,
+                                            _("intensity") = mScan.intensity,
+                                            _("charge") = mScan.charge);
+    List re = List::create(Named("ExpectedPrecursorIons") = ExpectedPrecursorIons,
+                           _("RealPeaks") = realPeaks,
+                           _("MatchedSpectraEntropyScore") = mAnnotator.getMatchedSpectraEntropyScore(),
+                           _("Peptide") = pepSeq);
+    return re;
+}
+
+
 
 //' scorePSMsimple Score a PSM without isotopic envelope shape modeling
 //' @param realMZ mz vector in MS2 scan

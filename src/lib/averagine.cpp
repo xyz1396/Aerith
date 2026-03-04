@@ -109,42 +109,60 @@ void averagine::adjustEstimatePrecursorMassbyNP()
 
 void averagine::changeAtomSIPabundance(const char SIPatom, const double pct)
 {
-    bool SIPatomFound = false;
-    for (size_t i = 0; i < SIPatoms.size(); i++)
+    const size_t atomPos = SIPatoms.find(SIPatom);
+    if (atomPos == string::npos)
     {
-        if (SIPatoms[i] == SIPatom)
-        {
-            SIPatomIX = i;
-            SIPatomFound = true;
-            break;
-        }
+        cout << SIPatom << "element is not supported!" << endl;
+        return;
     }
-    if (SIPatomFound)
+    const int atomIndex = static_cast<int>(atomPos);
+    SIPatomIX = atomIndex;
+    ProNovoConfig::getSetSIPelement() = SIPatom;
+    adjustEstimatePrecursorMassbyNP();
+    const bool updated = changeAtomProbability(
+        ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[atomIndex].vProb, SIPatom, pct);
+    if (!updated)
     {
-        ProNovoConfig::getSetSIPelement() = SIPatom;
-        adjustEstimatePrecursorMassbyNP();
-        ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[SIPatomIX].vProb[0] =
-            1.0 - pct;
-        // for O18 and S34
-        if (SIPatom == 'O' || SIPatom == 'S')
-        {            
-            ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[SIPatomIX].vProb[2] =
-            pct;
-        }
-        // for C13, H2, N15
-        else
-        {
-            ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[SIPatomIX].vProb[1] =
-            pct;
-        }
-        ProNovoConfig::configIsotopologue.computeIsotopicDistribution(
-            ProNovoConfig::configIsotopologue.mResidueAtomicComposition[averagineResidue],
-            averagineSIPdistribution);
+        return;
+    }
+    ProNovoConfig::configIsotopologue.computeIsotopicDistribution(
+        ProNovoConfig::configIsotopologue.mResidueAtomicComposition[averagineResidue],
+        averagineSIPdistribution);
+}
+
+bool averagine::changeAtomProbability(std::vector<double> &probs, const char atom, const double pct)
+{
+    const double boundedPct = std::max(0.0, std::min(1.0, pct));
+    if (boundedPct != pct)
+    {
+        cerr << "Warning: SIP abundance percentage " << pct << " is out of [0,1], clamped to "
+             << boundedPct << "." << endl;
+    }
+    const size_t isotopeIndex = (atom == 'O' || atom == 'S') ? 2u : 1u;
+    if (probs.empty() || isotopeIndex >= probs.size())
+    {
+        cout << atom << " isotope index is not available in atom distribution!" << endl;
+        return false;
+    }
+    probs[isotopeIndex] = boundedPct;
+    double sumOthers = 0.0;
+    for (size_t i = 1; i < probs.size(); ++i)
+    {
+        sumOthers += probs[i];
+    }
+    if (sumOthers > 1.0)
+    {
+        cerr << "Warning: sum of non-mono isotopes exceeds 1 for atom " << atom
+             << " (sumOthers=" << sumOthers << "). Resetting to mono+target only." << endl;
+        std::fill(probs.begin(), probs.end(), 0.0);
+        probs[isotopeIndex] = boundedPct;
+        probs[0] = 1.0 - boundedPct;
     }
     else
     {
-        cout << SIPatom << "element is not supported!" << endl;
+        probs[0] = 1.0 - sumOthers;
     }
+    return true;
 }
 
 void averagine::calAveraginePepAtomCounts()

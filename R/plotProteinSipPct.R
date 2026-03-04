@@ -99,7 +99,7 @@ plotPSMsipPCT <- function(psmPath) {
             xintercept = medianPCT,
             color = "red",
             linetype = "dashed",
-            size = 2
+            linewidth = 2
         ) +
         ggplot2::annotate("text",
             x = medianPCT,

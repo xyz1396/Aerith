@@ -7,7 +7,6 @@
 class averagine
 {
 private:
-    /* data */
 public:
     double *C12Mass, *C13Mass, *C13Abundance, *H1Mass, *H2Mass, *H2Abundance;
     double *O16Mass, *O17Mass, *O17Abundance, *O18Mass, *O18Abundance;
@@ -34,6 +33,7 @@ public:
     averagine(const int minPepLen, const int maxPepLen);
     averagine();
     ~averagine();
+    static bool changeAtomProbability(std::vector<double> &probs, char atom, const double pct);
     void changeAtomSIPabundance(const char SIPatom, const double pct);
     double weighted_mean(const std::vector<double> &values, const std::vector<double> &weights);
     double calNetronMass(const string &pepSeq);

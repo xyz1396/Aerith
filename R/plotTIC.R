@@ -46,7 +46,7 @@ plotTIC <- function(tic, breaks = seq(0, 200, by = 10)) {
                 ymin = 0
             )
         ) +
-            ggplot2::geom_linerange(size = 0.2) +
+            ggplot2::geom_linerange(linewidth = 0.2) +
             ggplot2::scale_x_continuous(breaks = breaks) +
             ggplot2::scale_y_continuous(
                 breaks = seq(0, 100, by = 25)
@@ -59,7 +59,7 @@ plotTIC <- function(tic, breaks = seq(0, 200, by = 10)) {
                     fill = NA,
                     color = "grey10",
                     linetype = 1,
-                    size = 0.5
+                    linewidth = 0.5
                 ),
                 text = ggplot2::element_text(size = 15)
             ) +

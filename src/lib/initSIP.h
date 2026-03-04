@@ -1,5 +1,6 @@
 #pragma once
 #include "proNovoConfig.h"
+#include "averagine.h"
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -17,49 +18,26 @@ inline string get_extdata()
 
 inline void computeResidueMassIntensityAgain(const string Atom_str, double Prob_d)
 {
-	// change Prob
+	char sipAtom = '\0';
 	if (Atom_str == "C13")
-	{
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vProb[0] =
-			1.0 - Prob_d;
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[0].vProb[1] =
-			Prob_d;
-		ProNovoConfig::getSetSIPelement() = "C";
-	}
-    else if (Atom_str == "H2")
-	{
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[1].vProb[0] =
-			1.0 - Prob_d;
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[1].vProb[1] =
-			Prob_d;
-		ProNovoConfig::getSetSIPelement() = "H";
-	}
-    else if (Atom_str == "O18")
-	{
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[2].vProb[0] =
-			1.0 - Prob_d;
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[2].vProb[2] =
-			Prob_d;
-		ProNovoConfig::getSetSIPelement() = "O";
-	}
+		sipAtom = 'C';
+	else if (Atom_str == "H2")
+		sipAtom = 'H';
+	else if (Atom_str == "O18")
+		sipAtom = 'O';
 	else if (Atom_str == "N15")
-	{
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[3].vProb[0] =
-			1.0 - Prob_d;
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[3].vProb[1] =
-			Prob_d;
-		ProNovoConfig::getSetSIPelement() = "N";
-	}
-    else if (Atom_str == "S34")
-	{
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vProb[0] =
-			1.0 - Prob_d;
-		ProNovoConfig::configIsotopologue.vAtomIsotopicDistribution[5].vProb[2] =
-			Prob_d;
-		ProNovoConfig::getSetSIPelement() = "N";
-	}
+		sipAtom = 'N';
+	else if (Atom_str == "S34")
+		sipAtom = 'S';
 	else
+	{
 		Rcerr << "this element is not support" << endl;
+		return;
+	}
+
+	averagine mAveragine;
+	mAveragine.changeAtomSIPabundance(sipAtom, Prob_d);
+
 	// compute residue mass and prob again
 	map<string, vector<int>>::iterator ResidueIter;
 	IsotopeDistribution tempIsotopeDistribution;

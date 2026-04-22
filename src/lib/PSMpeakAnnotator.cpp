@@ -1,4 +1,5 @@
 #include "PSMpeakAnnotator.h"
+#include <Rcpp.h>
 
 PSMpeakAnnotator::PSMpeakAnnotator(const double tolerancePPM) : tolerancePPM(tolerancePPM) {}
 
@@ -468,7 +469,7 @@ void PSMpeakAnnotator::selectTopPeaks(std::vector<double> &theo_mz,
         {
             if (ionMasses[i].size() != ionProbs[i].size())
             {   
-                std::cerr << "Error: ionMasses and ionProbs have different sizes." << std::endl;
+                Rcpp::Rcerr << "Error: ionMasses and ionProbs have different sizes." << std::endl;
                 continue;
             }
             double maxInten = *std::max_element(ionProbs[i].begin(), ionProbs[i].end());

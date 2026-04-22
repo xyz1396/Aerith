@@ -1,4 +1,5 @@
 #include "ftFileReader.h"
+#include <Rcpp.h>
 
 Scan::Scan() : scanNumber(0),
 			   retentionTime(0),
@@ -44,7 +45,7 @@ ftFileReader::ftFileReader(std::string file) : ftFileName(file)
 		if (!ftFileStream.is_open())
 		{
 			isEmpty = true;
-			std::cout << "Cannot open " << ftFileName << std::endl;
+			Rcpp::Rcout << "Cannot open " << ftFileName << std::endl;
 		}
 		else
 		{ // Set the buffer size to 2mb
@@ -56,7 +57,7 @@ ftFileReader::ftFileReader(std::string file) : ftFileName(file)
 	else
 	{
 		isEmpty = true;
-		std::cout << ftFileName << " does not exists" << std::endl;
+		Rcpp::Rcout << ftFileName << " does not exists" << std::endl;
 	}
 }
 
@@ -199,7 +200,7 @@ int safe_stoi(const std::string &s)
 	}
 	catch (const std::invalid_argument &e)
 	{
-		std::cerr << s << " is not a valid integer" << '\n';
+		Rcpp::Rcerr << s << " is not a valid integer" << '\n';
 		return 0;
 	}
 }
@@ -333,7 +334,7 @@ Scan ftFileReader::readOneScan(const size_t scanNumber)
 	Scan emptyScan(0, 0.0f, 0.0, "", "", 0, 0, 0.0, std::vector<int>(), std::vector<double>());
 	if (!detectPrecursorAndCharge())
 	{
-		std::cout << "Cannot read the first scan" << std::endl;
+		Rcpp::Rcout << "Cannot read the first scan" << std::endl;
 		return (emptyScan);
 	}
 	skipScans(scanNumber);
@@ -344,13 +345,13 @@ Scan ftFileReader::readOneScan(const size_t scanNumber)
 			return currentScan;
 		else
 		{
-			std::cout << scanNumber << " not exist" << std::endl;
+			Rcpp::Rcout << scanNumber << " not exist" << std::endl;
 			return emptyScan;
 		}
 	}
 	else
 	{
-		std::cout << scanNumber << " is larger than the last scan number" << std::endl;
+		Rcpp::Rcout << scanNumber << " is larger than the last scan number" << std::endl;
 		return emptyScan;
 	}
 }
@@ -377,7 +378,7 @@ void ftFileReader::readScans(const size_t startScanNumber, const size_t endScanN
 		}
 	}
 	else
-		std::cout << "Cannot read the first scan" << std::endl;
+		Rcpp::Rcout << "Cannot read the first scan" << std::endl;
 }
 
 void ftFileReader::readScans(std::vector<size_t> &scanNumbers)
@@ -402,7 +403,7 @@ void ftFileReader::readScans(std::vector<size_t> &scanNumbers)
 			// skip scan not exist
 			while (currentScan.scanNumber > scanNumbers[i] && i < scanNumbers.size())
 			{
-				std::cout << "Scan " << scanNumbers[i] << " not exist!" << std::endl;
+				Rcpp::Rcout << "Scan " << scanNumbers[i] << " not exist!" << std::endl;
 				i++;
 			}
 			if (currentScan.scanNumber == scanNumbers[i] && i < scanNumbers.size())
@@ -412,7 +413,7 @@ void ftFileReader::readScans(std::vector<size_t> &scanNumbers)
 		}
 	}
 	else
-		std::cout << "Cannot read the first scan" << std::endl;
+		Rcpp::Rcout << "Cannot read the first scan" << std::endl;
 }
 
 void ftFileReader::readAllScan()
@@ -427,16 +428,16 @@ void ftFileReader::readAllScan()
 		}
 	}
 	else
-		std::cout << "Cannot read the first scan" << std::endl;
+		Rcpp::Rcout << "Cannot read the first scan" << std::endl;
 }
 
 void ftFileReader::printFileInfo()
 {
-	std::cout << "ftFileName: " << ftFileName << std::endl;
-	std::cout << "has precursor: " << hasPrecursor << std::endl;
-	std::cout << "has charge: " << hasCharge << std::endl;
-	std::cout << "scanType: " << scanType << std::endl;
-	std::cout << "instrument: " << instrument << std::endl;
+	Rcpp::Rcout << "ftFileName: " << ftFileName << std::endl;
+	Rcpp::Rcout << "has precursor: " << hasPrecursor << std::endl;
+	Rcpp::Rcout << "has charge: " << hasCharge << std::endl;
+	Rcpp::Rcout << "scanType: " << scanType << std::endl;
+	Rcpp::Rcout << "instrument: " << instrument << std::endl;
 }
 
 void ftFileReader::printScan(const Scan &mScan)

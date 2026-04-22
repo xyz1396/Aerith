@@ -1,4 +1,5 @@
 #include "ms2scan.h"
+#include <Rcpp.h>
 
 /**********switching from weightsum to ranksum needs to turn on some function in ms2scan.cpp and peptide.cpp *******/
 
@@ -20,10 +21,10 @@ MS2Scan::~MS2Scan()
 
 void MS2Scan::print()
 {
-	cout << "dParentMZ" << "\t" << dParentMZ << endl;
-	cout << "vdMZ	vdMzIntensity" << endl;
+	Rcpp::Rcout << "dParentMZ" << "\t" << dParentMZ << endl;
+	Rcpp::Rcout << "vdMZ	vdMzIntensity" << endl;
 	for (size_t i = 0; i < vdMZ.size(); i++)
-		cout << setprecision(4) << vdMZ[i] << '\t' << setprecision(4) << vdIntensity[i] << endl;
+		Rcpp::Rcout << setprecision(4) << vdMZ[i] << '\t' << setprecision(4) << vdIntensity[i] << endl;
 }
 
 void MS2Scan::postprocess()
@@ -796,7 +797,7 @@ void MS2Scan::filterMS2scan()
 			vdpreprocessedIntensity.erase(vdpreprocessedIntensity.begin() + lowpeak.at(i));
 	if (vdpreprocessedMZ.front() <= 0)
 	{
-		cerr << "ERROR: negative MZ value = " << vdpreprocessedMZ.front() << endl;
+		Rcpp::Rcerr << "ERROR: negative MZ value = " << vdpreprocessedMZ.front() << endl;
 		bSetMS2Flag = false;
 	}
 }
@@ -870,7 +871,7 @@ void MS2Scan::initialPreprocess()
 		bin_res = LOW_BIN_RES;
 	if ((int)vdMZ.size() == 0 || vdMZ.size() != vdIntensity.size() || vdMZ.size() != viCharge.size())
 	{
-		cerr << "ERROR: Problem with the input mass spectrum" << endl;
+		Rcpp::Rcerr << "ERROR: Problem with the input mass spectrum" << endl;
 		bSetMS2Flag = false;
 	}
 	else

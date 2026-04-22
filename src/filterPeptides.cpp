@@ -1,6 +1,7 @@
 #include "lib/peptidesFiltrator.h"
 #include "lib/Spe2PepFileReader.h"
 #include <Rcpp.h>
+#include <utility>
 using namespace Rcpp;
 
 //' getUnfilteredPeptides
@@ -31,9 +32,9 @@ DataFrame getUnfilteredPeptides(CharacterVector workingPath)
         isDecoy[i] = pepIX.second.isDecoy;
         i++;
     }
-    return DataFrame::create(Named("identifiedPeptides") = move(identifiedPeptides),
-                             _["bestScores"] = move(bestScores),
-                             _["isDecoy"] = move(isDecoy));
+    return DataFrame::create(Named("identifiedPeptides") = std::move(identifiedPeptides),
+                             _["bestScores"] = std::move(bestScores),
+                             _["isDecoy"] = std::move(isDecoy));
 }
 
 //' getFilterThreshold
@@ -82,16 +83,16 @@ List getFilterThresholdTopPSMs(CharacterVector workingPath, NumericVector Overal
     reader.readAllFilesTopPSMs();
     sipPSM topPSMs = reader.convertFilesScansTopPSMs();
     std::vector<sipPSM> topPSMss{topPSMs};
-    DataFrame psmDf = DataFrame::create(Named("fileNames") = move(topPSMs.fileNames),
-                                        _["scanNumbers"] = move(topPSMs.scanNumbers),
-                                        _["parentCharges"] = move(topPSMs.parentCharges),
-                                        _["measuredParentMasses"] = move(topPSMs.measuredParentMasses),
-                                        _["calculatedParentMasses"] = move(topPSMs.calculatedParentMasses),
-                                        _["searchNames"] = move(topPSMs.searchNames),
-                                        _["scores"] = move(topPSMs.scores),
-                                        _["identifiedPeptides"] = move(topPSMs.identifiedPeptides),
-                                        _["originalPeptides"] = move(topPSMs.originalPeptides),
-                                        _["proteinNames"] = move(topPSMs.proteinNames));
+    DataFrame psmDf = DataFrame::create(Named("fileNames") = std::move(topPSMs.fileNames),
+                                        _["scanNumbers"] = std::move(topPSMs.scanNumbers),
+                                        _["parentCharges"] = std::move(topPSMs.parentCharges),
+                                        _["measuredParentMasses"] = std::move(topPSMs.measuredParentMasses),
+                                        _["calculatedParentMasses"] = std::move(topPSMs.calculatedParentMasses),
+                                        _["searchNames"] = std::move(topPSMs.searchNames),
+                                        _["scores"] = std::move(topPSMs.scores),
+                                        _["identifiedPeptides"] = std::move(topPSMs.identifiedPeptides),
+                                        _["originalPeptides"] = std::move(topPSMs.originalPeptides),
+                                        _["proteinNames"] = std::move(topPSMs.proteinNames));
     peptidesFiltrator filtrator(topPSMss, as<float>(OverallThreshold), "Rev_");
     filtrator.filterPeptideMap();
     std::vector<int> decoyCount{filtrator.decoyCountCharge2, filtrator.decoyCountCharge3,

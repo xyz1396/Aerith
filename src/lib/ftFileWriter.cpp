@@ -1,4 +1,5 @@
 #include "ftFileWriter.h"
+#include <Rcpp.h>
 
 ftFileWriter::ftFileWriter() {}
 
@@ -24,10 +25,10 @@ ftFileWriter::ftFileWriter(std::string file, std::string mInstrument,
             isWriteable = true;
         }
         else
-            std::cout << "Cannot write " << ftFileName << std::endl;
+            Rcpp::Rcout << "Cannot write " << ftFileName << std::endl;
     }
     else
-        std::cout << "Old " << ftFileName << " exists" << std::endl;
+        Rcpp::Rcout << "Old " << ftFileName << " exists" << std::endl;
 }
 
 ftFileWriter::~ftFileWriter()
@@ -210,7 +211,7 @@ void ftFileWriter::writeAllScanMS1(std::vector<Scan> &mScans)
         }
     }
     else
-        std::cout << "This format is not implemented!" << std::endl;
+        Rcpp::Rcout << "This format is not implemented!" << std::endl;
 }
 
 void ftFileWriter::writeAllScanMS2(std::vector<Scan> &mScans)
@@ -229,5 +230,5 @@ void ftFileWriter::writeAllScanMS2(std::vector<Scan> &mScans)
         }
     }
     else
-        std::cout << "This format is not implemented!" << std::endl;
+        Rcpp::Rcout << "This format is not implemented!" << std::endl;
 }

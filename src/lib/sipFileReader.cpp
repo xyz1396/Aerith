@@ -1,4 +1,5 @@
 #include "sipFileReader.h"
+#include <Rcpp.h>
 
 sipFileReader::sipFileReader()
 {
@@ -15,7 +16,7 @@ sipFileReader::sipFileReader(std::string mWorkingPath) : workingPath(mWorkingPat
             sipFileNames.push_back(p.path().string());
     }
     if (sipFileNames.size() == 0)
-        std::cout << "no .sip file was found in " << workingPath << " !" << std::endl;
+        Rcpp::Rcout << "no .sip file was found in " << workingPath << " !" << std::endl;
 }
 
 sipFileReader::~sipFileReader()
@@ -59,7 +60,7 @@ void sipFileReader::readOneFile(std::string sipFileName)
         sipFileStream.open(sipFileName.c_str(), std::ios::in);
         if (!sipFileStream.is_open())
         {
-            std::cout << "Cannot open " << sipFileName << std::endl;
+            Rcpp::Rcout << "Cannot open " << sipFileName << std::endl;
         }
         std::string currentLine;
         // ignore annotation in sip result file
@@ -93,7 +94,7 @@ void sipFileReader::readOneFile(std::string sipFileName)
     }
     else
     {
-        std::cout << sipFileName << " does not exists" << std::endl;
+        Rcpp::Rcout << sipFileName << " does not exists" << std::endl;
     }
 }
 

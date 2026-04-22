@@ -1,4 +1,6 @@
 #include "proNovoConfig.h"
+#include <Rcpp.h>
+#include <stdexcept>
 
 string ProNovoConfig::sFilename = "SiprosConfig.cfg";
 
@@ -177,7 +179,7 @@ bool ProNovoConfig::setFilename(const string &sConfigFileName)
 	// Try loading the file.
 	if (!ProNovoConfigSingleton->parseConfigKeyValues())
 	{
-		cerr << "ERROR! Loading Configuration file" << endl;
+		Rcpp::Rcerr << "ERROR! Loading Configuration file" << endl;
 		return false;
 	}
 
@@ -246,21 +248,21 @@ bool ProNovoConfig::getAtomIsotopicComposition(char cAtom, vector<double> &vdAto
 	map<string, string> mapElementMasses;
 	if (!getConfigMasterKeyValue("[Peptide_Identification]Element_Masses", mapElementMasses))
 	{
-		cerr << "Error: cannot retrieve Element Masses." << endl;
+		Rcpp::Rcerr << "Error: cannot retrieve Element Masses." << endl;
 		return false;
 	}
 
 	map<string, string> mapElementPercent;
 	if (!getConfigMasterKeyValue("[Peptide_Identification]Element_Percent", mapElementPercent))
 	{
-		cerr << "Error: cannot retrieve Element Percent." << endl;
+		Rcpp::Rcerr << "Error: cannot retrieve Element Percent." << endl;
 		return false;
 	}
 
 	map<string, string>::iterator iterMass = mapElementMasses.find(sAtom);
 	if (iterMass == mapElementMasses.end())
 	{
-		cerr << "Error: cannot find element masses for element " << sAtom << endl;
+			Rcpp::Rcerr << "Error: cannot find element masses for element " << sAtom << endl;
 		return false;
 	}
 	sData = iterMass->second;
@@ -278,7 +280,7 @@ bool ProNovoConfig::getAtomIsotopicComposition(char cAtom, vector<double> &vdAto
 	map<string, string>::iterator iterPercent = mapElementPercent.find(sAtom);
 	if (iterPercent == mapElementPercent.end())
 	{
-		cerr << "Error: cannot find element percent for element " << sAtom << endl;
+			Rcpp::Rcerr << "Error: cannot find element percent for element " << sAtom << endl;
 		return false;
 	}
 	sData = iterPercent->second;
@@ -303,7 +305,7 @@ bool ProNovoConfig::getResidueElementalComposition(string &sAtomicCompositionTab
 	map<string, string> mapResidueTable;
 	if (!getConfigMasterKeyValue("[Peptide_Identification]Residue", mapResidueTable))
 	{
-		cerr << "Error: cannot retrieve Elemental composition of amino acid residues." << endl;
+		Rcpp::Rcerr << "Error: cannot retrieve Elemental composition of amino acid residues." << endl;
 		return false;
 	}
 
@@ -325,7 +327,7 @@ bool ProNovoConfig::getPTMinfo(map<string, string> &mPTMinfo)
 	mPTMinfo.clear();
 	if (!getConfigMasterKeyValue("[Peptide_Identification]PTM", mPTMinfo))
 	{
-		cerr << "Error: cannot retrieve PTM information." << endl;
+		Rcpp::Rcerr << "Error: cannot retrieve PTM information." << endl;
 		return false;
 	}
 	return true;
@@ -413,7 +415,7 @@ bool ProNovoConfig::getParameters()
 		if (sAtom.size() == 1)
 			sElementList.append(sAtom);
 		else
-			cerr << "Warning: Ignore an invalid element at Element_List " << sAtom << endl;
+			Rcpp::Rcerr << "Warning: Ignore an invalid element at Element_List " << sAtom << endl;
 	}
 
 	// populate vpPeptideMassWindowOffset
@@ -452,8 +454,7 @@ void ProNovoConfig::NeutralLoss()
 			}
 			else
 			{
-				cerr << "illeagal ptm: " << sCurrentWholePTM << endl;
-				exit(0);
+				throw std::runtime_error("illeagal ptm: " + sCurrentWholePTM);
 			}
 		}
 	}
@@ -477,7 +478,7 @@ double ProNovoConfig::getResidueMass(string sResidue)
 		}
 	}
 
-	cerr << "ERROR: cannot find residue " << sResidue << endl;
+	Rcpp::Rcerr << "ERROR: cannot find residue " << sResidue << endl;
 	return dResidueMass;
 }
 
@@ -532,7 +533,7 @@ bool ProNovoConfig::parseConfigKeyValues()
 		//	    cout << (*it).first << " => " << (*it).second << endl;
 	}
 	else
-		cerr << "Can't open configure file " << sFilename << endl;
+		Rcpp::Rcerr << "Can't open configure file " << sFilename << endl;
 	config_stream.clear();
 	config_stream.close();
 	return bReVal;
@@ -552,7 +553,7 @@ bool ProNovoConfig::getConfigValue(string sConfigKey, string &sConfigValue)
 	else
 	{
 		sConfigValue = "";
-		cerr << "Warning: Cannot find parameter " << sConfigKey << " in the Config file." << endl;
+		Rcpp::Rcerr << "Warning: Cannot find parameter " << sConfigKey << " in the Config file." << endl;
 		return false;
 	}
 }
@@ -596,7 +597,7 @@ bool ProNovoConfig::parseConfigLine(const std::string &sLine)
 	{
 		if (sSectionName == "")
 		{
-			cerr << "can't find the section name" << endl;
+			Rcpp::Rcerr << "can't find the section name" << endl;
 			bReVal = false;
 		}
 		else
@@ -604,14 +605,14 @@ bool ProNovoConfig::parseConfigLine(const std::string &sLine)
 			equalPos = sLine.find("=");
 			if (equalPos == string::npos)
 			{
-				cerr << "can't find = " << endl;
+				Rcpp::Rcerr << "can't find = " << endl;
 				bReVal = false;
 			}
 			else
 			{
 				if ((equalPos == 0) || (equalPos == (sLine.length() - 1)))
 				{
-					cerr << "can't find key or value" << endl;
+					Rcpp::Rcerr << "can't find key or value" << endl;
 					bReVal = false;
 				}
 				else
@@ -624,7 +625,7 @@ bool ProNovoConfig::parseConfigLine(const std::string &sLine)
 					ret = mapConfigKeyValues.insert(pair<string, string>(sSectionName + sKey, sValue));
 					if (ret.second == false)
 					{
-						cerr << "Key " << sSectionName + sKey << " has existed with value of " << ret.first->second << endl;
+						Rcpp::Rcerr << "Key " << sSectionName + sKey << " has existed with value of " << ret.first->second << endl;
 						bReVal = false;
 					}
 				}

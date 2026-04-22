@@ -1,4 +1,5 @@
 #include "PSMfeatureExtractor.h"
+#include <Rcpp.h>
 
 PSMfeatureExtractor::PSMfeatureExtractor() {}
 
@@ -515,7 +516,7 @@ void PSMfeatureExtractor::writeTSV(const std::string &fileName) {
     std::ios_base::sync_with_stdio(false);
     std::ofstream file(fileName);
     if (!file) {
-        std::cerr << "Unable to open file for writing.\n";
+        Rcpp::Rcerr << "Unable to open file for writing.\n";
     }
     file << std::fixed << std::setprecision(6);
 
@@ -588,7 +589,7 @@ void PSMfeatureExtractor::writePecorlatorPin(const std::string &fileName,
     std::ios_base::sync_with_stdio(false);
     std::ofstream file(fileName);
     if (!file) {
-        std::cerr << "Unable to open file for writing.\n";
+        Rcpp::Rcerr << "Unable to open file for writing.\n";
     }
     file << std::fixed << std::setprecision(6);
 

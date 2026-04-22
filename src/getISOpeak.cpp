@@ -1,6 +1,8 @@
 #include "lib/initSIP.h"
 #include "lib/averagine.h"
+#include <algorithm>
 #include <Rcpp.h>
+#include <utility>
 
 using namespace Rcpp;
 
@@ -213,7 +215,8 @@ NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVecto
 		goodInput = false;
 		Rcout << Atom.get_cstring() << " element not supported!" << endl;
 	}
-	NumericVector v(AAstrs.size(), 0);
+	NumericVector v(AAstrs.size());
+	std::fill(v.begin(), v.end(), 0.0);
 	if (goodInput)
 	{
 		// read default config
@@ -271,7 +274,8 @@ NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector 
 		goodInput = false;
 		Rcout << Atom.get_cstring() << " element not supported!" << endl;
 	}
-	NumericVector v(AAstrs.size(), 0);
+	NumericVector v(AAstrs.size());
+	std::fill(v.begin(), v.end(), 0.0);
 	if (goodInput)
 	{
 		// read default config
@@ -341,8 +345,8 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 		{
 			mAveragine.calPrecursorIsotopeDistribution(as<std::string>(AAstrs(i)), mSIP);
 			df =
-				DataFrame::create(Named("Mass") = move(mSIP.vMass), _["Prob"] = move(mSIP.vProb));
-			spectraList[i] = move(df);
+				DataFrame::create(Named("Mass") = std::move(mSIP.vMass), _["Prob"] = std::move(mSIP.vProb));
+			spectraList[i] = std::move(df);
 		}
 	}
 	return spectraList;
@@ -397,7 +401,7 @@ DataFrame BYion_peak_calculator_DIY(String AAstr, String Atom,
 		}
 	}
 	DataFrame df =
-		DataFrame::create(Named("Mass") = move(masses),
-						  _["Prob"] = move(probs), _["Kind"] = move(kinds));
+		DataFrame::create(Named("Mass") = std::move(masses),
+						  _["Prob"] = std::move(probs), _["Kind"] = std::move(kinds));
 	return df;
 }

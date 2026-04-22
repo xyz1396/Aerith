@@ -3,17 +3,17 @@ PKG_CPPFLAGS = -I.
 # PKG_LIBS=$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
 CXX_STD = CXX17
-# PKG_CXXFLAGS += -O3 -fopenmp
-PKG_CXXFLAGS += $(SHLIB_OPENMP_CXXFLAGS)
-PKG_LIBS += $(SHLIB_OPENMP_CXXFLAGS) 
+PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
 
-# Include all C++ files in src/ and its subdirectories: src/A and src/B
-LIB = $(wildcard lib/*.cpp)
-SRC = $(wildcard *.cpp)
-SOURCES = $(SRC) $(LIB)
-
-# Obtain the object files
-OBJECTS = $(SOURCES:.cpp=.o)
+OBJECTS = RcppExports.o extractPSMfeatures.o filterPSMs.o filterPeptides.o \
+	generateCFG.o getISOpeak.o readScan.o readScans.o readSips.o \
+	readSpe2Peps.o scorePSM.o writeScans.o \
+	lib/PSMfeatureExtractor.o lib/PSMpeakAnnotator.o lib/PSMsFiltrator.o \
+	lib/Spe2PepFileReader.o lib/averagine.o lib/cfgParser.o \
+	lib/ftFileReader.o lib/ftFileWriter.o lib/isotopologue.o lib/ms2scan.o \
+	lib/peptide.o lib/peptidesFiltrator.o lib/proNovoConfig.o \
+	lib/sipFileReader.o lib/sipGenerator.o lib/sipPSM.o
 
 # Make the shared object
 all: $(SHLIB)

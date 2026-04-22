@@ -1,6 +1,7 @@
 #include "lib/PSMsFiltrator.h"
 #include "lib/sipFileReader.h"
 #include <Rcpp.h>
+#include <utility>
 using namespace Rcpp;
 
 //' getUnfilteredPSMs
@@ -20,24 +21,24 @@ DataFrame getUnfilteredPSMs(String sipPath, String ftPath, size_t topN)
     reader.readAllFilesTopPSMs();
     PSMsFiltrator filtrator(sipPath, ftPath);
     sipPSMinfo msipPSMinfo = filtrator.convertFilesScansTopPSMs(reader.filesScansTopPSMs);
-    return DataFrame::create(Named("psmIDs") = move(msipPSMinfo.psmIDs),
-                             _("ftFileNames") = move(msipPSMinfo.fileNames),
-                             _["scanNumbers"] = move(msipPSMinfo.scanNumbers),
-                             _["retentionTimes"] = move(msipPSMinfo.retentionTimes),
-                             _["scores"] = move(msipPSMinfo.scores),
-                             _["ranks"] = move(msipPSMinfo.ranks),
-                             _["parentCharges"] = move(msipPSMinfo.parentCharges),
-                             _["pcts"] = move(msipPSMinfo.pcts),
-                             _["searchNames"] = move(msipPSMinfo.searchNames),
-                             _["isDecoys"] = move(msipPSMinfo.isDecoys),
-                             _["measuredParentMasses"] = move(msipPSMinfo.measuredParentMasses),
-                             _["calculatedParentMasses"] = move(msipPSMinfo.calculatedParentMasses),
-                             _["identifiedPepSeqs"] = move(msipPSMinfo.identifiedPeptides),
-                             _["originalPepSeqs"] = move(msipPSMinfo.originalPeptides),
-                             _["realPepSeqs"] = move(msipPSMinfo.realPepSeqs),
-                             _["formatedPepSeqs"] = move(msipPSMinfo.formatedPepSeqs),
-                             _["pepLengths"] = move(msipPSMinfo.pepLengths),
-                             _["proNames"] = move(msipPSMinfo.proteinNames),
-                             _["trimedProteinNames"] = move(msipPSMinfo.trimedProteinNames),
-                             _["proCounts"] = move(msipPSMinfo.proCounts));
+    return DataFrame::create(Named("psmIDs") = std::move(msipPSMinfo.psmIDs),
+                             _("ftFileNames") = std::move(msipPSMinfo.fileNames),
+                             _["scanNumbers"] = std::move(msipPSMinfo.scanNumbers),
+                             _["retentionTimes"] = std::move(msipPSMinfo.retentionTimes),
+                             _["scores"] = std::move(msipPSMinfo.scores),
+                             _["ranks"] = std::move(msipPSMinfo.ranks),
+                             _["parentCharges"] = std::move(msipPSMinfo.parentCharges),
+                             _["pcts"] = std::move(msipPSMinfo.pcts),
+                             _["searchNames"] = std::move(msipPSMinfo.searchNames),
+                             _["isDecoys"] = std::move(msipPSMinfo.isDecoys),
+                             _["measuredParentMasses"] = std::move(msipPSMinfo.measuredParentMasses),
+                             _["calculatedParentMasses"] = std::move(msipPSMinfo.calculatedParentMasses),
+                             _["identifiedPepSeqs"] = std::move(msipPSMinfo.identifiedPeptides),
+                             _["originalPepSeqs"] = std::move(msipPSMinfo.originalPeptides),
+                             _["realPepSeqs"] = std::move(msipPSMinfo.realPepSeqs),
+                             _["formatedPepSeqs"] = std::move(msipPSMinfo.formatedPepSeqs),
+                             _["pepLengths"] = std::move(msipPSMinfo.pepLengths),
+                             _["proNames"] = std::move(msipPSMinfo.proteinNames),
+                             _["trimedProteinNames"] = std::move(msipPSMinfo.trimedProteinNames),
+                             _["proCounts"] = std::move(msipPSMinfo.proCounts));
 }

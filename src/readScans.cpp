@@ -1,5 +1,6 @@
 #include "lib/ftFileReader.h"
 #include <Rcpp.h>
+#include <utility>
 
 using namespace Rcpp;
 
@@ -139,12 +140,12 @@ List readAllScanMS1(const String ftFile)
         mScan = &reader.Scans[i];
         // use move to speed up copy vector
         // use wrap to convert vector to numericVector
-        DataFrame peakDf = DataFrame::create(Named("mz") = wrap(move(mScan->mz)),
-                                             _["intensity"] = wrap(move(mScan->intensity)),
-                                             _["resolution"] = wrap(move(mScan->resolution)),
-                                             _["baseLine"] = wrap(move(mScan->baseLine)),
-                                             _["signalToNoise"] = wrap(move(mScan->signalToNoise)),
-                                             _["charge"] = wrap(move(mScan->charge)));
+        DataFrame peakDf = DataFrame::create(Named("mz") = wrap(std::move(mScan->mz)),
+                                             _["intensity"] = wrap(std::move(mScan->intensity)),
+                                             _["resolution"] = wrap(std::move(mScan->resolution)),
+                                             _["baseLine"] = wrap(std::move(mScan->baseLine)),
+                                             _["signalToNoise"] = wrap(std::move(mScan->signalToNoise)),
+                                             _["charge"] = wrap(std::move(mScan->charge)));
         List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
                                       _["retentionTime"] = mScan->retentionTime,
                                       _["TIC"] = mScan->TIC,
@@ -277,12 +278,12 @@ List readAllScanMS2(const String ftFile)
     {
         mScan = &reader.Scans[i];
         // use move to speed up copy vector
-        DataFrame peakDf = DataFrame::create(Named("mz") = wrap(move(mScan->mz)),
-                                             _["intensity"] = wrap(move(mScan->intensity)),
-                                             _["resolution"] = wrap(move(mScan->resolution)),
-                                             _["baseLine"] = wrap(move(mScan->baseLine)),
-                                             _["signalToNoise"] = wrap(move(mScan->signalToNoise)),
-                                             _["charge"] = wrap(move(mScan->charge)));
+        DataFrame peakDf = DataFrame::create(Named("mz") = wrap(std::move(mScan->mz)),
+                                             _["intensity"] = wrap(std::move(mScan->intensity)),
+                                             _["resolution"] = wrap(std::move(mScan->resolution)),
+                                             _["baseLine"] = wrap(std::move(mScan->baseLine)),
+                                             _["signalToNoise"] = wrap(std::move(mScan->signalToNoise)),
+                                             _["charge"] = wrap(std::move(mScan->charge)));
         List mScanList = List::create(Named("scanNumber") = mScan->scanNumber,
                                       _["retentionTime"] = mScan->retentionTime,
                                       _["precursorScanNumber"] = mScan->precursorScanNumber,

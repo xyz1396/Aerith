@@ -1,4 +1,5 @@
 #include "averagine.h"
+#include <Rcpp.h>
 
 averagine::averagine(const int minPepLen, const int maxPepLen)
     : minPepLen(minPepLen), maxPepLen(maxPepLen), pepLenRange(maxPepLen - minPepLen + 1)
@@ -112,7 +113,7 @@ void averagine::changeAtomSIPabundance(const char SIPatom, const double pct)
     const size_t atomPos = SIPatoms.find(SIPatom);
     if (atomPos == string::npos)
     {
-        cout << SIPatom << "element is not supported!" << endl;
+        Rcpp::Rcout << SIPatom << "element is not supported!" << endl;
         return;
     }
     const int atomIndex = static_cast<int>(atomPos);
@@ -135,13 +136,13 @@ bool averagine::changeAtomProbability(std::vector<double> &probs, const char ato
     const double boundedPct = std::max(0.0, std::min(1.0, pct));
     if (boundedPct != pct)
     {
-        cerr << "Warning: SIP abundance percentage " << pct << " is out of [0,1], clamped to "
-             << boundedPct << "." << endl;
+        Rcpp::Rcerr << "Warning: SIP abundance percentage " << pct << " is out of [0,1], clamped to "
+                    << boundedPct << "." << endl;
     }
     const size_t isotopeIndex = (atom == 'O' || atom == 'S') ? 2u : 1u;
     if (probs.empty() || isotopeIndex >= probs.size())
     {
-        cout << atom << " isotope index is not available in atom distribution!" << endl;
+        Rcpp::Rcout << atom << " isotope index is not available in atom distribution!" << endl;
         return false;
     }
     probs[isotopeIndex] = boundedPct;
@@ -152,8 +153,8 @@ bool averagine::changeAtomProbability(std::vector<double> &probs, const char ato
     }
     if (sumOthers > 1.0)
     {
-        cerr << "Warning: sum of non-mono isotopes exceeds 1 for atom " << atom
-             << " (sumOthers=" << sumOthers << "). Resetting to mono+target only." << endl;
+        Rcpp::Rcerr << "Warning: sum of non-mono isotopes exceeds 1 for atom " << atom
+                    << " (sumOthers=" << sumOthers << "). Resetting to mono+target only." << endl;
         std::fill(probs.begin(), probs.end(), 0.0);
         probs[isotopeIndex] = boundedPct;
         probs[0] = 1.0 - boundedPct;
@@ -227,7 +228,7 @@ void averagine::calPepAtomCounts(const string &pepSeq)
                 .mResidueAtomicComposition.find(pepSeq.substr(i, 1)) == ProNovoConfig::configIsotopologue
                                                                             .mResidueAtomicComposition.end())
         {
-            cerr << "ERROR: cannot find " << pepSeq.substr(i, 1) << " residue or PTM in the config file." << endl;
+            Rcpp::Rcerr << "ERROR: cannot find " << pepSeq.substr(i, 1) << " residue or PTM in the config file." << endl;
             return;
         }
         residueAtomCounts = &ProNovoConfig::configIsotopologue
@@ -256,7 +257,7 @@ void averagine::calBYionsAtomCounts(const string &pepSeq)
                 .mResidueAtomicComposition.find(pepSeq.substr(i, 1)) == ProNovoConfig::configIsotopologue
                                                                             .mResidueAtomicComposition.end())
         {
-            cerr << "ERROR: cannot find " << pepSeq.substr(i, 1) << " residue or PTM in the config file." << endl;
+            Rcpp::Rcerr << "ERROR: cannot find " << pepSeq.substr(i, 1) << " residue or PTM in the config file." << endl;
             return;
         }
         if (!isalpha(pepSeq[i]))

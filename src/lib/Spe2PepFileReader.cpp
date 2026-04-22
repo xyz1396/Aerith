@@ -1,4 +1,5 @@
 #include "Spe2PepFileReader.h"
+#include <Rcpp.h>
 
 Spe2PepFileReader::Spe2PepFileReader()
 {
@@ -30,7 +31,7 @@ std::vector<std::string> Spe2PepFileReader::getSpe2PepFiles(const std::string &m
         }
     }
     if (spe2PepFiles.size() == 0)
-        std::cerr << "no .Spe2Pep.txt file was found in " << mWorkingPath << " !" << std::endl;
+        Rcpp::Rcerr << "no .Spe2Pep.txt file was found in " << mWorkingPath << " !" << std::endl;
     return spe2PepFiles;
 }
 
@@ -125,7 +126,7 @@ void Spe2PepFileReader::readOneEntireFile(const std::string &sipFileName)
     std::ifstream file(sipFileName, std::ios::in | std::ios::binary | std::ios::ate);
     if (!file)
     {
-        std::cout << "Cannot open " << sipFileName << std::endl;
+        Rcpp::Rcout << "Cannot open " << sipFileName << std::endl;
         return;
     }
     std::streamsize fileSize = file.tellg();
@@ -134,7 +135,7 @@ void Spe2PepFileReader::readOneEntireFile(const std::string &sipFileName)
     // Read the entire file into one string
     if (!file.read(&fileContent[0], fileSize))
     {
-        std::cout << "Cannot open " << sipFileName << std::endl;
+        Rcpp::Rcout << "Cannot open " << sipFileName << std::endl;
         return;
     }
     size_t pos = 0;
@@ -246,7 +247,7 @@ void Spe2PepFileReader::readOneFile(std::string sipFileName)
         sipFileStream.open(sipFileName.c_str(), std::ios::in);
         if (!sipFileStream.is_open())
         {
-            std::cout << "Cannot open " << sipFileName << std::endl;
+            Rcpp::Rcout << "Cannot open " << sipFileName << std::endl;
         }
         // ignore annotation in .Spe2Pep.txt file
         while (!sipFileStream.eof())
@@ -279,7 +280,7 @@ void Spe2PepFileReader::readOneFile(std::string sipFileName)
     }
     else
     {
-        std::cout << sipFileName << " does not exists" << std::endl;
+        Rcpp::Rcout << sipFileName << " does not exists" << std::endl;
     }
 }
 
@@ -443,7 +444,7 @@ std::unordered_map<std::string, std::vector<std::string>> Spe2PepFileReader::
         pos = filename.find_last_of(".", pos - 1);
         pos = filename.find_last_of(".", pos - 1);
         if (pos == std::string::npos)
-            std::cout << filename << " 's name style is not right" << std::endl;
+            Rcpp::Rcout << filename << " 's name style is not right" << std::endl;
         else
             FT2map[filename.substr(0, pos)].push_back(str);
     }
@@ -531,7 +532,7 @@ void Spe2PepFileReader::mergeDecoyToTarget(Spe2PepFileReader &targetReader,
         else
         {
             targetReader.filesScansTopPSMs.insert(decoyFileIX);
-            std::cerr << "target decoy files not match, " << decoyFileIX.first << " only exists in decoy" << std::endl;
+            Rcpp::Rcerr << "target decoy files not match, " << decoyFileIX.first << " only exists in decoy" << std::endl;
         }
     }
     for (auto &targetFileIX : targetReader.filesScansTopPSMs)
@@ -587,7 +588,7 @@ void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
     std::ofstream file(fileName);
     if (!file)
     {
-        std::cerr << "Unable to open file for writing.\n";
+        Rcpp::Rcerr << "Unable to open file for writing.\n";
     }
     file << std::fixed << std::setprecision(6);
 

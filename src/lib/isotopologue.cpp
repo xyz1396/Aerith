@@ -1,4 +1,6 @@
 #include "isotopologue.h"
+#include <Rcpp.h>
+#include <stdexcept>
 
 IsotopeDistribution::IsotopeDistribution()
 {
@@ -17,10 +19,10 @@ IsotopeDistribution::~IsotopeDistribution()
 
 void IsotopeDistribution::print()
 {
-	cout << "Mass " << '\t' << "Inten" << endl;
+	Rcpp::Rcout << "Mass " << '\t' << "Inten" << endl;
 	for (unsigned int i = 0; i < vMass.size(); i++)
 	{
-		cout << setprecision(8) << vMass[i] << '\t' << vProb[i] << endl;
+		Rcpp::Rcout << setprecision(8) << vMass[i] << '\t' << vProb[i] << endl;
 	}
 }
 
@@ -110,7 +112,7 @@ bool Isotopologue::setupIsotopologue(const string &sTable, const string &AtomNam
 			if (issStream.eof())
 			{
 				// this row doesn't have 6 fields
-				cerr << "ERROR:  the RESIDUE_ATOMIC_COMPOSITION table in ProNovoConfig is not correct!" << endl;
+				Rcpp::Rcerr << "ERROR:  the RESIDUE_ATOMIC_COMPOSITION table in ProNovoConfig is not correct!" << endl;
 				return false;
 			}
 			issStream >> iNumber;
@@ -140,14 +142,12 @@ bool Isotopologue::setupIsotopologue(const string &sTable, const string &AtomNam
 	{
 		if (!ProNovoConfig::getAtomIsotopicComposition(AtomName[i], vdMassTemp, vdNaturalCompositionTemp))
 		{
-			cerr << "ERROR: cannot retrieve isotopic composition for atom " << AtomName[i] << " from ProNovoConfig" << endl;
+			Rcpp::Rcerr << "ERROR: cannot retrieve isotopic composition for atom " << AtomName[i] << " from ProNovoConfig" << endl;
 			return false;
 		}
 		if (!CheckMass(vdMassTemp, vdNaturalCompositionTemp))
 		{
-			cerr << "ERROR: Isotopic distribution of elements is not correctly set." << endl;
-			cerr << "ERROR: Difference of isotopic distribution of elements should be around 1 Dalton." << endl;
-			exit(1);
+			throw std::runtime_error("Isotopic distribution of elements is not correctly set.");
 		}
 		vAtomIsotopicDistribution[i].vMass = vdMassTemp;
 		vAtomIsotopicDistribution[i].vProb = vdNaturalCompositionTemp;
@@ -160,7 +160,7 @@ bool Isotopologue::setupIsotopologue(const string &sTable, const string &AtomNam
 	{
 		if (!computeIsotopicDistribution(ResidueIter->second, tempIsotopeDistribution))
 		{
-			cerr << "ERROR: cannot calculate the isotopic distribution for residue " << ResidueIter->first << endl;
+			Rcpp::Rcerr << "ERROR: cannot calculate the isotopic distribution for residue " << ResidueIter->first << endl;
 			return false;
 		}
 
@@ -194,8 +194,7 @@ bool Isotopologue::setupIsotopologue(const string &sTable, const string &AtomNam
 		}
 		else
 		{
-			cout << "error: duplicate symbols" << endl;
-			exit(1);
+			throw std::runtime_error("error: duplicate symbols");
 		}
 	}
 	map<string, IsotopeDistribution>::iterator iterResidueIsotopicDistribution;
@@ -226,25 +225,24 @@ bool Isotopologue::setupIsotopologue(const string &sTable, const string &AtomNam
 		}
 		else
 		{
-			cout << "error: duplicate symbols" << endl;
-			exit(1);
+			throw std::runtime_error("error: duplicate symbols");
 		}
 	}
 	if (ProNovoConfig::pdAAMassFragment.find('h') == ProNovoConfig::pdAAMassFragment.end())
 	{
-		cout << "Error 70" << endl;
+		Rcpp::Rcout << "Error 70" << endl;
 	}
 	if (ProNovoConfig::pdAAMassFragment.find('c') == ProNovoConfig::pdAAMassFragment.end())
 	{
-		cout << "Error 71" << endl;
+		Rcpp::Rcout << "Error 71" << endl;
 	}
 	if (ProNovoConfig::pdAAMassFragment.find('o') == ProNovoConfig::pdAAMassFragment.end())
 	{
-		cout << "Error 72" << endl;
+		Rcpp::Rcout << "Error 72" << endl;
 	}
 	if (ProNovoConfig::pdAAMassFragment.find('n') == ProNovoConfig::pdAAMassFragment.end())
 	{
-		cout << "Error 73" << endl;
+		Rcpp::Rcout << "Error 73" << endl;
 	}
 	// H2O
 	dMass = ProNovoConfig::pdAAMassFragment.find('h') * 2 + ProNovoConfig::pdAAMassFragment.find('o');
@@ -330,7 +328,7 @@ bool Isotopologue::getSingleResidueMostAbundantMasses(vector<string> &vsResidues
 		}
 		else
 		{
-			cerr << "ERROR: Cannot recognize the configuration for residue " << sCurrentResidue << endl;
+		Rcpp::Rcerr << "ERROR: Cannot recognize the configuration for residue " << sCurrentResidue << endl;
 		}
 	}
 
@@ -377,7 +375,7 @@ bool Isotopologue::computeIsotopicDistribution(string sSequence, IsotopeDistribu
 	}
 	else
 	{
-		cerr << "ERROR: can't find the N-terminus" << endl;
+		Rcpp::Rcerr << "ERROR: can't find the N-terminus" << endl;
 		return false;
 	}
 
@@ -389,7 +387,7 @@ bool Isotopologue::computeIsotopicDistribution(string sSequence, IsotopeDistribu
 	}
 	else
 	{
-		cerr << "ERROR: can't find the C-terminus" << endl;
+		Rcpp::Rcerr << "ERROR: can't find the C-terminus" << endl;
 		return false;
 	}
 
@@ -405,7 +403,7 @@ bool Isotopologue::computeIsotopicDistribution(string sSequence, IsotopeDistribu
 		}
 		else
 		{
-			cerr << "ERROR: can't find the residue " << currentResidue << endl;
+			Rcpp::Rcerr << "ERROR: can't find the residue " << currentResidue << endl;
 			return false;
 		}
 	}
@@ -439,7 +437,7 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 
 	if (iPeptideLength < ProNovoConfig::getMinPeptideLength())
 	{
-		cerr << "ERROR: Peptide sequence is too short " << sSequence << endl;
+		Rcpp::Rcerr << "ERROR: Peptide sequence is too short " << sSequence << endl;
 		return false;
 	}
 
@@ -466,7 +464,7 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 
 	if (sSequence[0] != '[')
 	{
-		cerr << "ERROR: First character in a peptide sequence must be [." << endl;
+		Rcpp::Rcerr << "ERROR: First character in a peptide sequence must be [." << endl;
 		return false;
 	}
 
@@ -483,7 +481,7 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 			ResidueIter = vResidueIsotopicDistribution.find(currentPTM);
 			if (ResidueIter == vResidueIsotopicDistribution.end())
 			{
-				cerr << "ERROR: cannot find this PTM in the config file " << currentPTM << endl;
+				Rcpp::Rcerr << "ERROR: cannot find this PTM in the config file " << currentPTM << endl;
 				return false;
 			}
 
@@ -494,7 +492,7 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 	}
 	else
 	{
-		cerr << "ERROR: can't find the N-terminus" << endl;
+		Rcpp::Rcerr << "ERROR: can't find the N-terminus" << endl;
 		return false;
 	}
 
@@ -507,14 +505,14 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 
 		if (!isalpha(sSequence[i]))
 		{
-			cerr << "ERROR: One residue can only have one PTM (Up to only one symbol after an amino acid)" << endl;
+			Rcpp::Rcerr << "ERROR: One residue can only have one PTM (Up to only one symbol after an amino acid)" << endl;
 			return false;
 		}
 		currentResidue = sSequence.substr(i, 1);
 		ResidueIter = vResidueIsotopicDistribution.find(currentResidue);
 		if (ResidueIter == vResidueIsotopicDistribution.end())
 		{
-			cerr << "ERROR: cannot find this residue in the config file. " << currentResidue << endl;
+			Rcpp::Rcerr << "ERROR: cannot find this residue in the config file. " << currentResidue << endl;
 			return false;
 		}
 		currentDistribution = ResidueIter->second;
@@ -526,7 +524,7 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 				ResidueIter = vResidueIsotopicDistribution.find(currentPTM);
 				if (ResidueIter == vResidueIsotopicDistribution.end())
 				{
-					cerr << "ERROR: cannot find this PTM in the config file " << currentPTM << endl;
+					Rcpp::Rcerr << "ERROR: cannot find this PTM in the config file " << currentPTM << endl;
 					return false;
 				}
 
@@ -554,7 +552,7 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 				ResidueIter = vResidueIsotopicDistribution.find(currentPTM);
 				if (ResidueIter == vResidueIsotopicDistribution.end())
 				{
-					cerr << "ERROR: cannot find this PTM in the config file " << currentPTM << endl;
+					Rcpp::Rcerr << "ERROR: cannot find this PTM in the config file " << currentPTM << endl;
 					return false;
 				}
 
@@ -566,7 +564,7 @@ bool Isotopologue::computeProductIon(string sSequence, vector<vector<double>> &v
 	}
 	else
 	{
-		cerr << "ERROR: can't find the C-terminus" << endl;
+		Rcpp::Rcerr << "ERROR: can't find the C-terminus" << endl;
 		return false;
 	}
 
@@ -681,7 +679,7 @@ bool Isotopologue::computeAtomicComposition(string sSequence, vector<int> &myAto
 	}
 	else
 	{
-		cerr << "ERROR: can't find the atomic composition for the N-terminus" << endl;
+		Rcpp::Rcerr << "ERROR: can't find the atomic composition for the N-terminus" << endl;
 		return false;
 	}
 
@@ -694,7 +692,7 @@ bool Isotopologue::computeAtomicComposition(string sSequence, vector<int> &myAto
 	}
 	else
 	{
-		cerr << "ERROR: can't find the atomic composition for the C-terminus" << endl;
+		Rcpp::Rcerr << "ERROR: can't find the atomic composition for the C-terminus" << endl;
 		return false;
 	}
 
@@ -710,7 +708,7 @@ bool Isotopologue::computeAtomicComposition(string sSequence, vector<int> &myAto
 		}
 		else
 		{
-			cerr << "ERROR: can't find the atomic composition for residue/PTM: " << currentResidue << endl;
+			Rcpp::Rcerr << "ERROR: can't find the atomic composition for residue/PTM: " << currentResidue << endl;
 			return false;
 		}
 	}
@@ -810,9 +808,7 @@ IsotopeDistribution Isotopologue::sum(const IsotopeDistribution &distribution0, 
 
 	if (sumProb <= 0)
 	{
-		cerr << "Error: Sum of distribution is zero" << endl;
-		exit(1);
-		return sumDistribution;
+		throw std::runtime_error("Error: Sum of distribution is zero");
 	}
 
 	for (i = 0; i < iSizeSumDistribution; ++i)

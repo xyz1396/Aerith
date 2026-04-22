@@ -1,4 +1,5 @@
 #include "peptide.h"
+#include <Rcpp.h>
 
 Peptide::Peptide()
 {
@@ -36,7 +37,7 @@ void Peptide::calculateExpectedFragments(const string &sNewPeptide, const map<ch
 	vdYionMasses.reserve(sNewPeptide.length());
 
 	if (sNewPeptide[0] != '[')
-		cerr << "ERROR: peptide sequence must start with '[' as N terminus; Invalid sequence = " << sNewPeptide << endl;
+		Rcpp::Rcerr << "ERROR: peptide sequence must start with '[' as N terminus; Invalid sequence = " << sNewPeptide << endl;
 	for (i = 1; i < (int)sNewPeptide.length(); ++i)
 	{
 		if (sNewPeptide[i] == ']')
@@ -44,7 +45,7 @@ void Peptide::calculateExpectedFragments(const string &sNewPeptide, const map<ch
 			break;
 		iter = mapResidueMass.find(sNewPeptide[i]);
 		if (iter == mapResidueMass.end())
-			cerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the config." << endl;
+			Rcpp::Rcerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the config." << endl;
 		else if (isalpha(sNewPeptide[i]))
 		{
 			// this is an amino acid residue
@@ -67,7 +68,7 @@ void Peptide::calculateExpectedFragments(const string &sNewPeptide, const map<ch
 			// this is PTM to the C terminus
 			iter = mapResidueMass.find(sNewPeptide[i]);
 			if (iter == mapResidueMass.end())
-				cerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the config." << endl;
+				Rcpp::Rcerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the config." << endl;
 			else
 				dMass = dMass + iter->second;
 		}

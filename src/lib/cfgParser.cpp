@@ -1,4 +1,5 @@
 #include "cfgParser.h"
+#include <Rcpp.h>
 
 cfgParser::cfgParser(const string &cfgFileName)
 {
@@ -7,7 +8,7 @@ cfgParser::cfgParser(const string &cfgFileName)
         cfgFileStream.open(cfgFileName.c_str(), ios::in);
         if (!cfgFileStream.is_open())
         {
-            cout << "Cannot open " << cfgFileName << endl;
+            Rcpp::Rcout << "Cannot open " << cfgFileName << endl;
         }
         string line;
         while (getline(cfgFileStream, line))
@@ -67,7 +68,7 @@ size_t cfgParser::findParameter(const string &parameter)
     else
     {
         return 0;
-        cout << parameter << "Not Found!" << endl;
+        Rcpp::Rcout << parameter << "Not Found!" << endl;
     }
 }
 
@@ -127,8 +128,8 @@ void cfgParser::writeFile(const string &folderPath)
     fs::path path{folderPath};
     if (!fs::exists(path))
     {
-        cout << path.string() << " Not exists" << endl;
-        cout << "Creat " << path.string() << endl;
+        Rcpp::Rcout << path.string() << " Not exists" << endl;
+        Rcpp::Rcout << "Creat " << path.string() << endl;
         fs::create_directories(path);
     }
     path /= newFileName + ".cfg";

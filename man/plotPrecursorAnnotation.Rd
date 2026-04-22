@@ -39,6 +39,9 @@ plotPrecursorAnnotation(
 \item{isoWidth}{isolation window width. Defaults to the m/z span of
 \code{observedSpect} when \code{0}.}
 
+\item{xwidth}{x-axis display width around \code{isoCenter}. Defaults to the m/z
+span of the observed and expected peaks when \code{0}.}
+
 \item{ifRemoveNotFoundIon}{set it FALSE as default}
 
 \item{ifShowPrecursorChargeAnnotation}{Logical. If TRUE, show precursor charge

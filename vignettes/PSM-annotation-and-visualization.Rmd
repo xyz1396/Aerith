@@ -181,6 +181,44 @@ p <- plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth
 p
 ```
 
+The same precursor comparison can also be performed with the dedicated precursor annotation helpers. `annotatePrecursor()` returns the matched isotopic peaks, while `plotPrecursorAnnotation()` provides the corresponding visualization directly from the observed MS1 spectrum.
+
+```{r}
+observed_precursor <- getRealScanFromList(ft1)
+xlimit <- observed_precursor@spectra$MZ > 880 & observed_precursor@spectra$MZ < 890
+observed_precursor@spectra <- observed_precursor@spectra[xlimit, ]
+
+precursor_anno <- annotatePrecursor(
+    observed_precursor@spectra$Mass,
+    observed_precursor@spectra$Prob,
+    observed_precursor@spectra$Charge,
+    pepSeq = pep,
+    charge = 3,
+    Atom = "C13",
+    Prob = 0.0107,
+    isoCenter = 886.65,
+    isoWidth = 4.0
+)
+matched_precursor <- precursor_anno$ExpectedPrecursorIons[
+    precursor_anno$ExpectedPrecursorIons$matchedIndices != -1,
+    c("mz", "intensity", "charge", "matchedIndices", "SIPabundances")
+]
+head(matched_precursor)
+
+plotPrecursorAnnotation(
+    observedSpect = observed_precursor,
+    pep = pep,
+    charge = 3,
+    Atom = "C13",
+    Prob = 0.0107,
+    isoCenter = 886.65,
+    isoWidth = 4.0,
+    xwidth = 10.0,
+    ifRemoveNotFoundIon = TRUE,
+    ifAdjustSIPabundance = FALSE
+)
+```
+
 **Key Analysis Components:**
 
 1. **MS1 data extraction**: Reading the precursor scan corresponding to the MS2 spectrum
@@ -354,6 +392,44 @@ p <- plot(precursorSP, linewidth = 0.3) + plotRealScan(precursorScan1, linewidth
     theme(legend.title = element_blank()) +
     scale_color_manual(values = c("#E7872B", "#F3082F"))
 p
+```
+
+For heavily labeled samples, the dedicated precursor helpers make it easier to inspect which peaks in the broadened isotopic envelope are matched and to generate a focused annotation plot over the precursor region.
+
+```{r}
+observed_precursor <- getRealScanFromList(ft1)
+xlimit <- observed_precursor@spectra$MZ > 590 & observed_precursor@spectra$MZ < 620
+observed_precursor@spectra <- observed_precursor@spectra[xlimit, ]
+
+precursor_anno <- annotatePrecursor(
+    observed_precursor@spectra$Mass,
+    observed_precursor@spectra$Prob,
+    observed_precursor@spectra$Charge,
+    pepSeq = pep,
+    charge = 3,
+    Atom = "C13",
+    Prob = 0.5,
+    isoCenter = 605.0,
+    isoWidth = 5.0
+)
+matched_precursor <- precursor_anno$ExpectedPrecursorIons[
+    precursor_anno$ExpectedPrecursorIons$matchedIndices != -1,
+    c("mz", "intensity", "charge", "matchedIndices", "SIPabundances")
+]
+head(matched_precursor)
+
+plotPrecursorAnnotation(
+    observedSpect = observed_precursor,
+    pep = pep,
+    charge = 3,
+    Atom = "C13",
+    Prob = 0.5,
+    isoCenter = 605.0,
+    isoWidth = 5.0,
+    xwidth = 30.0,
+    ifRemoveNotFoundIon = TRUE,
+    ifAdjustSIPabundance = FALSE
+)
 ```
 
 **Heavy Labeling Precursor Features:**

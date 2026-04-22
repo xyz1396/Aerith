@@ -492,6 +492,8 @@ plotPSMannotation <- function(observedSpect, pep, Atom, Prob, charges,
 #'   `observedSpect` when `0`.
 #' @param isoWidth isolation window width. Defaults to the m/z span of
 #'   `observedSpect` when `0`.
+#' @param xwidth x-axis display width around `isoCenter`. Defaults to the m/z
+#'   span of the observed and expected peaks when `0`.
 #' @param ifRemoveNotFoundIon set it FALSE as default
 #' @param ifShowPrecursorChargeAnnotation Logical. If TRUE, show precursor charge
 #'   annotation labels with ggrepel. Default TRUE.
@@ -692,4 +694,3 @@ plotPrecursorAnnotation <- function(observedSpect, pep, charge,
     )
     return(p)
 }
-

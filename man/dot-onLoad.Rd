@@ -11,6 +11,9 @@
 
 \item{pkgname}{character string giving the name of the package.}
 }
+\value{
+Called for its side effects. Returns \code{NULL} invisibly.
+}
 \description{
 Sets up environment variables and package configuration when Aerith is loaded.
 }

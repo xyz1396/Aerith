@@ -9,6 +9,9 @@
 \arguments{
 \item{libpath}{character string giving the complete path to the package.}
 }
+\value{
+Called for its side effects.
+}
 \description{
 Cleanup when package is unloaded.
 }

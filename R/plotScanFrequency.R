@@ -169,7 +169,7 @@ plotPrecursorMzFrequency <- function(info, timeBinWidth = 1, x_breaks = seq(0, 2
                     fill = NA,
                     color = "grey10",
                     linetype = 1,
-                    size = 0.5
+                    linewidth = 0.5
                 ),
                 text = ggplot2::element_text(size = 15)
             ) +

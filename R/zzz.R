@@ -4,6 +4,7 @@
 #'
 #' @param libname character string giving the library directory where the package defining the namespace was found.
 #' @param pkgname character string giving the name of the package.
+#' @return Called for its side effects. Returns `NULL` invisibly.
 #' @keywords internal
 .onLoad <- function(libname, pkgname) {
     # Set OpenMP stack size to avoid stack overflow in parallel processing
@@ -17,6 +18,7 @@
 #' Cleanup when package is unloaded.
 #'
 #' @param libpath character string giving the complete path to the package.
+#' @return Called for its side effects.
 #' @keywords internal
 .onUnload <- function(libpath) {
     # Sys.unsetenv("OMP_STACKSIZE")

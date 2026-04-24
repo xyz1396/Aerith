@@ -423,10 +423,10 @@ double scorePSM(const NumericVector &realMZ, const NumericVector &realIntensity,
     // for test
     // Rcout << ProNovoConfig::getSetMinValue() << "\t" << ProNovoConfig::getSetFold() << endl;
     Peptide myPep;
-    string sOriginalPeptide, sProteinName;
-    int ibeginPos;
-    double dPeptideMass;
-    char cIdentifyPrefix, cIdentifySuffix, cOriginalPrefix, cOriginalSuffix;
+    string sOriginalPeptide = "", sProteinName = "";
+    int ibeginPos = 0;
+    double dPeptideMass = 0.0;
+    char cIdentifyPrefix = '-', cIdentifySuffix = '-', cOriginalPrefix = '-', cOriginalSuffix = '-';
     myPep.setPeptide(pepSeq, sOriginalPeptide, sProteinName,
                      ibeginPos, dPeptideMass, cIdentifyPrefix,
                      cIdentifySuffix, cOriginalPrefix, cOriginalSuffix);
@@ -647,10 +647,10 @@ double scorePSMsimple(const NumericVector &realMZ, const NumericVector &realInte
     // compute residue mass and prob again
     computeResidueMassIntensityAgain(Atom, Prob);
     Peptide myPep;
-    string sOriginalPeptide, sProteinName;
-    int ibeginPos;
-    double dPeptideMass;
-    char cIdentifyPrefix, cIdentifySuffix, cOriginalPrefix, cOriginalSuffix;
+    string sOriginalPeptide = "", sProteinName = "";
+    int ibeginPos = 0;
+    double dPeptideMass = 0.0;
+    char cIdentifyPrefix = '-', cIdentifySuffix = '-', cOriginalPrefix = '-', cOriginalSuffix = '-';
     myPep.setPeptide(pepSeq, sOriginalPeptide, sProteinName,
                      ibeginPos, dPeptideMass, cIdentifyPrefix,
                      cIdentifySuffix, cOriginalPrefix, cOriginalSuffix);

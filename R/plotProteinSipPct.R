@@ -10,8 +10,6 @@
 #'
 #' @return A data frame containing summary statistics of the SIP percent values.
 #'
-#' @import stringr
-#'
 #' @export
 #'
 #' @examples
@@ -59,8 +57,6 @@ summaryPSMsipPCT <- function(psmPath, SIPthreshold = 5, chargeThreshold = 3) {
 #' @param psmPath A character string specifying the path to the PSM file.
 #'
 #' @return A ggplot2 object representing the histogram of SIP percent values.
-#'
-#' @import ggplot2 stringr
 #'
 #' @export
 #'
@@ -179,15 +175,15 @@ plotProSipPct <- function(proPath) {
     p <-
         ggplot2::ggplot(
             data = x,
-            mapping = aes(x = Abundance)
+            mapping = ggplot2::aes(x = Abundance)
         ) +
         ggplot2::geom_histogram(
             binwidth = 1,
             color = I("black")
         ) +
-        xlab("SIP abundance (%)") +
-        ylab("Protein Count") +
-        theme(text = element_text(size = 15))
+        ggplot2::xlab("SIP abundance (%)") +
+        ggplot2::ylab("Protein Count") +
+        ggplot2::theme(text = ggplot2::element_text(size = 15))
     p
 }
 
@@ -200,9 +196,6 @@ plotProSipPct <- function(proPath) {
 #' @param output_file Output PDF file name for the plot.
 #' @param width Width of the output PDF (default: 16).
 #' @param height Height of the output PDF (default: 12).
-#' @import data.table
-#' @import stringr
-#' @import ggplot2
 #' @importFrom scales log_breaks
 #' @return A ggplot2 object representing the hexbin plot.
 #' @export
@@ -249,9 +242,6 @@ plotFilteredPCTIntensitySummary <- function(
 #' @param output_file Output PDF file name for the plot.
 #' @param width Width of the output PDF (default: 16).
 #' @param height Height of the output PDF (default: 12).
-#' @import data.table
-#' @import stringr
-#' @import ggplot2
 #' @importFrom scales log_breaks
 #' @return A ggplot2 object representing the hexbin plot.
 #' @export

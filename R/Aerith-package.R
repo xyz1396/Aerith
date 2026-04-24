@@ -7,6 +7,12 @@
 #' @details Aerith streamlines pre-processing, quality control, and post-processing
 #'   steps for stable-isotope proteomics workflows, providing plotting helpers,
 #'   scoring utilities, and tidy outputs suited for downstream analysis.
+#' @importFrom dplyr across all_of desc group_by n summarise
+#' @importFrom grDevices topo.colors
+#' @importFrom methods new setClass setMethod slot
+#' @importFrom Rcpp evalCpp
+#' @importFrom stats fft mad median rmultinom sd time
+#' @importFrom utils head read.table
 #' @useDynLib Aerith, .registration = TRUE
 #' @keywords internal
 "_PACKAGE"

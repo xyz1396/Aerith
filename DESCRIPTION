@@ -18,7 +18,6 @@ LinkingTo:
     Rcpp
 Imports:
     mzR,
-    MSnbase,
     methods, 
     Rcpp,
     ggplot2,

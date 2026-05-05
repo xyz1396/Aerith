@@ -246,8 +246,6 @@ MGF (Mascot Generic Format) files are widely used for database searching and con
 **Reading MGF Files:**
 
 ```{r mgf-reading}
-# MGF support requires the MSnbase package
-
 demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
 
 # Read MGF file containing MS2 spectra

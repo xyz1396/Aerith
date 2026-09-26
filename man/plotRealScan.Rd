@@ -9,7 +9,7 @@ plotRealScan(spect, linewidth = 0.1)
 \arguments{
 \item{spect}{AAspectra object of real scan}
 
-\item{linewidth}{}
+\item{linewidth}{Numeric width of the observed peaks. Default is 0.1.}
 }
 \value{
 ggplot2 layer

@@ -1,5 +1,5 @@
 #pragma once
-#include "proNovoConfig.h"
+#include "parameters.h"
 #include <random>
 
 using namespace std;

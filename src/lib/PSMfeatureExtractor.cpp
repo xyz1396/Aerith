@@ -7,6 +7,7 @@ size_t PSMfeatureExtractor::binarySearchPeak(const Scan *mScan, double Mz,
                                              int charge) {
     // init peakIX to invalid value
     size_t peakIX = std::numeric_limits<size_t>::max();
+    if (mScan == nullptr || mScan->mz.empty()) return peakIX;
     size_t low = 0;
     size_t high = mScan->mz.size() - 1;
     size_t mid = 0;
@@ -136,10 +137,12 @@ std::vector<isotopicPeak> PSMfeatureExtractor::findIsotopicPeaks(
     const double observedPrecursorMass, const double calculatedPrecursorMass) {
     std::vector<isotopicPeak> isotopicPeaks = {};
     double observedPrecursorMZ = observedPrecursorMass / precursorCharge +
-                                 ProNovoConfig::getProtonMass();
+                                 AerithParameters::current().getProtonMass();
     double calculatedPrecursorMZ = calculatedPrecursorMass / precursorCharge +
-                                 ProNovoConfig::getProtonMass();                            
-    Scan *MS1Scan = scanNumerFT1ScanMap[MS1ScanNumber];
+                                 AerithParameters::current().getProtonMass();
+    const auto scan = scanNumerFT1ScanMap.find(MS1ScanNumber);
+    if (scan == scanNumerFT1ScanMap.end()) return isotopicPeaks;
+    Scan *MS1Scan = scan->second;
     size_t peakIX = std::numeric_limits<size_t>::max();
     // if first search failed, search 2 scans before it
     for (int i = 0; i < 3; i++) {
@@ -169,16 +172,16 @@ std::vector<isotopicPeak> PSMfeatureExtractor::findIsotopicPeaks(
         // Go left and right side
         for (int direction : {-1, 1}) {
             currentIX = peakIX + direction;
-            currentMass = MS1Scan->mz[currentIX] * precursorCharge;
             for (int iso = 1; iso <= tryISO; iso++) {
                 foundIsotopicPeak = false;
                 maxIntensity = 0;
                 expectedMass =
                     MS1Scan->mz[peakIX] * precursorCharge +
-                    direction * iso * ProNovoConfig::getNeutronMass();
-                while (currentIX >= 0 && currentIX < MS1Scan->mz.size() &&
-                       (direction * (currentMass - expectedMass) <
-                        massTolerance)) {
+                    direction * iso * AerithParameters::current().getNeutronMass();
+                while (currentIX < MS1Scan->mz.size()) {
+                    currentMass = MS1Scan->mz[currentIX] * precursorCharge;
+                    if (direction * (currentMass - expectedMass) >=
+                        massTolerance) break;
                     // find the matched isotopic peak with max intensity
                     if (std::abs(expectedMass - currentMass) < massTolerance &&
                         // MS1Scan->charge[currentIX] == precursorCharge &&
@@ -188,7 +191,6 @@ std::vector<isotopicPeak> PSMfeatureExtractor::findIsotopicPeaks(
                         maxIntensity = MS1Scan->intensity[currentIX];
                     }
                     currentIX += direction;
-                    currentMass = MS1Scan->mz[currentIX] * precursorCharge;
                 }
                 if (foundIsotopicPeak)
                     isotopicPeaks.push_back({MS1Scan->mz[foundIX],
@@ -218,43 +220,21 @@ double PSMfeatureExtractor::getSIPelementAbundanceFromMS1(
     const std::vector<isotopicPeak> &isotopicPeaks, const int precursorCharge) {
     // in case of no isotopic peaks
     if (isotopicPeaks.size() == 0) return 0.0;
-    double baseMass = mAveragine.calPrecursorBaseMass(nakePeptide);
+    double baseMass = peptideCalculator.calPrecursorBaseMass(nakePeptide);
     int charge = precursorCharge;
-    double baseMZ = baseMass / charge + ProNovoConfig::getProtonMass();
+    double baseMZ = baseMass / charge + AerithParameters::current().getProtonMass();
     double MZthreshold = baseMZ - 0.5 / charge;
-    std::vector<double> usefulIsotopicPeakIntensity;
-    usefulIsotopicPeakIntensity.reserve(isotopicPeaks.size());
+    double intensity = 0.0, massExcess = 0.0;
     for (const auto &peak : isotopicPeaks) {
         if (peak.mz > MZthreshold) {
-            usefulIsotopicPeakIntensity.push_back(peak.intensity);
+            intensity += peak.intensity;
+            massExcess += peak.intensity * (peak.mz - baseMZ) * charge;
         }
     }
-    int firstUsefulIsotopicPeakIX =
-        isotopicPeaks.size() - usefulIsotopicPeakIntensity.size();
-    double firstUsefulIsotopicPeakMZ =
-        isotopicPeaks[firstUsefulIsotopicPeakIX].mz;
-    int firstDeltaNeutron =
-        static_cast<int>(std::round((firstUsefulIsotopicPeakMZ - baseMZ) /
-                                    ProNovoConfig::getNeutronMass() * charge));
-    double sumOfIntensities =
-        std::accumulate(usefulIsotopicPeakIntensity.begin(),
-                        usefulIsotopicPeakIntensity.end(), 0.0);
-    for (auto &intensity : usefulIsotopicPeakIntensity) {
-        intensity /= sumOfIntensities;
-    }
-    double pct = 0.0;
-    for (size_t i = 0; i < usefulIsotopicPeakIntensity.size(); i++) {
-        pct += usefulIsotopicPeakIntensity[i] * (i + firstDeltaNeutron);
-    }
-    double atomNumber = mAveragine.pepAtomCounts[mAveragine.SIPatomIX];
-    double deltaNeutron = 1.0;
-    const std::string &sipElement = ProNovoConfig::getSetSIPelement();
-    if (sipElement == "O" || sipElement == "S") {
-        deltaNeutron = 2.0;
-    }
-    pct /= (atomNumber * deltaNeutron);
-    pct *= 100.;
-    return pct;
+    if (intensity <= 0.0) return 0.0;
+    return AerithParameters::current().isotopologue.estimateSIPAbundance(
+        peptideCalculator.pepComposition, peptideCalculator.SIPatomIX,
+        massExcess / intensity);
 }
 
 std::pair<int, int> PSMfeatureExtractor::getSeqLengthAndMissCleavageSiteNumber(
@@ -287,12 +267,12 @@ std::pair<int, double> PSMfeatureExtractor::getMassWindowShiftAndError(
     const double observedPrecursorMass, const double calculatedPrecursorMass) {
     int massWindowShift = static_cast<int>(
         round(std::abs(observedPrecursorMass - calculatedPrecursorMass) /
-              ProNovoConfig::getNeutronMass()));
+              AerithParameters::current().getNeutronMass()));
     double massError =
         std::fmod(std::abs(observedPrecursorMass - calculatedPrecursorMass),
-                  ProNovoConfig::getNeutronMass());
-    if (massError > ProNovoConfig::getNeutronMass() / 2) {
-        massError = ProNovoConfig::getNeutronMass() - massError;
+                  AerithParameters::current().getNeutronMass());
+    if (massError > AerithParameters::current().getNeutronMass() / 2) {
+        massError = AerithParameters::current().getNeutronMass() - massError;
     }
     // convert it to ppm
     massError = massError / calculatedPrecursorMass * 1000000;
@@ -391,7 +371,7 @@ void PSMfeatureExtractor::extractFeaturesOfEachPSM() {
         mSipPSM->mzShiftFromisolationWindowCenters[i] = std::abs(
             mSipPSM->isolationWindowCenterMZs[i] -
             mSipPSM->measuredParentMasses[i] / mSipPSM->parentCharges[i] -
-            ProNovoConfig::getProtonMass());
+            AerithParameters::current().getProtonMass());
         std::tie(mSipPSM->isotopicMassWindowShifts[i], mSipPSM->massErrors[i]) =
             getMassWindowShiftAndError(mSipPSM->measuredParentMasses[i],
                                        mSipPSM->calculatedParentMasses[i]);
@@ -512,7 +492,6 @@ void PSMfeatureExtractor::extractPSMfeatureParallel(
 }
 
 void PSMfeatureExtractor::writeTSV(const std::string &fileName) {
-    setlocale(LC_ALL, "C");
     std::ios_base::sync_with_stdio(false);
     std::ofstream file(fileName);
     if (!file) {
@@ -585,7 +564,6 @@ void PSMfeatureExtractor::writeTSV(const std::string &fileName) {
 
 void PSMfeatureExtractor::writePecorlatorPin(const std::string &fileName,
                                              bool doProteinInference) {
-    setlocale(LC_ALL, "C");
     std::ios_base::sync_with_stdio(false);
     std::ofstream file(fileName);
     if (!file) {

@@ -37,7 +37,6 @@ ftFileReader::ftFileReader()
 
 ftFileReader::ftFileReader(std::string file) : ftFileName(file)
 {
-	setlocale(LC_ALL, "C");
 	std::ios_base::sync_with_stdio(false);
 	if (fs::exists(ftFileName))
 	{
@@ -165,6 +164,7 @@ Scan ftFileReader::readScanNumberRentionTime()
 		if (isNumber(tokens[0]))
 		{
 			continueRead = false;
+			break;
 		}
 		else
 		{
@@ -225,6 +225,7 @@ Scan ftFileReader::readScanNumberRentionTimePrecursor()
 		if (isNumber(tokens[0]))
 		{
 			continueRead = false;
+			break;
 		}
 		else if (tokens[0] == "D" && tokens.size() > 2)
 		{

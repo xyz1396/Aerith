@@ -1,5 +1,5 @@
 #include "lib/initSIP.h"
-#include "lib/averagine.h"
+#include "lib/PeptideIsotopeCalculator.h"
 #include <algorithm>
 #include <Rcpp.h>
 #include <utility>
@@ -16,10 +16,9 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 DataFrame precursor_peak_calculator(String AAstr)
 { 
-	string config = get_extdata();
-	ProNovoConfig::setFilename(config);
+	AerithParameters::reset();
 	IsotopeDistribution myIso;
-	ProNovoConfig::configIsotopologue.computeIsotopicDistribution(AAstr, myIso);
+	AerithParameters::current().isotopologue.computeIsotopicDistribution(AAstr, myIso);
 	DataFrame df =
 		DataFrame::create(Named("Mass") = myIso.vMass, _["Prob"] = myIso.vProb);
 	return df;
@@ -37,19 +36,17 @@ DataFrame precursor_peak_calculator(String AAstr)
 DataFrame residue_peak_calculator_DIY(String residue, String Atom,
 									  double Prob)
 {
-	if (Prob < 0 || Prob > 1)
-		Rcout << "Wrong isotopic percentage" << endl;
-	// read default config
-	string config = get_extdata();
-	ProNovoConfig::setFilename(config);
+	AerithParameters::validateAbundance(Prob);
+	// Reset the compiled parameter object.
+	AerithParameters::reset();
 	// compute residue mass and prob again
 	computeResidueMassIntensityAgain(Atom, Prob);
 	IsotopeDistribution myIso;
-	auto residueIter = ProNovoConfig::configIsotopologue.vResidueIsotopicDistribution.find(residue);
-	if (residueIter != ProNovoConfig::configIsotopologue.vResidueIsotopicDistribution.end())
+	auto residueIter = AerithParameters::current().isotopologue.vResidueIsotopicDistribution.find(residue);
+	if (residueIter != AerithParameters::current().isotopologue.vResidueIsotopicDistribution.end())
 		myIso = residueIter->second;
 	else
-		Rcout << "Rediue not found!" << endl;
+		stop("Unknown residue or PTM: %s", residue.get_cstring());
 	DataFrame df =
 		DataFrame::create(Named("Mass") = myIso.vMass, _["Prob"] = myIso.vProb);
 	return df;
@@ -70,16 +67,14 @@ DataFrame residue_peak_calculator_DIY(String residue, String Atom,
 DataFrame precursor_peak_calculator_DIY(String AAstr, String Atom,
 										double Prob)
 {
-	
-	if (Prob < 0 || Prob > 1)
-		Rcout << "Wrong isotopic percentage" << endl;
-	// read default config
-	string config = get_extdata();
-	ProNovoConfig::setFilename(config);
+
+	AerithParameters::validateAbundance(Prob);
+	// Reset the compiled parameter object.
+	AerithParameters::reset();
 	// compute residue mass and prob again
 	computeResidueMassIntensityAgain(Atom, Prob);
 	IsotopeDistribution myIso;
-	ProNovoConfig::configIsotopologue.computeIsotopicDistribution(AAstr, myIso);
+	AerithParameters::current().isotopologue.computeIsotopicDistribution(AAstr, myIso);
 	DataFrame df =
 		DataFrame::create(Named("Mass") = myIso.vMass, _["Prob"] = myIso.vProb);
 	return df;
@@ -87,29 +82,38 @@ DataFrame precursor_peak_calculator_DIY(String AAstr, String Atom,
 
 //' Simple calculator of C H O N P S atom count of peptide
 //' @param AAstrs a CharacterVector of peptides
+//' @param pool Atom pool to count: `"total"` (default), `"sip"`, `"natural"`,
+//' `"reagent"`, or `"solvent"`. Natural is the sum of reagent and solvent atoms.
+//' @details Cysteine is IAA-blocked by default. An explicit `C/` annotation
+//' represents the same fixed modification and is counted once.
 //' @return a dataframe of C H O N P S atom count each row is for one peptide
 //' @export
 //' @examples
 //' df <- calPepAtomCount(c("HKFL","ADCH"))
 // [[Rcpp::export]]
-DataFrame calPepAtomCount(StringVector AAstrs)
+DataFrame calPepAtomCount(StringVector AAstrs, String pool = "total")
 {
-	string config = get_extdata();
-	ProNovoConfig::setFilename(config);
-	averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
-						 ProNovoConfig::getMaxPeptideLength());
+    if (pool != "total" && pool != "sip" && pool != "natural" &&
+        pool != "reagent" && pool != "solvent")
+        stop("pool must be 'total', 'sip', 'natural', 'reagent', or 'solvent'");
+	AerithParameters::reset();
+	PeptideIsotopeCalculator peptideCalculator;
 	vector<int> C(AAstrs.size(), 0);
 	vector<int> H, O, N, P, S;
 	H = O = N = P = S = C;
 	for (int i = 0; i < AAstrs.size(); i++)
 	{
-		mAveragine.calPepAtomCounts(as<std::string>((AAstrs[i])));
-		C[i] = mAveragine.pepAtomCounts[0];
-		H[i] = mAveragine.pepAtomCounts[1];
-		O[i] = mAveragine.pepAtomCounts[2];
-		N[i] = mAveragine.pepAtomCounts[3];
-		P[i] = mAveragine.pepAtomCounts[4];
-		S[i] = mAveragine.pepAtomCounts[5];
+		peptideCalculator.calPepAtomCounts(as<std::string>((AAstrs[i])));
+        const auto counts = pool == "sip" ? peptideCalculator.pepComposition[IsotopeSource::Biosynthetic] :
+            pool == "natural" ? peptideCalculator.pepComposition.naturalSourceTotal() :
+            pool == "reagent" ? peptideCalculator.pepComposition[IsotopeSource::ReagentNatural] :
+            pool == "solvent" ? peptideCalculator.pepComposition[IsotopeSource::DigestionSolvent] : peptideCalculator.pepAtomCounts;
+		C[i] = counts[0];
+		H[i] = counts[1];
+		O[i] = counts[2];
+		N[i] = counts[3];
+		P[i] = counts[4];
+		S[i] = counts[5];
 	}
 	DataFrame df = DataFrame::create(Named("C") = C, _("H") = H,
 									 _("O") = O, _("N") = N,
@@ -126,42 +130,40 @@ DataFrame calPepAtomCount(StringVector AAstrs)
 // [[Rcpp::export]]
 List calBYAtomCountAndBaseMass(StringVector AAstrs)
 {
-	string config = get_extdata();
-	ProNovoConfig::setFilename(config);
-	averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
-						 ProNovoConfig::getMaxPeptideLength());
+	AerithParameters::reset();
+	PeptideIsotopeCalculator peptideCalculator;
 	List pepBYs(AAstrs.size());
 	for (int i = 0; i < (int)AAstrs.size(); i++)
 	{
-		mAveragine.calBYionBaseMasses(as<std::string>((AAstrs[i])));
-		int BYionsSize = mAveragine.BionsBaseMasses.size() + mAveragine.YionsBaseMasses.size();
+		peptideCalculator.calBYionBaseMasses(as<std::string>((AAstrs[i])));
+		int BYionsSize = peptideCalculator.BionsBaseMasses.size() + peptideCalculator.YionsBaseMasses.size();
 		vector<int> C(BYionsSize, 0);
 		vector<int> H, O, N, P, S;
 		H = O = N = P = S = C;
 		vector<string> BYkinds(BYionsSize);
 		vector<double> BYbaseMasses(BYionsSize);
-		for (size_t j = 0; j < mAveragine.BionsBaseMasses.size(); j++)
+		for (size_t j = 0; j < peptideCalculator.BionsBaseMasses.size(); j++)
 		{
-			C[j] = mAveragine.BionsAtomCounts[j][0];
-			H[j] = mAveragine.BionsAtomCounts[j][1];
-			O[j] = mAveragine.BionsAtomCounts[j][2];
-			N[j] = mAveragine.BionsAtomCounts[j][3];
-			P[j] = mAveragine.BionsAtomCounts[j][4];
-			S[j] = mAveragine.BionsAtomCounts[j][5];
+			C[j] = peptideCalculator.BionsAtomCounts[j][0];
+			H[j] = peptideCalculator.BionsAtomCounts[j][1];
+			O[j] = peptideCalculator.BionsAtomCounts[j][2];
+			N[j] = peptideCalculator.BionsAtomCounts[j][3];
+			P[j] = peptideCalculator.BionsAtomCounts[j][4];
+			S[j] = peptideCalculator.BionsAtomCounts[j][5];
 			BYkinds[j] = "B" + to_string(j + 1);
-			BYbaseMasses[j] = mAveragine.BionsBaseMasses[j];
+			BYbaseMasses[j] = peptideCalculator.BionsBaseMasses[j];
 		}
-		int start = mAveragine.BionsBaseMasses.size();
-		for (size_t j = 0; j < mAveragine.YionsBaseMasses.size(); j++)
+		int start = peptideCalculator.BionsBaseMasses.size();
+		for (size_t j = 0; j < peptideCalculator.YionsBaseMasses.size(); j++)
 		{
-			C[j + start] = mAveragine.YionsAtomCounts[j][0];
-			H[j + start] = mAveragine.YionsAtomCounts[j][1];
-			O[j + start] = mAveragine.YionsAtomCounts[j][2];
-			N[j + start] = mAveragine.YionsAtomCounts[j][3];
-			P[j + start] = mAveragine.YionsAtomCounts[j][4];
-			S[j + start] = mAveragine.YionsAtomCounts[j][5];
+			C[j + start] = peptideCalculator.YionsAtomCounts[j][0];
+			H[j + start] = peptideCalculator.YionsAtomCounts[j][1];
+			O[j + start] = peptideCalculator.YionsAtomCounts[j][2];
+			N[j + start] = peptideCalculator.YionsAtomCounts[j][3];
+			P[j + start] = peptideCalculator.YionsAtomCounts[j][4];
+			S[j + start] = peptideCalculator.YionsAtomCounts[j][5];
 			BYkinds[j + start] = "Y" + to_string(j + 1);
-			BYbaseMasses[j + start] = mAveragine.YionsBaseMasses[j];
+			BYbaseMasses[j + start] = peptideCalculator.YionsBaseMasses[j];
 		}
 		DataFrame df = DataFrame::create(Named("C") = C, _("H") = H,
 										 _("O") = O, _("N") = N,
@@ -170,11 +172,14 @@ List calBYAtomCountAndBaseMass(StringVector AAstrs)
 		pepBYs[i] = df;
 	}
 	pepBYs.names() = AAstrs;
-	ProNovoConfig::unSetFilename();
+
 	return pepBYs;
 }
 
-//' Simple calculator of peptide precursor mass by binomial NP
+//' Estimate a representative precursor isotope mass
+//' @details Uses the nominal shift of the isotope envelope's most abundant
+//' peak and the mean isotope spacing across all atom sources.
+//' This is an estimate of the modal peak mass.
 //' @param AAstrs a CharacterVector of peptides
 //' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 //' @param Probs a NumericVector with the same length of AAstr for SIP abundances
@@ -185,51 +190,18 @@ List calBYAtomCountAndBaseMass(StringVector AAstrs)
 // [[Rcpp::export]]
 NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVector Probs)
 {
-	bool goodInput = true;
-	if (Probs.size() != AAstrs.size())
-	{
-		Rcout << "lengths of AAstr and Probs are not equal!" << endl;
-		goodInput = false;
-	}
-	for (R_xlen_t i = 0; i < Probs.size(); i++)
-	{
-		if (Probs[i] < 0 || Probs[i] > 1)
-		{
-			Rcout << "Wrong isotopic percentage!" << endl;
-			goodInput = false;
-		}
-	}
-	char cAtom = 'C';
-	if (Atom == "C13")
-		cAtom = 'C';
-	else if (Atom == "H2")
-		cAtom = 'H';
-	else if (Atom == "O18")
-		cAtom = 'O';
-	else if (Atom == "N15")
-		cAtom = 'N';
-    else if (Atom == "S34")
-		cAtom = 'S';
-	else
-	{
-		goodInput = false;
-		Rcout << Atom.get_cstring() << " element not supported!" << endl;
-	}
-	NumericVector v(AAstrs.size());
-	std::fill(v.begin(), v.end(), 0.0);
-	if (goodInput)
-	{
-		// read default config
-		string config = get_extdata();
-		ProNovoConfig::setFilename(config);
-		averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
-							 ProNovoConfig::getMaxPeptideLength());
-		for (int i = 0; i < AAstrs.size(); i++)
-		{
-			mAveragine.changeAtomSIPabundance(cAtom, Probs[i]);
-			v[i] = mAveragine.calPrecursorMass(as<std::string>((AAstrs[i])));
-		}
-	}
+    if (Probs.size() != AAstrs.size())
+        stop("AAstrs and Probs must have equal lengths.");
+    const char atom = AerithParameters::isotopeElement(Atom.get_cstring());
+    for (double probability : Probs) AerithParameters::validateAbundance(probability);
+    AerithParameters::reset();
+    PeptideIsotopeCalculator calculator;
+    NumericVector v(AAstrs.size());
+    for (int i = 0; i < AAstrs.size(); ++i)
+    {
+        calculator.changeAtomSIPabundance(atom, Probs[i]);
+        v[i] = calculator.calPrecursorMass(as<std::string>(AAstrs[i]));
+    }
 	return v;
 }
 
@@ -244,112 +216,19 @@ NumericVector calPepPrecursorMass(StringVector AAstrs, String Atom, NumericVecto
 // [[Rcpp::export]]
 NumericVector calPepNeutronMass(StringVector AAstrs, String Atom, NumericVector Probs)
 {
-	bool goodInput = true;
-	if (Probs.size() != AAstrs.size())
-	{
-		Rcout << "lengths of AAstr and Probs are not equal!" << endl;
-		goodInput = false;
-	}
-	for (R_xlen_t i = 0; i < Probs.size(); i++)
-	{
-		if (Probs[i] < 0 || Probs[i] > 1)
-		{
-			Rcout << "Wrong isotopic percentage!" << endl;
-			goodInput = false;
-		}
-	}
-	char cAtom = 'C';
-	if (Atom == "C13")
-		cAtom = 'C';
-	else if (Atom == "H2")
-		cAtom = 'H';
-	else if (Atom == "O18")
-		cAtom = 'O';
-	else if (Atom == "N15")
-		cAtom = 'N';
-    else if (Atom == "S34")
-		cAtom = 'S';
-	else
-	{
-		goodInput = false;
-		Rcout << Atom.get_cstring() << " element not supported!" << endl;
-	}
-	NumericVector v(AAstrs.size());
-	std::fill(v.begin(), v.end(), 0.0);
-	if (goodInput)
-	{
-		// read default config
-		string config = get_extdata();
-		ProNovoConfig::setFilename(config);
-		averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
-							 ProNovoConfig::getMaxPeptideLength());
-		for (int i = 0; i < AAstrs.size(); i++)
-		{
-			mAveragine.changeAtomSIPabundance(cAtom, Probs[i]);
-			v[i] = mAveragine.calNetronMass(as<std::string>((AAstrs[i])));
-		}
-	}
+    if (Probs.size() != AAstrs.size())
+        stop("AAstrs and Probs must have equal lengths.");
+    const char atom = AerithParameters::isotopeElement(Atom.get_cstring());
+    for (double probability : Probs) AerithParameters::validateAbundance(probability);
+    AerithParameters::reset();
+    PeptideIsotopeCalculator calculator;
+    NumericVector v(AAstrs.size());
+    for (int i = 0; i < AAstrs.size(); ++i)
+    {
+        calculator.changeAtomSIPabundance(atom, Probs[i]);
+        v[i] = calculator.calNetronMass(as<std::string>(AAstrs[i]));
+    }
 	return v;
-}
-
-//' Simple peak calculator of user defined isotopic distribution of one peptide by averagine
-//' @param AAstrs a CharacterVector of peptides
-//' @param Atom a CharacterVector C13 or N15
-//' @param Prob a NumericVector for its abundance
-//' @return a list of DataFrames of spectra
-//' @examples
-//' demoSpectra <- precursor_peak_calculator_DIY_averagine(c("PEPTIDE", "ACDEFGHIK"), "C13", 0.25)
-//' demoSpectra[[1]]
-//' @export
-// [[Rcpp::export]]
-List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
-											 double Prob)
-{
-	bool goodInput = true;
-	if (Prob < 0 || Prob > 1)
-	{
-		Rcout << "Wrong isotopic percentage!" << endl;
-		goodInput = false;
-	}
-	char cAtom = 'C';
-	if (Atom == "C13")
-		cAtom = 'C';
-	else if (Atom == "H2")
-		cAtom = 'H';
-	else if (Atom == "O18")
-		cAtom = 'O';
-	else if (Atom == "N15")
-		cAtom = 'N';
-    else if (Atom == "S34")
-		cAtom = 'S';
-	else
-	{
-		goodInput = false;
-		Rcout << Atom.get_cstring() << " element not supported!" << endl;
-	}
-	List spectraList(AAstrs.size());
-	if (goodInput)
-	{
-		// read default config
-		string config = get_extdata();
-		ProNovoConfig::setFilename(config);
-		averagine mAveragine(ProNovoConfig::getMinPeptideLength(),
-							 ProNovoConfig::getMaxPeptideLength());
-		mAveragine.changeAtomSIPabundance(cAtom, Prob);
-		mAveragine.calAveraginePepAtomCounts();
-		mAveragine.calAveraginePepSIPdistributions();
-
-		IsotopeDistribution mSIP;
-		DataFrame df;
-		for (int i = 0; i < AAstrs.size(); i++)
-		{
-			mAveragine.calPrecursorIsotopeDistribution(as<std::string>(AAstrs(i)), mSIP);
-			df =
-				DataFrame::create(Named("Mass") = std::move(mSIP.vMass), _["Prob"] = std::move(mSIP.vProb));
-			spectraList[i] = std::move(df);
-		}
-	}
-	return spectraList;
 }
 
 //' @title BY Ion Peak Calculator with User-Defined Isotopic Distribution
@@ -367,18 +246,16 @@ List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom,
 DataFrame BYion_peak_calculator_DIY(String AAstr, String Atom,
 									double Prob)
 {
-	if (Prob < 0 || Prob > 1)
-		Rcout << "Wrong isotopic percentage" << endl;
-	// read default config
-	string config = get_extdata();
-	ProNovoConfig::setFilename(config);
+	AerithParameters::validateAbundance(Prob);
+	// Reset the compiled parameter object.
+	AerithParameters::reset();
 	// compute residue mass and prob again
 	computeResidueMassIntensityAgain(Atom, Prob);
     string AAstr_str = AAstr.get_cstring();
     // AA string format is [AAKRCI] for example
 	AAstr_str = "[" + AAstr_str + "]";
 	vector<vector<double>> vvdYionMass, vvdYionProb, vvdBionMass, vvdBionProb;
-	ProNovoConfig::configIsotopologue.computeProductIon(AAstr_str, vvdYionMass,
+	AerithParameters::current().isotopologue.computeProductIon(AAstr_str, vvdYionMass,
 														vvdYionProb, vvdBionMass, vvdBionProb);
 	vector<double> masses, probs;
 	vector<string> kinds;
@@ -404,4 +281,51 @@ DataFrame BYion_peak_calculator_DIY(String AAstr, String Atom,
 		DataFrame::create(Named("Mass") = std::move(masses),
 						  _["Prob"] = std::move(probs), _["Kind"] = std::move(kinds));
 	return df;
+}
+
+//' Inspect Aerith's compiled parameters
+//' @description Returns a snapshot of the compiled peptide chemistry and SIP
+//' scoring defaults. Calculations initialize these
+//' parameters directly and do not read configuration files.
+//' @return A list containing the chemistry profile, fixed PTMs, source-specific
+//' residue formulas, isotope distributions, and scoring defaults.
+//' @examples
+//' parameters <- getAerithParameters()
+//' parameters$chemistryProfile
+//' parameters$residues$reagent["C", ]
+//' @export
+// [[Rcpp::export]]
+List getAerithParameters()
+{
+    const AerithParameters parameters;
+    const auto &iso = parameters.isotopologue;
+    List atoms(6), residues(3);
+    CharacterVector elements = CharacterVector::create("C", "H", "O", "N", "P", "S");
+    atoms.attr("names") = elements;
+    for (int i = 0; i < 6; ++i)
+        atoms[i] = DataFrame::create(_["Mass"] = iso.naturalAtomIsotopicDistribution[i].vMass,
+            _["Prob"] = iso.naturalAtomIsotopicDistribution[i].vProb);
+    for (int source = 0; source < 3; ++source)
+    {
+        IntegerMatrix counts(iso.mResidueCompositions.size(), 6);
+        CharacterVector names(iso.mResidueCompositions.size());
+        int row = 0;
+        for (const auto &entry : iso.mResidueCompositions)
+        {
+            names[row] = entry.first;
+            for (int element = 0; element < 6; ++element)
+                counts(row, element) = entry.second.atoms[source][element];
+            ++row;
+        }
+        counts.attr("dimnames") = List::create(names, elements);
+        residues[source] = counts;
+    }
+    residues.attr("names") = CharacterVector::create("sip", "reagent", "solvent");
+    return List::create(_["chemistryProfile"] = parameters.chemistryProfile,
+        _["fixedPtms"] = parameters.fixedPtms, _["residues"] = residues,
+        _["isotopes"] = atoms, _["searchType"] = parameters.searchType,
+        _["fragmentToleranceDa"] = parameters.fragmentToleranceDa,
+        _["parentToleranceDa"] = parameters.parentToleranceDa,
+        _["deductionMinValue"] = parameters.deductionMinValue,
+        _["deductionFold"] = parameters.deductionFold);
 }

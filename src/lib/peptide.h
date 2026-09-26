@@ -6,7 +6,7 @@
 #include <map>
 #include <iostream>
 
-#include "proNovoConfig.h"
+#include "parameters.h"
 
 using namespace std;
 

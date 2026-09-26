@@ -121,7 +121,6 @@ void Spe2PepFileReader::readFileChunk()
 
 void Spe2PepFileReader::readOneEntireFile(const std::string &sipFileName)
 {
-    // setlocale(LC_ALL, "C");
     // std::ios_base::sync_with_stdio(false);
     std::ifstream file(sipFileName, std::ios::in | std::ios::binary | std::ios::ate);
     if (!file)
@@ -240,7 +239,6 @@ void Spe2PepFileReader::readOneEntireFile(const std::string &sipFileName)
 
 void Spe2PepFileReader::readOneFile(std::string sipFileName)
 {
-    setlocale(LC_ALL, "C");
     std::ios_base::sync_with_stdio(false);
     if (fs::exists(sipFileName))
     {
@@ -583,7 +581,6 @@ void Spe2PepFileReader::readSpe2PepFilesScansTopPSMsFromEachFT2TargetAndDecoyPar
 
 void Spe2PepFileReader::writeTSV(const std::string fileName = "a.tsv")
 {
-    setlocale(LC_ALL, "C");
     std::ios_base::sync_with_stdio(false);
     std::ofstream file(fileName);
     if (!file)

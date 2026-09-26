@@ -12,7 +12,7 @@
 #' @importFrom methods new setClass setMethod slot
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats fft mad median rmultinom sd time
-#' @importFrom utils head read.table
+#' @importFrom utils head read.table tail
 #' @useDynLib Aerith, .registration = TRUE
 #' @keywords internal
 "_PACKAGE"

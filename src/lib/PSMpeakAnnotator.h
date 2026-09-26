@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "ftFileReader.h"
-#include "averagine.h"
+#include "PeptideIsotopeCalculator.h"
 #include "ms2scan.h"
 #include <unordered_map>
 
@@ -61,7 +61,7 @@ public:
 
 private:
     std::string peptide;
-    averagine mAveragine = averagine();
+    PeptideIsotopeCalculator peptideCalculator;
     Scan *realScan;
     double precursorBaseMass = 0.0;
     int precursorSIPatomCount = 0;
@@ -95,7 +95,7 @@ private:
     // calculate SIP abundance from BY ion isotopic envelope by binomial distribution estimation
     double calSIPabundancesOfBYion(const double baseMass,
                                    const std::vector<int> &matchedIXs,
-                                   const Scan *mScan, const int SIPelementCount,
+                                   const Scan *mScan, const Composition &composition,
                                    const int charge);
     void matchIsotopicEnvelopes(Scan *mRealScan, const int charge);
     void calMatchedSpectraEntropyScore();

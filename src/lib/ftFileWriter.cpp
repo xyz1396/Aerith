@@ -64,6 +64,7 @@ void ftFileWriter::getMeanRanksOfPeaks(std::vector<float> &ranks,
                                        const double &step)
 {
     int n = mScan.mz.size();
+    if (n == 0) return;
     // in case devide by 0
     std::vector<int> windowsCount(n, 1);
     double start = mScan.mz.front();
@@ -71,11 +72,11 @@ void ftFileWriter::getMeanRanksOfPeaks(std::vector<float> &ranks,
     int startIX = 0, IX = 0;
     bool moveWindow = true;
     // get sum and number of ranks of each moving window
-    while (end < mScan.mz.back() + window)
+    while (startIX < n && end < mScan.mz.back() + window)
     {
         if (moveWindow)
         {
-            while (mScan.mz[IX] < end && IX < n)
+            while (IX < n && mScan.mz[IX] < end)
             {
                 IX++;
                 // moveWindow = true;
@@ -93,7 +94,7 @@ void ftFileWriter::getMeanRanksOfPeaks(std::vector<float> &ranks,
         }
         startIX++;
         IX = startIX;
-        if (mScan.mz[IX] >= start)
+        if (IX < n && mScan.mz[IX] >= start)
             moveWindow = true;
     }
     // average the ranks

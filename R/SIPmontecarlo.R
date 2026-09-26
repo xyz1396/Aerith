@@ -14,7 +14,7 @@ supported_isotopes <- list(
 )
 supported_elements <- names(supported_isotopes)
 
-# define isotopic mass of all elements from SiprosConfig.cfg
+# Isotopic masses for compound simulations
 isotopic_masses <- c(
     H1 = 1.00782503223,
     H2 = 2.01410177812,

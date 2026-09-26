@@ -6,7 +6,7 @@ output:
     toc_float: true
     theme: united
 vignette: >
-  %\VignetteIndexEntry{Theoretic-spectra-generation-of-SIP-labeled-peptide}
+  %\VignetteIndexEntry{Theoretic spectra generation of SIP-labeled peptide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,13 +32,56 @@ library(ggplot2)
 
 Stable isotope probing (SIP) experiments benefit from reliable theoretical spectra to interpret precursor and fragment ions. This vignette walks through the Aerith workflow for generating SIP-aware peptide spectra, emphasizing how each function supports isotope-resolved analysis. We start with unlabeled peptides and progress to labeled scenarios, outlining key parameters, interpretation tips, and best practices. Aerith integrates binomial-based isotope modeling, fragment intensity estimation, and visualization in a single toolkit, aligning with current SIP proteomics methodologies that rely on high accuracy precursor modeling and fragment annotation.
 
+### Compiled parameters and atom sources
+
+Aerith uses a C++ `AerithParameters` object to store compiled chemistry
+parameters. These define real C, H, O, N, P, and S isotope distributions, residue and
+PTM formulas, fixed carbamidomethylation, and SIP scoring defaults. There is no
+configuration-file reader or file-based override. The former `generateOneCFG`
+and `generateCFGs` functions have been removed.
+
+```{r}
+parameters <- getAerithParameters()
+parameters$chemistryProfile
+parameters$fixedPtms
+parameters$residues$reagent["C", ]
+```
+
+Only biosynthetic atoms follow the requested SIP abundance. Reagent atoms and
+atoms introduced by digestion solvent keep their natural isotope distributions.
+IAA's net C2H3NO addition belongs to the reagent pool, and
+terminal H2O belongs to the digestion-solvent pool. Oxidation adds reagent oxygen;
+deamidation removes biosynthetic H/N and adds reagent oxygen. Phosphorylation
+uses real phosphorus. This bookkeeping does not model subsequent solvent exchange.
+
+```{r}
+calPepAtomCount("C")             # Total C5 H10 O3 N2 S, including termini
+calPepAtomCount("C", "sip")      # C3 H5 O N S
+calPepAtomCount("C", "reagent")  # IAA: C2 H3 O N
+calPepAtomCount("C", "solvent")  # Terminal water: H2 O
+calPepAtomCount("C", "natural")  # Reagent + solvent
+```
+
+An explicit `C/` is a zero-delta alias for the already blocked cysteine. The
+precursor and fragment calculators use the same sourced formulas; b ions contain
+no terminal water and y ions retain natural terminal water. Negative PTM deltas
+are combined with the residue before calculating its isotope envelope. Matched
+peak abundance estimation subtracts the expected natural background and counts
+only biosynthetic atoms as labelable.
+
+Unsupported isotope names, non-finite abundances, abundances outside [0, 1], and
+unknown residues/PTMs raise errors. Each calculation starts from the compiled
+parameters, so earlier calls cannot alter the next calculation's natural pools.
+Use `precursor_peak_calculator_DIY` to calculate a precursor spectrum from its
+actual sourced peptide composition.
+
 ### Unlabeled Spectra 
 
 For unlabeled peptides, Aerith estimates precursor isotope distributions, calculates neutral masses, and visualizes theoretical spectra that reflect expected instrument observations.
 
 #### Get precursor mass
 
-The `precursor_peak_calculator` function returns the isotopic distribution for a peptide sequence, while `calPepAtomCount` reports elemental composition derived from the amino acid content. The `calPepPrecursorMass` function uses a binomial model to estimate the precursor monoisotopic mass given a target isotope and its natural abundance. The sequence parameter accepts standard one-letter amino acid codes, and the isotope argument takes values such as `"C13"` or `"N15"`. Adjust the abundance parameter to match experimental labeling levels; use natural abundance (for example 0.0107 for carbon) when no enrichment is applied.
+The `precursor_peak_calculator` function returns the isotopic distribution for a peptide sequence, while `calPepAtomCount` reports elemental composition derived from the amino acid content. The `calPepPrecursorMass` function uses the nominal shift of the isotope envelope's most abundant peak and its mean isotope spacing to estimate a representative precursor peak mass given a target isotope and its natural abundance. The sequence parameter accepts standard one-letter amino acid codes, and the isotope argument takes values such as `"C13"` or `"N15"`. Adjust the abundance parameter to match experimental labeling levels; use natural abundance (for example 0.0107 for carbon) when no enrichment is applied.
 
 ```{r}
 a <- precursor_peak_calculator("PEPTIDECCCC")

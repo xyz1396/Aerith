@@ -92,7 +92,9 @@ extractPSMfeaturesTargetAndDecoy <- function(targetPath, decoyPath, topN, ftFile
 #' file_content <- readRDS(ft_file)
 #' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
 #' pin_path <- file.path(tmp, "a.pin")
-#' extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
+#' extractPSMfeaturesTargetAndDecoytoPercolatorPin(
+#'     target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path
+#' )
 #' print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
 #' print(file.info(pin_path))
 #' @export
@@ -157,7 +159,7 @@ getFilterThresholdTopPSMs <- function(workingPath, OverallThreshold, topN) {
 #' @param topN store top N PSMs of each scan of one .FT file
 #' @param decoyPrefix the prefix of decoy sequence
 #' @return a dataframe about filter threshold and FDR results, 
-#' rows of "<charge>, 0, 0 ,0" means cannot find threshold at this charge
+#' rows of `<charge>, 0, 0, 0` mean no threshold was found at this charge
 #' @examples
 #' tmp <- tempdir()
 #' sip_dir <- file.path(tmp, "sip")
@@ -172,41 +174,6 @@ getFilterThresholdTopPSMs <- function(workingPath, OverallThreshold, topN) {
 #' @export
 getFilterThresholdTopPSMsSpe2Pep <- function(workingPath, OverallThreshold, topN, decoyPrefix) {
     .Call(`_Aerith_getFilterThresholdTopPSMsSpe2Pep`, workingPath, OverallThreshold, topN, decoyPrefix)
-}
-
-#' generateOneCFG
-#' @param cfgPath a full path of .cfg file
-#' @param outPath a full path for .cfg file output
-#' @param element a string of element name, "N" for example
-#' @param pct a integer of element SIP abundance
-#' @param center a integer of mass window center
-#' @param width a integer of mass half window width
-#' @return a bool value if generate succeed or not
-#' @examples
-#' cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
-#' tmp <- tempdir()
-#' tmp <- file.path(tmp, "configs")
-#' generateOneCFG(cfg, tmp, "N", 50, 0, 2)
-#' list.files(tmp, full.names = TRUE)
-#' @export
-generateOneCFG <- function(cfgPath, outPath, element, pct, center, width) {
-    .Call(`_Aerith_generateOneCFG`, cfgPath, outPath, element, pct, center, width)
-}
-
-#' generateCFGs
-#' @param cfgPath a full path of .cfg file
-#' @param outPath a full path for .cfg file output
-#' @param element a string of element name, "N" for example
-#' @return a bool value if generate succeed or not
-#' @examples
-#' cfg <- system.file("extdata", "SiprosConfig.cfg", package = "Aerith")
-#' tmp <- tempdir()
-#' tmp <- file.path(tmp, "configs")
-#' generateCFGs(cfg, tmp, "N")
-#' list.files(tmp, full.names = TRUE)
-#' @export
-generateCFGs <- function(cfgPath, outPath, element) {
-    .Call(`_Aerith_generateCFGs`, cfgPath, outPath, element)
 }
 
 #' @title Precursor Peak Calculator
@@ -249,12 +216,16 @@ precursor_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
 
 #' Simple calculator of C H O N P S atom count of peptide
 #' @param AAstrs a CharacterVector of peptides
+#' @param pool Atom pool to count: `"total"` (default), `"sip"`, `"natural"`,
+#' `"reagent"`, or `"solvent"`. Natural is the sum of reagent and solvent atoms.
+#' @details Cysteine is IAA-blocked by default. An explicit `C/` annotation
+#' represents the same fixed modification and is counted once.
 #' @return a dataframe of C H O N P S atom count each row is for one peptide
 #' @export
 #' @examples
 #' df <- calPepAtomCount(c("HKFL","ADCH"))
-calPepAtomCount <- function(AAstrs) {
-    .Call(`_Aerith_calPepAtomCount`, AAstrs)
+calPepAtomCount <- function(AAstrs, pool = "total") {
+    .Call(`_Aerith_calPepAtomCount`, AAstrs, pool)
 }
 
 #' Simple calculator of C H O N P S atom count and mass without isotope of B Y ions
@@ -267,7 +238,10 @@ calBYAtomCountAndBaseMass <- function(AAstrs) {
     .Call(`_Aerith_calBYAtomCountAndBaseMass`, AAstrs)
 }
 
-#' Simple calculator of peptide precursor mass by binomial NP
+#' Estimate a representative precursor isotope mass
+#' @details Uses the nominal shift of the isotope envelope's most abundant
+#' peak and the mean isotope spacing across all atom sources.
+#' This is an estimate of the modal peak mass.
 #' @param AAstrs a CharacterVector of peptides
 #' @param Atom a Character of "C13", "H2", "O18", "N15", or "S34"
 #' @param Probs a NumericVector with the same length of AAstr for SIP abundances
@@ -291,19 +265,6 @@ calPepNeutronMass <- function(AAstrs, Atom, Probs) {
     .Call(`_Aerith_calPepNeutronMass`, AAstrs, Atom, Probs)
 }
 
-#' Simple peak calculator of user defined isotopic distribution of one peptide by averagine
-#' @param AAstrs a CharacterVector of peptides
-#' @param Atom a CharacterVector C13 or N15
-#' @param Prob a NumericVector for its abundance
-#' @return a list of DataFrames of spectra
-#' @examples
-#' demoSpectra <- precursor_peak_calculator_DIY_averagine(c("PEPTIDE", "ACDEFGHIK"), "C13", 0.25)
-#' demoSpectra[[1]]
-#' @export
-precursor_peak_calculator_DIY_averagine <- function(AAstrs, Atom, Prob) {
-    .Call(`_Aerith_precursor_peak_calculator_DIY_averagine`, AAstrs, Atom, Prob)
-}
-
 #' @title BY Ion Peak Calculator with User-Defined Isotopic Distribution
 #' @description This function calculates the isotopic distribution of B and Y ions for a given amino acid string with a user-defined isotopic distribution and returns a DataFrame containing the mass, probability, and type of each ion.
 #' @param AAstr A string representing the amino acid sequence.
@@ -317,6 +278,21 @@ precursor_peak_calculator_DIY_averagine <- function(AAstrs, Atom, Prob) {
 #' @export
 BYion_peak_calculator_DIY <- function(AAstr, Atom, Prob) {
     .Call(`_Aerith_BYion_peak_calculator_DIY`, AAstr, Atom, Prob)
+}
+
+#' Inspect Aerith's compiled parameters
+#' @description Returns a snapshot of the compiled peptide chemistry and SIP
+#' scoring defaults. Calculations initialize these
+#' parameters directly and do not read configuration files.
+#' @return A list containing the chemistry profile, fixed PTMs, source-specific
+#' residue formulas, isotope distributions, and scoring defaults.
+#' @examples
+#' parameters <- getAerithParameters()
+#' parameters$chemistryProfile
+#' parameters$residues$reagent["C", ]
+#' @export
+getAerithParameters <- function() {
+    .Call(`_Aerith_getAerithParameters`)
 }
 
 #' readOneScanMS2
@@ -822,4 +798,3 @@ writeAllScanMS1 <- function(header, scansList, ftFile) {
 writeAllScanMS2 <- function(header, scansList, ftFile) {
     .Call(`_Aerith_writeAllScanMS2`, header, scansList, ftFile)
 }
-

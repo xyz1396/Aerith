@@ -1,4 +1,34 @@
 
+# Aerith 1.1.2
+
+* Use release-compatible version numbering and exclude local build artifacts
+  and development configuration from package builds and Git status.
+
+# Aerith 1.1.1
+
+* Remove precursor_peak_calculator_DIY_averagine and its native entry point.
+  Use precursor_peak_calculator_DIY; no compatibility alias is provided.
+  Rename the remaining exact-composition helper to PeptideIsotopeCalculator.
+
+* Store compiled peptide chemistry in AerithParameters with
+  three atom sources: biosynthetic, reagent-natural, and digestion solvent.
+* Remove the bundled SiprosConfig.cfg, its parser, and generateOneCFG/generateCFGs.
+  All peptide calculations initialize compiled parameters without file fallback.
+* Add getAerithParameters and reagent/solvent pools to calPepAtomCount.
+* Keep fixed IAA, oxidation/deamidation reagent atoms, and terminal water natural;
+  use real phosphorus and proportional O/S isotope rescaling.
+* Reject unsupported isotopes and invalid abundances instead of returning defaults.
+* Use actual sourced formulas for precursor and B/Y spectra, including PTM losses,
+  and estimate precursor mass from the modal isotope shift.
+* Guard scan boundaries when annotating precursor and fragment isotope peaks.
+
+* Add a compact show method for AAspectra objects.
+* Fix invalid phosphorus isotope access and guard peak-array boundaries during
+  PSM feature extraction, including missing precursor scans and empty matches.
+* Retain the first peak when reading FT scans and support single-peak MGF files.
+* Avoid reading past peak arrays when denoising spectra.
+* Handle empty target or decoy protein-name lists without invalid string access.
+
 # Aerith 0.99.0
 
 * Initial submission to Bioconductor

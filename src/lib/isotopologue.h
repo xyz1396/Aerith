@@ -8,7 +8,8 @@
 #include <iomanip>
 #include <algorithm>
 #include <iostream>
-#include "proNovoConfig.h"
+
+#include "composition.h"
 
 using namespace std;
 
@@ -41,7 +42,8 @@ public:
 	~Isotopologue();
 
 	// setup all variables from configuration
-	bool setupIsotopologue(const string &sTable, const string &AtomNameInput);
+    void setupIsotopologue(const map<string, Composition> &residues,
+        const vector<IsotopeDistribution> &atoms);
 
 	// get the MostAbundant masses of  residues
 	bool getSingleResidueMostAbundantMasses(vector<string> &vsResidues, vector<double> &vdMostAbundantMasses, double &dTerminusMassN,
@@ -53,8 +55,9 @@ public:
 	double computeMonoisotopicMass(string sSequence);
 
 	// variables for this isotopologue
-	map<string, vector<int>> mResidueAtomicComposition;
+	map<string, Composition> mResidueCompositions;
 	vector<IsotopeDistribution> vAtomIsotopicDistribution;
+	vector<IsotopeDistribution> naturalAtomIsotopicDistribution;
 	map<string, IsotopeDistribution> vResidueIsotopicDistribution;
 
 	// emass functions for IsotopeDistribution's arithmetic
@@ -71,9 +74,16 @@ public:
 	// compute isotoptic distribution for an amino acid sequence
 	bool computeIsotopicDistribution(string sSequence, IsotopeDistribution &myIsotopeDistribution);
 
-	// compute isotoptic distribution for a given atomic composition,
-	// which can be that of a residue's or a amino acid sequence's
-	bool computeIsotopicDistribution(vector<int> AtomicComposition, IsotopeDistribution &myIsotopeDistribution);
+	bool computeIsotopicDistribution(const Composition &composition,
+        IsotopeDistribution &distribution);
+	Composition peptideComposition(const string &sequence) const;
+    std::pair<vector<Composition>, vector<Composition>> fragmentCompositions(
+        const string &sequence) const;
+	void refreshResidueDistributions();
+	// Estimate sample enrichment from a mean neutral-mass excess over the
+	// monoisotopic mass, accounting for both pools and other elements.
+	double estimateSIPAbundance(const Composition &composition,
+        size_t element, double meanMassExcess) const;
 
 	// compute the atomic composition for an amino acid sequence
 	bool computeAtomicComposition(string sSequence, vector<int> &myAtomicComposition);
@@ -101,19 +111,12 @@ private:
 
 	// when two peaks have a mass difference less than the MassPrecision
 	// they will be merged into one peak with their average mass and sum intensity
-	const double MassPrecision; // 0.01
+	double MassPrecision; // 0.01
 
 	// when a peak have a probability less than the ProbabilityCutoff
 	// this peak will be ingnored, which makes the total probability space less than 1
-	const double ProbabilityCutoff; // 1*10E-9
+	double ProbabilityCutoff; // 1*10E-9
 
-	// the name of atoms
-	string AtomName;
-
-	// the number of natural CHONPS and enriched CHONPS
-	unsigned int AtomNumber;
-
-	// Sipros Ensemble
 	// emass needs the mass to be one nucleus difference
 	bool CheckMass(vector<double> &vdMass, vector<double> &vdNaturalCompositionTemp);
 };

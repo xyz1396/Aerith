@@ -5,8 +5,8 @@
 
 MS2Scan::MS2Scan()
 {
-	dMassTolerance = ProNovoConfig::getMassAccuracyFragmentIon();
-	dProtonMass = ProNovoConfig::getProtonMass();
+	dMassTolerance = AerithParameters::current().getMassAccuracyFragmentIon();
+	dProtonMass = AerithParameters::current().getProtonMass();
 	inumberofWeightSumScore = 0;
 	dsumofSquareWeightSumScore = 0;
 	dsumofWeightScore = 0;
@@ -118,31 +118,31 @@ void MS2Scan::scoreWeightSum(Peptide *currentPeptide)
 	{
 		dYweight = 0;
 		dBweight = 0;
-		dExpectedMZ = currentPeptide->vdYionMasses[n] + ProNovoConfig::getProtonMass();
+		dExpectedMZ = currentPeptide->vdYionMasses[n] + AerithParameters::current().getProtonMass();
 		if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
-			dYweight = ProNovoConfig::scoreError(
+			dYweight = AerithParameters::current().scoreError(
 						   fabs(vdpreprocessedMZ[iIndex4MostAbundunt] - dExpectedMZ)) +
 					   vdpreprocessedIntensity[iIndex4MostAbundunt];
-		dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - n - 1] + ProNovoConfig::getProtonMass();
+		dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - n - 1] + AerithParameters::current().getProtonMass();
 		if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
-			dBweight = ProNovoConfig::scoreError(
+			dBweight = AerithParameters::current().scoreError(
 						   fabs(vdpreprocessedMZ[iIndex4MostAbundunt] - dExpectedMZ)) +
 					   vdpreprocessedIntensity[iIndex4MostAbundunt];
 		if (iParentChargeState >= 3)
 		{
 			if (vbFragmentZ2[n])
 			{
-				dExpectedMZ = (currentPeptide->vdYionMasses[n] + ProNovoConfig::getProtonMass() * 2) / 2;
+				dExpectedMZ = (currentPeptide->vdYionMasses[n] + AerithParameters::current().getProtonMass() * 2) / 2;
 				if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
-					dYweight += ProNovoConfig::scoreError(
+					dYweight += AerithParameters::current().scoreError(
 									fabs(vdpreprocessedMZ[iIndex4MostAbundunt] - dExpectedMZ)) +
 								vdpreprocessedIntensity[iIndex4MostAbundunt];
 			}
 			else
 			{
-				dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - n - 1] + ProNovoConfig::getProtonMass() * 2) / 2;
+				dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - n - 1] + AerithParameters::current().getProtonMass() * 2) / 2;
 				if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
-					dBweight += ProNovoConfig::scoreError(
+					dBweight += AerithParameters::current().scoreError(
 									fabs(vdpreprocessedMZ[iIndex4MostAbundunt] - dExpectedMZ)) +
 								vdpreprocessedIntensity[iIndex4MostAbundunt];
 			}
@@ -248,9 +248,9 @@ void MS2Scan::scoreRankSum(Peptide* currentPeptide)
 	for (i = 0; i < iNumFragments; i++)
 	{
 	    if (vbFragmentZ2[i])
-		dExpectedMZ = (currentPeptide->vdYionMasses[i]+ ProNovoConfig::getProtonMass()*2)/2;
+		dExpectedMZ = (currentPeptide->vdYionMasses[i]+ AerithParameters::current().getProtonMass()*2)/2;
 	    else
-		dExpectedMZ = currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass();
+		dExpectedMZ = currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass();
 	    if (searchMZ2D( dExpectedMZ, iIndex4MostAbundunt))
 		if (iIndex4MostAbundunt <= iUpperBound) 
 		    vSAllUnits[iIndex4MostAbundunt].match = true;
@@ -259,9 +259,9 @@ void MS2Scan::scoreRankSum(Peptide* currentPeptide)
 	    else
 		iUnOber++;
 	    if (!(vbFragmentZ2[i]))
-		dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass()*2)/2;
+		dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass()*2)/2;
 	    else
-		dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass();
+		dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass();
 	    if (searchMZ2D( dExpectedMZ, iIndex4MostAbundunt))
 		if (iIndex4MostAbundunt <= iUpperBound) 
 		    vSAllUnits[iIndex4MostAbundunt].match = true;
@@ -273,7 +273,7 @@ void MS2Scan::scoreRankSum(Peptide* currentPeptide)
     }else
 	for (i = 0; i < iNumFragments; i++)
 	{
-	    dExpectedMZ = currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass();
+	    dExpectedMZ = currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass();
 	    if (searchMZ2D( dExpectedMZ, iIndex4MostAbundunt))
 		if (iIndex4MostAbundunt <= iUpperBound) 
 		    vSAllUnits[iIndex4MostAbundunt].match = true;
@@ -281,7 +281,7 @@ void MS2Scan::scoreRankSum(Peptide* currentPeptide)
 		    iUnOber++;
 	    else
 		iUnOber++;
-	    dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass();
+	    dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass();
 	    if (searchMZ2D( dExpectedMZ, iIndex4MostAbundunt))
 		if (iIndex4MostAbundunt <= iUpperBound) 
 		    vSAllUnits[iIndex4MostAbundunt].match = true;
@@ -352,9 +352,9 @@ void MS2Scan::scoreRankSumHighMS2(Peptide *currentPeptide)
 		for (i = 0; i < iNumFragments; i++)
 		{
 			if (vbFragmentZ2[i])
-				dExpectedMZ = (currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass() * 2) / 2;
+				dExpectedMZ = (currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass() * 2) / 2;
 			else
-				dExpectedMZ = currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass();
+				dExpectedMZ = currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -363,9 +363,9 @@ void MS2Scan::scoreRankSumHighMS2(Peptide *currentPeptide)
 			else
 				iUnOberserve++;
 			if (!(vbFragmentZ2[i]))
-				dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass() * 2) / 2;
+				dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass() * 2) / 2;
 			else
-				dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass();
+				dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -378,7 +378,7 @@ void MS2Scan::scoreRankSumHighMS2(Peptide *currentPeptide)
 	else
 		for (i = 0; i < iNumFragments; i++)
 		{
-			dExpectedMZ = currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass();
+			dExpectedMZ = currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -386,7 +386,7 @@ void MS2Scan::scoreRankSumHighMS2(Peptide *currentPeptide)
 					iUnOberserve++;
 			else
 				iUnOberserve++;
-			dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass();
+			dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -454,9 +454,9 @@ void MS2Scan::scoreRankSum(Peptide *currentPeptide)
 		for (i = 0; i < iNumFragments; i++)
 		{
 			if (vbFragmentZ2[i])
-				dExpectedMZ = (currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass() * 2) / 2;
+				dExpectedMZ = (currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass() * 2) / 2;
 			else
-				dExpectedMZ = currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass();
+				dExpectedMZ = currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -465,9 +465,9 @@ void MS2Scan::scoreRankSum(Peptide *currentPeptide)
 			else
 				iUnOberserve++;
 			if (!(vbFragmentZ2[i]))
-				dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass() * 2) / 2;
+				dExpectedMZ = (currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass() * 2) / 2;
 			else
-				dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass();
+				dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -480,7 +480,7 @@ void MS2Scan::scoreRankSum(Peptide *currentPeptide)
 	else
 		for (i = 0; i < iNumFragments; i++)
 		{
-			dExpectedMZ = currentPeptide->vdYionMasses[i] + ProNovoConfig::getProtonMass();
+			dExpectedMZ = currentPeptide->vdYionMasses[i] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -488,7 +488,7 @@ void MS2Scan::scoreRankSum(Peptide *currentPeptide)
 					iUnOberserve++;
 			else
 				iUnOberserve++;
-			dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + ProNovoConfig::getProtonMass();
+			dExpectedMZ = currentPeptide->vdBionMasses[iNumFragments - i - 1] + AerithParameters::current().getProtonMass();
 			if (searchMZ2D(dExpectedMZ, iIndex4MostAbundunt))
 				if (iIndex4MostAbundunt <= iUpperBound)
 					vbMatch[iIndex4MostAbundunt] = true;
@@ -518,7 +518,7 @@ bool MS2Scan::mySUGreater(ScanUnit s1, ScanUnit s2)
 
 bool MS2Scan::searchMZ(const double &dTarget, int &iIndex4Found)
 {
-	double dErrRange = ProNovoConfig::getMassAccuracyFragmentIon();
+	double dErrRange = AerithParameters::current().getMassAccuracyFragmentIon();
 
 	if (dTarget > (vdpreprocessedMZ.back() + dErrRange))
 		return false;
@@ -534,7 +534,7 @@ bool MS2Scan::searchMZ(const double &dTarget, int &iIndex4Found)
 bool MS2Scan::searchMZ2D(const double &dTarget, int &iIndex4Found)
 {
 	bool bReVal = true;
-	double dErrRange = ProNovoConfig::getMassAccuracyFragmentIon();
+	double dErrRange = AerithParameters::current().getMassAccuracyFragmentIon();
 	double dCurrentIntensity = -1;
 	int i, iLowerBound, iUpperBound;
 	iIndex4Found = -1;
@@ -726,7 +726,7 @@ void MS2Scan::binCalculation()
 	// populate all vbPeakPresenceBins with false
 	//	vbPeakPresenceBins.resize(iBinNumber, false);
 	vbPeakPresenceBins.resize(iBinNumber, -1);
-	iBinRange = (unsigned long int)(ProNovoConfig::getMassAccuracyFragmentIon() * bin_res + SMALLINCREMENT); // + 1;
+	iBinRange = (unsigned long int)(AerithParameters::current().getMassAccuracyFragmentIon() * bin_res + SMALLINCREMENT); // + 1;
 	for (i = 0; i < (int)vdpreprocessedMZ.size(); i++)
 	{
 		iTarget = (unsigned long int)(vdpreprocessedMZ[i] * bin_res + SMALLINCREMENT);
@@ -748,7 +748,7 @@ void MS2Scan::binCalculation2D()
 	unsigned long int j;
 
 	vbPeakPresenceBins2D.clear();
-	dErrRange = ProNovoConfig::getMassAccuracyFragmentIon();
+	dErrRange = AerithParameters::current().getMassAccuracyFragmentIon();
 	iBinNumber = (unsigned long int)(vdpreprocessedMZ.back() + 10.0 + SMALLINCREMENT);
 	vbPeakPresenceBins2D.resize(iBinNumber, initalPair);
 	for (i = 0; i < (int)vdpreprocessedMZ.size(); i++)
@@ -1296,7 +1296,7 @@ void MS2Scan::scoreWeightSumHighMS2(Peptide *currentPeptide) //it's primaryScore
 		{
 			ProductIon currentIon;
 			currentIon.setProductIon('y', n + 1, z);
-			if (ProNovoConfig::getSearchType() == "SIP")
+			if (AerithParameters::current().getSearchType() == "SIP")
 			{
 				if (findProductIonSIP(currentPeptide->vvdYionMass[n], currentPeptide->vvdYionProb[n], z,
 									  dScoreWeight, dMZError, dMostAbundantObservedMZ, iMostAbundantPeakIndex))
@@ -1321,7 +1321,7 @@ void MS2Scan::scoreWeightSumHighMS2(Peptide *currentPeptide) //it's primaryScore
 		{
 			ProductIon currentIon;
 			currentIon.setProductIon('b', n + 1, z);
-			if (ProNovoConfig::getSearchType() == "SIP")
+			if (AerithParameters::current().getSearchType() == "SIP")
 			{
 				if (findProductIonSIP(currentPeptide->vvdBionMass[n], currentPeptide->vvdBionProb[n], z,
 									  dScoreWeight, dMZError, dMostAbundantObservedMZ, iMostAbundantPeakIndex))
@@ -1367,13 +1367,13 @@ void MS2Scan::scoreWeightSumHighMS2(Peptide *currentPeptide) //it's primaryScore
 			dBonus4ComplementaryFragmentObserved = 2.0;
 		else
 			dBonus4ComplementaryFragmentObserved = 1.0;
-		if (ProNovoConfig::getSearchType() == "SIP")
-			dScore += ProNovoConfig::scoreError(fabs(vFoundIons[i].getMZError() -
+		if (AerithParameters::current().getSearchType() == "SIP")
+			dScore += AerithParameters::current().scoreError(fabs(vFoundIons[i].getMZError() -
 													 dAverageMZError)) *
 					  vFoundIons[i].getScoreWeight() * dBonus4ComplementaryFragmentObserved;
 		else
 			// no mass error calibration
-			dScore += ProNovoConfig::scoreError(fabs(vFoundIons[i].getMZError())) * vFoundIons[i].getScoreWeight() * dBonus4ComplementaryFragmentObserved;
+			dScore += AerithParameters::current().scoreError(fabs(vFoundIons[i].getMZError())) * vFoundIons[i].getScoreWeight() * dBonus4ComplementaryFragmentObserved;
 
 		//cout<<dScore<<endl;
 	}
@@ -1458,7 +1458,7 @@ void ProductIon::setObservedInfo(double dMZErrorInput, double dWeightInput,
 	dMassError = dMZError * iCharge;
 	dScoreWeight = dWeightInput;
 	dMostAbundantMZ = dMostAbundantMZInput;
-	double dProtonMass = ProNovoConfig::getProtonMass();
+	double dProtonMass = AerithParameters::current().getProtonMass();
 	dMostAbundantMass = dMostAbundantMZ * iCharge - dProtonMass * iCharge;
 	iMostAbundantPeakIndex = iMostAbundantPeakIndexInput;
 }

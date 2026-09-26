@@ -119,7 +119,8 @@ plotScanFrequency <- function(info, binwidth = 1, breaks = seq(0, 200, by = 10))
 #' writeLines(readRDS(rds), demo_file)
 #' b <- readAllScanMS1(demo_file)
 #' b <- getRetentionTimeAndPrecursorInfo(b)
-#' plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) + plotScanFrequencyMS2(b, binwidth = 0.1)
+#' plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) +
+#'     plotScanFrequencyMS2(b, binwidth = 0.1)
 plotScanFrequencyMS2 <- function(info, binwidth = 1) {
     return(ggplot2::geom_freqpoly(data = info, binwidth = binwidth))
 }

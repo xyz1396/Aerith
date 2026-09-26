@@ -58,7 +58,9 @@ ft_file <- system.file("extdata", "demo_target_decoy.FT1.rds", package = "Aerith
 file_content <- readRDS(ft_file)
 writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
 pin_path <- file.path(tmp, "a.pin")
-extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
+extractPSMfeaturesTargetAndDecoytoPercolatorPin(
+    target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path
+)
 print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
 print(file.info(pin_path))
 }

@@ -4,16 +4,23 @@
 \alias{calPepAtomCount}
 \title{Simple calculator of C H O N P S atom count of peptide}
 \usage{
-calPepAtomCount(AAstrs)
+calPepAtomCount(AAstrs, pool = "total")
 }
 \arguments{
 \item{AAstrs}{a CharacterVector of peptides}
+
+\item{pool}{Atom pool to count: \code{"total"} (default), \code{"sip"}, \code{"natural"},
+\code{"reagent"}, or \code{"solvent"}. Natural is the sum of reagent and solvent atoms.}
 }
 \value{
 a dataframe of C H O N P S atom count each row is for one peptide
 }
 \description{
 Simple calculator of C H O N P S atom count of peptide
+}
+\details{
+Cysteine is IAA-blocked by default. An explicit \verb{C/} annotation
+represents the same fixed modification and is counted once.
 }
 \examples{
 df <- calPepAtomCount(c("HKFL","ADCH"))

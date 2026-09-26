@@ -79,9 +79,8 @@ private:
 List extractPSMfeatures(String Spe2PepFilePath, int topN,
                         String ftFilepath, int ThreadNumber = 3)
 {
-    // read default config
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    // Initialize compiled parameters.
+    AerithParameters::reset();
     PSMfeatureExtractor extractor;
     extractor.extractPSMfeatureParallel(Spe2PepFilePath, topN, ftFilepath, ThreadNumber);
     std::vector<sipPSM> &sipPSMs = extractor.mSpe2PepFileReader.sipPSMs;
@@ -192,9 +191,8 @@ List extractPSMfeatures(String Spe2PepFilePath, int topN,
 List extractPSMfeaturesTargetAndDecoy(String targetPath, String decoyPath, int topN,
                                       String ftFilepath, int ThreadNumber = 3)
 {
-    // read default config
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    // Initialize compiled parameters.
+    AerithParameters::reset();
     PSMfeatureExtractor extractor;
     extractor.extractPSMfeatureParallel(targetPath, decoyPath, topN, ftFilepath, ThreadNumber);
     std::vector<sipPSM> &sipPSMs = extractor.mSpe2PepFileReader.sipPSMs;
@@ -301,7 +299,9 @@ List extractPSMfeaturesTargetAndDecoy(String targetPath, String decoyPath, int t
 //' file_content <- readRDS(ft_file)
 //' writeLines(file_content, file.path(ft_dir, "Pan_052322_X13.FT1"))
 //' pin_path <- file.path(tmp, "a.pin")
-//' extractPSMfeaturesTargetAndDecoytoPercolatorPin(target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path)
+//' extractPSMfeaturesTargetAndDecoytoPercolatorPin(
+//'     target_dir, decoy_dir, 3, ft_dir, 3, FALSE, pin_path
+//' )
 //' print(list.files(c(ft_dir, target_dir, decoy_dir), full.names = TRUE, recursive = TRUE))
 //' print(file.info(pin_path))
 //' @export
@@ -312,9 +312,8 @@ void extractPSMfeaturesTargetAndDecoytoPercolatorPin(String targetPath, String d
                                                      bool doProteinInference = false,
                                                      String fileName = "a.pin")
 {
-    // read default config
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    // Initialize compiled parameters.
+    AerithParameters::reset();
     PSMfeatureExtractor extractor;
     extractor.extractPSMfeatureParallel(targetPath, decoyPath, topN, ftFilepath, ThreadNumber);
     extractor.writePecorlatorPin(fileName, doProteinInference);

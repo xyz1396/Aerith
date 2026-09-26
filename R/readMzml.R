@@ -250,7 +250,8 @@ readMgf <- function(mgf) {
 
         peakTable <- tryCatch(
             data.table::fread(
-                text = paste(peakLines, collapse = "\n"),
+                # Keep a single peak row recognizable as inline table data.
+                text = paste0(paste(peakLines, collapse = "\n"), "\n"),
                 header = FALSE,
                 col.names = c("mz", "intensity"),
                 colClasses = c("numeric", "numeric"),

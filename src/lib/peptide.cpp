@@ -45,7 +45,7 @@ void Peptide::calculateExpectedFragments(const string &sNewPeptide, const map<ch
 			break;
 		iter = mapResidueMass.find(sNewPeptide[i]);
 		if (iter == mapResidueMass.end())
-			Rcpp::Rcerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the config." << endl;
+			Rcpp::Rcerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the compiled chemistry." << endl;
 		else if (isalpha(sNewPeptide[i]))
 		{
 			// this is an amino acid residue
@@ -68,11 +68,11 @@ void Peptide::calculateExpectedFragments(const string &sNewPeptide, const map<ch
 			// this is PTM to the C terminus
 			iter = mapResidueMass.find(sNewPeptide[i]);
 			if (iter == mapResidueMass.end())
-				Rcpp::Rcerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the config." << endl;
+				Rcpp::Rcerr << "WARNING: Residue " << sNewPeptide[i] << " Peptide " << sNewPeptide << " is not defined in the compiled chemistry." << endl;
 			else
 				dMass = dMass + iter->second;
 		}
-	dMass = dMass + ProNovoConfig::getTerminusMassC() + ProNovoConfig::getTerminusMassN();
+	dMass = dMass + AerithParameters::current().getTerminusMassC() + AerithParameters::current().getTerminusMassN();
 	vdBionMasses.pop_back();
 	for (i = vdBionMasses.size() - 1; i >= 0; --i)
 		vdYionMasses.push_back(dMass - vdBionMasses[i]);
@@ -80,7 +80,7 @@ void Peptide::calculateExpectedFragments(const string &sNewPeptide, const map<ch
 
 void Peptide::calculateIsotope(const string &sNewPeptide, const map<char, double> &mapResidueMass)
 {
-	ProNovoConfig::configIsotopologue.computeProductIon(sNewPeptide,
+	AerithParameters::current().isotopologue.computeProductIon(sNewPeptide,
 														vvdYionMass, vvdYionProb, vvdBionMass, vvdBionProb);
 }
 
@@ -108,7 +108,7 @@ string Peptide::neutralLossProcess(const string &sCurrentPeptide)
 	vector<pair<string, string>> vpNeutralLossList;
 	size_t i, listLength, pos;
 	sNewPeptide = sCurrentPeptide;
-	vpNeutralLossList = ProNovoConfig::getNeutralLossList();
+	vpNeutralLossList = AerithParameters::current().getNeutralLossList();
 	//   cout<<"!!!"<<endl;
 	//   cout<< sNewPeptide <<endl;
 	listLength = vpNeutralLossList.size();

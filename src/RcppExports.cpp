@@ -118,35 +118,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// generateOneCFG
-bool generateOneCFG(String cfgPath, String outPath, String element, int pct, int center, int width);
-RcppExport SEXP _Aerith_generateOneCFG(SEXP cfgPathSEXP, SEXP outPathSEXP, SEXP elementSEXP, SEXP pctSEXP, SEXP centerSEXP, SEXP widthSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< String >::type cfgPath(cfgPathSEXP);
-    Rcpp::traits::input_parameter< String >::type outPath(outPathSEXP);
-    Rcpp::traits::input_parameter< String >::type element(elementSEXP);
-    Rcpp::traits::input_parameter< int >::type pct(pctSEXP);
-    Rcpp::traits::input_parameter< int >::type center(centerSEXP);
-    Rcpp::traits::input_parameter< int >::type width(widthSEXP);
-    rcpp_result_gen = Rcpp::wrap(generateOneCFG(cfgPath, outPath, element, pct, center, width));
-    return rcpp_result_gen;
-END_RCPP
-}
-// generateCFGs
-bool generateCFGs(String cfgPath, String outPath, String element);
-RcppExport SEXP _Aerith_generateCFGs(SEXP cfgPathSEXP, SEXP outPathSEXP, SEXP elementSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< String >::type cfgPath(cfgPathSEXP);
-    Rcpp::traits::input_parameter< String >::type outPath(outPathSEXP);
-    Rcpp::traits::input_parameter< String >::type element(elementSEXP);
-    rcpp_result_gen = Rcpp::wrap(generateCFGs(cfgPath, outPath, element));
-    return rcpp_result_gen;
-END_RCPP
-}
 // precursor_peak_calculator
 DataFrame precursor_peak_calculator(String AAstr);
 RcppExport SEXP _Aerith_precursor_peak_calculator(SEXP AAstrSEXP) {
@@ -185,13 +156,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // calPepAtomCount
-DataFrame calPepAtomCount(StringVector AAstrs);
-RcppExport SEXP _Aerith_calPepAtomCount(SEXP AAstrsSEXP) {
+DataFrame calPepAtomCount(StringVector AAstrs, String pool);
+RcppExport SEXP _Aerith_calPepAtomCount(SEXP AAstrsSEXP, SEXP poolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< StringVector >::type AAstrs(AAstrsSEXP);
-    rcpp_result_gen = Rcpp::wrap(calPepAtomCount(AAstrs));
+    Rcpp::traits::input_parameter< String >::type pool(poolSEXP);
+    rcpp_result_gen = Rcpp::wrap(calPepAtomCount(AAstrs, pool));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -232,19 +204,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// precursor_peak_calculator_DIY_averagine
-List precursor_peak_calculator_DIY_averagine(StringVector AAstrs, String Atom, double Prob);
-RcppExport SEXP _Aerith_precursor_peak_calculator_DIY_averagine(SEXP AAstrsSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< StringVector >::type AAstrs(AAstrsSEXP);
-    Rcpp::traits::input_parameter< String >::type Atom(AtomSEXP);
-    Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
-    rcpp_result_gen = Rcpp::wrap(precursor_peak_calculator_DIY_averagine(AAstrs, Atom, Prob));
-    return rcpp_result_gen;
-END_RCPP
-}
 // BYion_peak_calculator_DIY
 DataFrame BYion_peak_calculator_DIY(String AAstr, String Atom, double Prob);
 RcppExport SEXP _Aerith_BYion_peak_calculator_DIY(SEXP AAstrSEXP, SEXP AtomSEXP, SEXP ProbSEXP) {
@@ -255,6 +214,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type Atom(AtomSEXP);
     Rcpp::traits::input_parameter< double >::type Prob(ProbSEXP);
     rcpp_result_gen = Rcpp::wrap(BYion_peak_calculator_DIY(AAstr, Atom, Prob));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getAerithParameters
+List getAerithParameters();
+RcppExport SEXP _Aerith_getAerithParameters() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(getAerithParameters());
     return rcpp_result_gen;
 END_RCPP
 }
@@ -658,17 +627,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Aerith_getFilterThreshold", (DL_FUNC) &_Aerith_getFilterThreshold, 2},
     {"_Aerith_getFilterThresholdTopPSMs", (DL_FUNC) &_Aerith_getFilterThresholdTopPSMs, 3},
     {"_Aerith_getFilterThresholdTopPSMsSpe2Pep", (DL_FUNC) &_Aerith_getFilterThresholdTopPSMsSpe2Pep, 4},
-    {"_Aerith_generateOneCFG", (DL_FUNC) &_Aerith_generateOneCFG, 6},
-    {"_Aerith_generateCFGs", (DL_FUNC) &_Aerith_generateCFGs, 3},
     {"_Aerith_precursor_peak_calculator", (DL_FUNC) &_Aerith_precursor_peak_calculator, 1},
     {"_Aerith_residue_peak_calculator_DIY", (DL_FUNC) &_Aerith_residue_peak_calculator_DIY, 3},
     {"_Aerith_precursor_peak_calculator_DIY", (DL_FUNC) &_Aerith_precursor_peak_calculator_DIY, 3},
-    {"_Aerith_calPepAtomCount", (DL_FUNC) &_Aerith_calPepAtomCount, 1},
+    {"_Aerith_calPepAtomCount", (DL_FUNC) &_Aerith_calPepAtomCount, 2},
     {"_Aerith_calBYAtomCountAndBaseMass", (DL_FUNC) &_Aerith_calBYAtomCountAndBaseMass, 1},
     {"_Aerith_calPepPrecursorMass", (DL_FUNC) &_Aerith_calPepPrecursorMass, 3},
     {"_Aerith_calPepNeutronMass", (DL_FUNC) &_Aerith_calPepNeutronMass, 3},
-    {"_Aerith_precursor_peak_calculator_DIY_averagine", (DL_FUNC) &_Aerith_precursor_peak_calculator_DIY_averagine, 3},
     {"_Aerith_BYion_peak_calculator_DIY", (DL_FUNC) &_Aerith_BYion_peak_calculator_DIY, 3},
+    {"_Aerith_getAerithParameters", (DL_FUNC) &_Aerith_getAerithParameters, 0},
     {"_Aerith_readOneScanMS2", (DL_FUNC) &_Aerith_readOneScanMS2, 2},
     {"_Aerith_readOneScanMS1", (DL_FUNC) &_Aerith_readOneScanMS1, 2},
     {"_Aerith_readFTheader", (DL_FUNC) &_Aerith_readFTheader, 1},

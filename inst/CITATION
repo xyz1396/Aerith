@@ -1,7 +1,6 @@
-citHeader("Please cite Aerith using both references below:")
-
-citEntry(
-    entry = "Article",
+bibentry(
+    bibtype = "Article",
+    header = "Please cite Aerith as:",
     title = "Aerith: Visualization and Annotation of Isotopic Enrichment Patterns of Peptides and Metabolites with Stable Isotope Labeling from Proteomics and Metabolomics",
     author = c(
         person("Yi", "Xiong"),

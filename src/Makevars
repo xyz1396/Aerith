@@ -7,12 +7,12 @@ PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
 
 OBJECTS = RcppExports.o extractPSMfeatures.o filterPSMs.o filterPeptides.o \
-	generateCFG.o getISOpeak.o readScan.o readScans.o readSips.o \
+	getISOpeak.o readScan.o readScans.o readSips.o \
 	readSpe2Peps.o scorePSM.o writeScans.o \
 	lib/PSMfeatureExtractor.o lib/PSMpeakAnnotator.o lib/PSMsFiltrator.o \
-	lib/Spe2PepFileReader.o lib/averagine.o lib/cfgParser.o \
+	lib/Spe2PepFileReader.o lib/PeptideIsotopeCalculator.o \
 	lib/ftFileReader.o lib/ftFileWriter.o lib/isotopologue.o lib/ms2scan.o \
-	lib/peptide.o lib/peptidesFiltrator.o lib/proNovoConfig.o \
+	lib/peptide.o lib/peptidesFiltrator.o lib/parameters.o \
 	lib/sipFileReader.o lib/sipGenerator.o lib/sipPSM.o
 
 # Make the shared object

@@ -26,6 +26,26 @@ setClass("AAspectra",
     )
 )
 
+#' Show an annotated mass spectrum
+#'
+#' @param object An [AAspectra-class] object.
+#' @return Returns `NULL` invisibly, after printing a compact spectrum summary.
+#' @importFrom methods show
+#' @export
+#' @examples
+#' show(getPrecursorSpectra("KHRIP", 1:2))
+setMethod("show", "AAspectra", function(object) {
+    cat("AAspectra\n")
+    cat("  Sequence/label:",
+        if (length(object@AAstr)) paste(object@AAstr, collapse = ", ")
+        else "(none)", "\n")
+    cat("  Peaks:", nrow(object@spectra), "\n")
+    cat("  Charges:",
+        if (length(object@charges)) paste(object@charges, collapse = ", ")
+        else "(none)", "\n")
+    invisible(NULL)
+})
+
 #' add MZ to spectra data.frame
 #'
 #' @param spectra a dataframe of spectra
@@ -351,7 +371,7 @@ plotSipBYionLabel <- function(spect) {
 #' plot real scan layer under the B Y ion peaks
 #'
 #' @param spect AAspectra object of real scan
-#' @param linewidth
+#' @param linewidth Numeric width of the observed peaks. Default is 0.1.
 #'
 #' @return ggplot2 layer
 #' @export

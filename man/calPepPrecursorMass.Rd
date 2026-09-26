@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{calPepPrecursorMass}
 \alias{calPepPrecursorMass}
-\title{Simple calculator of peptide precursor mass by binomial NP}
+\title{Estimate a representative precursor isotope mass}
 \usage{
 calPepPrecursorMass(AAstrs, Atom, Probs)
 }
@@ -17,7 +17,12 @@ calPepPrecursorMass(AAstrs, Atom, Probs)
 a vector of peptide precursor masses
 }
 \description{
-Simple calculator of peptide precursor mass by binomial NP
+Estimate a representative precursor isotope mass
+}
+\details{
+Uses the nominal shift of the isotope envelope's most abundant
+peak and the mean isotope spacing across all atom sources.
+This is an estimate of the modal peak mass.
 }
 \examples{
 masses <- calPepPrecursorMass(c("HKFL", "ADCH"), "C13", c(0.2, 0.3))

@@ -6,7 +6,7 @@ output:
     toc_float: true
     theme: united
 vignette: >
-  %\VignetteIndexEntry{Score-function-test-of-PSM}
+  %\VignetteIndexEntry{Score function test of PSM}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,5 +1,16 @@
 context("readMgf")
 
+test_that("readMgf parses a single peak", {
+    file <- tempfile(fileext = ".mgf")
+    on.exit(unlink(file))
+    writeLines(c("BEGIN IONS", "SCANS=1", "RTINSECONDS=60",
+        "PEPMASS=500.2", "CHARGE=2+", "100 200", "END IONS"), file)
+
+    scan <- readMgf(file)[[1]]
+    expect_equal(scan$peaks$mz, 100)
+    expect_equal(scan$peaks$intensity, 200)
+})
+
 test_that("readMgf parses the demo MGF file", {
     demo_file <- system.file("extdata", "demo.mgf", package = "Aerith")
     mgf <- readMgf(demo_file)

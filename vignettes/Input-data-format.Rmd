@@ -6,7 +6,7 @@ output:
     toc_float: true
     theme: united
 vignette: >
-  %\VignetteIndexEntry{Input-data-format}
+  %\VignetteIndexEntry{Input Data Format and File Handling in Aerith}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

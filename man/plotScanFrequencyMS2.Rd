@@ -26,5 +26,6 @@ demo_file <- tempfile(fileext = ".FT1")
 writeLines(readRDS(rds), demo_file)
 b <- readAllScanMS1(demo_file)
 b <- getRetentionTimeAndPrecursorInfo(b)
-plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) + plotScanFrequencyMS2(b, binwidth = 0.1)
+plotScanFrequency(a, binwidth = 0.1, breaks = seq(9, 10, by = 0.2)) +
+    plotScanFrequencyMS2(b, binwidth = 0.1)
 }

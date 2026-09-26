@@ -53,7 +53,6 @@ void sipFileReader::fillVectors()
 
 void sipFileReader::readOneFile(std::string sipFileName)
 {
-    setlocale(LC_ALL, "C");
     std::ios_base::sync_with_stdio(false);
     if (fs::exists(sipFileName))
     {

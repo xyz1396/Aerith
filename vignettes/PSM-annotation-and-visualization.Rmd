@@ -6,7 +6,7 @@ output:
     toc_float: true
     theme: united
 vignette: >
-  %\VignetteIndexEntry{PSM-annotation-and-visualization}
+  %\VignetteIndexEntry{PSM Annotation and Visualization}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

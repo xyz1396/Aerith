@@ -51,8 +51,8 @@ std::tuple<int, bool, std::string> PSMsFiltrator::detectProDecoy(const std::stri
 			decoyCount++;
 		}
 	}
-	decoyName.pop_back();
-	targetName.pop_back();
+	if (!decoyName.empty()) decoyName.pop_back();
+	if (!targetName.empty()) targetName.pop_back();
 	if (isDecoy)
 		return {decoyCount, true, decoyName};
 	else

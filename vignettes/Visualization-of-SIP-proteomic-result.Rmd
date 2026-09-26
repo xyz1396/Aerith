@@ -6,7 +6,7 @@ output:
     toc_float: true
     theme: united
 vignette: >
-  %\VignetteIndexEntry{Visualization-of-SIP-proteomic-result}
+  %\VignetteIndexEntry{Visualization of SIP proteomic result}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,7 +1,7 @@
 #pragma once
 #include "Spe2PepFileReader.h"
 #include "ftFileReader.h"
-#include "averagine.h"
+#include "PeptideIsotopeCalculator.h"
 #include "isotopicPeak.h"
 #include <unordered_map>
 #ifdef _OPENMP
@@ -14,7 +14,7 @@ class PSMfeatureExtractor
 public:
     PSMfeatureExtractor();
     Spe2PepFileReader mSpe2PepFileReader;
-    averagine mAveragine = averagine();
+    PeptideIsotopeCalculator peptideCalculator;
     std::vector<Scan> FT1Scans;
     std::vector<Scan> FT2Scans;
     sipPSM *mSipPSM;

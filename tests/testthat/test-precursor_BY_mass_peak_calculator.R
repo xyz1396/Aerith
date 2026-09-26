@@ -1,5 +1,15 @@
 context("precursor_BY_mass_peak_calculator")
 
+test_that("monoisotopic phosphorus contributes no isotope mass shift", {
+  # PEPTIDE has C34 H53 O15 N7 and no sulfur or phosphorus.
+  isotope_counts <- c(34 * 0.0107, 53 * 0.000115,
+    15 * 0.00038, 15 * 0.00205, 7 * 0.00368)
+  isotope_shifts <- c(1.003355, 1.006277, 1.004217, 2.004245, 0.997035)
+  expected <- sum(isotope_counts * isotope_shifts) /
+    sum(isotope_counts * c(1, 1, 1, 2, 1))
+  expect_equal(calPepNeutronMass("PEPTIDE", "C13", 0.0107), expected)
+})
+
 test_that("peak_calculator works", {
   print(precursor_peak_calculator("SRKSD"))
   expect_length(precursor_peak_calculator("SRKSD"), 2)

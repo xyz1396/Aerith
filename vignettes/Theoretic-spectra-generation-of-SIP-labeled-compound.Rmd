@@ -6,7 +6,7 @@ output:
     toc_float: true
     theme: united
 vignette: >
-  %\VignetteIndexEntry{Theoretic-spectra-generation-of-SIP-labeled-compound}
+  %\VignetteIndexEntry{Theoretic spectra generation of SIP-labeled compound}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

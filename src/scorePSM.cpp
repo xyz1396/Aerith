@@ -89,8 +89,8 @@ public:
         else
         {
             // deductionCoefficient is -0.55 when 13Cpct=0 , -0.05 when 13Cpct=0.5
-            // Rcout << ProNovoConfig::getDeductionCoefficient() << endl;
-            return ProNovoConfig::getDeductionCoefficient() * expectedIntensity;
+            // Rcout << AerithParameters::current().getDeductionCoefficient() << endl;
+            return AerithParameters::current().getDeductionCoefficient() * expectedIntensity;
         }
     };
 
@@ -270,7 +270,7 @@ public:
             {
                 ProductIon currentIon;
                 currentIon.setProductIon('y', n + 1, z);
-                if (ProNovoConfig::getSearchType() == "SIP")
+                if (AerithParameters::current().getSearchType() == "SIP")
                 {
                     if (findProductIonSIP(currentPeptide->vvdYionMass[n], currentPeptide->vvdYionProb[n], z,
                                           dScoreWeight, dMZError, dMostAbundantObservedMZ, iMostAbundantPeakIndex))
@@ -295,7 +295,7 @@ public:
             {
                 ProductIon currentIon;
                 currentIon.setProductIon('b', n + 1, z);
-                if (ProNovoConfig::getSearchType() == "SIP")
+                if (AerithParameters::current().getSearchType() == "SIP")
                 {
                     if (findProductIonSIP(currentPeptide->vvdBionMass[n], currentPeptide->vvdBionProb[n], z,
                                           dScoreWeight, dMZError, dMostAbundantObservedMZ, iMostAbundantPeakIndex))
@@ -341,13 +341,13 @@ public:
                 dBonus4ComplementaryFragmentObserved = 2.0;
             else
                 dBonus4ComplementaryFragmentObserved = 1.0;
-            if (ProNovoConfig::getSearchType() == "SIP")
-                dScore += ProNovoConfig::scoreError(fabs(vFoundIons[i].getMZError() -
+            if (AerithParameters::current().getSearchType() == "SIP")
+                dScore += AerithParameters::current().scoreError(fabs(vFoundIons[i].getMZError() -
                                                          dAverageMZError)) *
                           vFoundIons[i].getScoreWeight() * dBonus4ComplementaryFragmentObserved;
             else
                 // no mass error calibration
-                dScore += ProNovoConfig::scoreError(fabs(vFoundIons[i].getMZError())) * vFoundIons[i].getScoreWeight() * dBonus4ComplementaryFragmentObserved;
+                dScore += AerithParameters::current().scoreError(fabs(vFoundIons[i].getMZError())) * vFoundIons[i].getScoreWeight() * dBonus4ComplementaryFragmentObserved;
 
             // cout<<dScore<<endl;
         }
@@ -370,9 +370,8 @@ public:
 double scoreIntensity(const bool observed, const double realIntensity, const double expectedIntensity,
                       const String &Atom, double Prob)
 {
-    // read default config
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    // Initialize compiled parameters.
+    AerithParameters::reset();
     // compute residue mass and prob again
     computeResidueMassIntensityAgain(Atom, Prob);
     ms2scanWithNewScoreFunction myScan;
@@ -414,14 +413,13 @@ double scorePSM(const NumericVector &realMZ, const NumericVector &realIntensity,
                 const NumericVector &realCharge, int parentCharge,
                 const String &pepSeq, const String &Atom, double Prob)
 {
-    // read default config
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    // Initialize compiled parameters.
+    AerithParameters::reset();
     // compute residue mass and prob again
     computeResidueMassIntensityAgain(Atom, Prob);
-    ProNovoConfig::setDeductionCoefficient();
+    AerithParameters::current().setDeductionCoefficient();
     // for test
-    // Rcout << ProNovoConfig::getSetMinValue() << "\t" << ProNovoConfig::getSetFold() << endl;
+    // Rcout << AerithParameters::current().deductionMinValue << "\t" << AerithParameters::current().deductionFold << endl;
     Peptide myPep;
     string sOriginalPeptide = "", sProteinName = "";
     int ibeginPos = 0;
@@ -505,9 +503,8 @@ List annotatePSM(const NumericVector &realMZ, const NumericVector &realIntensity
                  const String &Atom, double Prob,
                  const double isoCenter = 0, const double isoWidth = 0, const bool calScores = false)
 {
-    // read default config
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    // Initialize compiled parameters.
+    AerithParameters::reset();
     // compute residue mass and prob again
     computeResidueMassIntensityAgain(Atom, Prob);
     Scan mScan;
@@ -580,8 +577,7 @@ List annotatePrecursor(const NumericVector &realMZ, const NumericVector &realInt
                        const String &Atom, double Prob,
                        const double isoCenter = 0, const double isoWidth = 0, const bool calScores = false)
 {
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    AerithParameters::reset();
     computeResidueMassIntensityAgain(Atom, Prob);
     Scan mScan;
     mScan.mz = as<vector<double>>(realMZ);
@@ -641,9 +637,8 @@ List annotatePrecursor(const NumericVector &realMZ, const NumericVector &realInt
 double scorePSMsimple(const NumericVector &realMZ, const NumericVector &realIntensity,
                    const NumericVector &realCharge, int parentCharge, const String &pepSeq, const String &Atom, double Prob)
 {
-    // read default config
-    string config = get_extdata();
-    ProNovoConfig::setFilename(config);
+    // Initialize compiled parameters.
+    AerithParameters::reset();
     // compute residue mass and prob again
     computeResidueMassIntensityAgain(Atom, Prob);
     Peptide myPep;

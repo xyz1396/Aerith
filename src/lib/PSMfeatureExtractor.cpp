@@ -432,8 +432,6 @@ void PSMfeatureExtractor::extractPSMfeatureParallel(
     int num_threads = std::min(num_cores, 10);
     num_threads = std::min(num_threads, threadNumber);
     omp_set_num_threads(num_threads);
-    // Enable nested parallelism
-    omp_set_nested(1);
 #endif
 #pragma omp parallel for
     for (size_t i = 0; i < mSpe2PepFileReader.FT2s.size(); i++) {

@@ -1,4 +1,9 @@
 
+# Aerith 1.1.3
+
+* Avoid a Windows OpenMP runtime crash during PSM feature extraction by no
+  longer enabling unused nested parallelism.
+
 # Aerith 1.1.2
 
 * Use release-compatible version numbering and exclude local build artifacts
